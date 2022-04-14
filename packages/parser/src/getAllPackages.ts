@@ -28,7 +28,10 @@ export async function getAllPackages(monorepoRoot: MonorepoRoot): Promise<Packag
     }
 
     const mrlintFiles = await promisifiedGlob(
-        `${monorepoRoot.fullPath}/${rootPackageJson.workspaces.join("|")}/.mrlint.json`
+        `${monorepoRoot.fullPath}/${rootPackageJson.workspaces.join("|")}/.mrlint.json`,
+        {
+            ignore: "**/node_modules/**",
+        }
     );
     for (const mrlintFile of mrlintFiles) {
         const packageDirectory = path.dirname(mrlintFile);
