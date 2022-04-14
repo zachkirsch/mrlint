@@ -1,6 +1,6 @@
 import { Logger, Package, PackageType, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
-import produce from "immer";
-import { IPackageJson } from "package-json-type";
+import produce, { Draft } from "immer";
+import { IPackageJson, IScriptsMap } from "package-json-type";
 import path from "path";
 import { Executable, EXECUTABLES, Executables, RequiredDependency } from "../utils/Executables";
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
@@ -99,60 +99,19 @@ function generatePackageJson({
         draft.files = ["lib"];
 
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-            const packageNameWithoutScope = oldPackageJson.name.slice(oldPackageJson.name.indexOf("/") + 1);
-            draft.bin = {
-                [packageNameWithoutScope]: "./cli",
-            };
+            draft.bin = "./cli";
         }
 
-        draft.scripts = {
-            clean: `${executables.get(Executable.TSC)} --build --clean`,
-            compile: `${executables.get(Executable.TSC)} --build`,
-            test: `${executables.get(Executable.JEST)} --passWithNoTests`,
-            "lint:eslint": `${executables.get(
-                Executable.ESLINT
-            )} --max-warnings 0 . --ignore-path=${pathToEslintIgnore}`,
-            "lint:eslint:fix": `${executables.get(
-                Executable.ESLINT
-            )} --max-warnings 0 . --ignore-path=${pathToEslintIgnore} --fix`,
-            "lint:style": `${executables.get(Executable.STYLELINT)} '**/*.scss' --allow-empty-input --max-warnings 0`,
-            "lint:style:fix": `${executables.get(
-                Executable.STYLELINT
-            )} '**/*.scss' --allow-empty-input --max-warnings 0 --fix`,
-            format: `${executables.get(
-                Executable.PRETTIER
-            )} --write --ignore-unknown --ignore-path ${pathToPrettierIgnore} "**"`,
-            "format:check": `${executables.get(
-                Executable.PRETTIER
-            )} --check --ignore-unknown --ignore-path ${pathToPrettierIgnore} "**"`,
-            depcheck: executables.get(Executable.DEPCHECK),
-        };
-
-        if (!packageToLint.config.private) {
-            draft.scripts.prepublish =
-                "run clean && run compile && run test && run lint:eslint && run lint:style && run format:check && run depcheck";
-        }
+        addScripts({
+            draft,
+            executables,
+            pathToEslintIgnore,
+            pathToPrettierIgnore,
+            packageToLint,
+            oldPackageJson,
+        });
 
         if (packageToLint.config.type === PackageType.REACT_APP) {
-            draft.scripts = {
-                ...draft.scripts,
-                start: `${executables.get(Executable.ENV_CMD)} -e development ${executables.get(
-                    Executable.ENV_CMD
-                )} -f .env.local --silent craco start`,
-                "build:staging": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=STAGING ${executables.get(
-                    Executable.ENV_CMD
-                )} -e development craco --max_old_space_size=4096 build`,
-                "build:production": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=PRODUCTION ${executables.get(
-                    Executable.ENV_CMD
-                )} -e production craco --max_old_space_size=4096 build`,
-                "deploy:staging": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=STAGING ${executables.get(
-                    Executable.AWS_CDK
-                )} deploy --output deploy/cdk.out --require-approval never --progress events`,
-                "deploy:production": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=PRODUCTION ${executables.get(
-                    Executable.AWS_CDK
-                )} deploy --output deploy/cdk.out --require-approval never --progress events`,
-                eject: `${executables.get(Executable.REACT_SCRIPTS)} eject`,
-            };
             draft.browserslist = {
                 production: [">0.2%", "not dead", "not op_mini all"],
                 development: ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"],
@@ -179,6 +138,79 @@ function generatePackageJson({
     });
 
     return packageJson;
+}
+
+function addScripts({
+    draft,
+    executables,
+    pathToEslintIgnore,
+    pathToPrettierIgnore,
+    packageToLint,
+    oldPackageJson,
+}: {
+    draft: Draft<IPackageJson>;
+    executables: Executables;
+    pathToEslintIgnore: string;
+    pathToPrettierIgnore: string;
+    packageToLint: Package;
+    oldPackageJson: IPackageJson;
+}) {
+    let scripts: Partial<IScriptsMap> & Record<string, string> = {
+        clean: `${executables.get(Executable.TSC)} --build --clean`,
+        compile: `${executables.get(Executable.TSC)} --build`,
+        test: `${executables.get(Executable.JEST)} --passWithNoTests`,
+        "lint:eslint": `${executables.get(Executable.ESLINT)} --max-warnings 0 . --ignore-path=${pathToEslintIgnore}`,
+        "lint:eslint:fix": `${executables.get(
+            Executable.ESLINT
+        )} --max-warnings 0 . --ignore-path=${pathToEslintIgnore} --fix`,
+        "lint:style": `${executables.get(Executable.STYLELINT)} '**/*.scss' --allow-empty-input --max-warnings 0`,
+        "lint:style:fix": `${executables.get(
+            Executable.STYLELINT
+        )} '**/*.scss' --allow-empty-input --max-warnings 0 --fix`,
+        format: `${executables.get(
+            Executable.PRETTIER
+        )} --write --ignore-unknown --ignore-path ${pathToPrettierIgnore} "**"`,
+        "format:check": `${executables.get(
+            Executable.PRETTIER
+        )} --check --ignore-unknown --ignore-path ${pathToPrettierIgnore} "**"`,
+        depcheck: executables.get(Executable.DEPCHECK),
+    };
+
+    if (!packageToLint.config.private) {
+        scripts.prepublish =
+            "run clean && run compile && run test && run lint:eslint && run lint:style && run format:check && run depcheck";
+    }
+
+    if (packageToLint.config.type === PackageType.REACT_APP) {
+        scripts = {
+            ...scripts,
+            start: `${executables.get(Executable.ENV_CMD)} -e development ${executables.get(
+                Executable.ENV_CMD
+            )} -f .env.local --silent craco start`,
+            "build:staging": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=STAGING ${executables.get(
+                Executable.ENV_CMD
+            )} -e development craco --max_old_space_size=4096 build`,
+            "build:production": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=PRODUCTION ${executables.get(
+                Executable.ENV_CMD
+            )} -e production craco --max_old_space_size=4096 build`,
+            "deploy:staging": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=STAGING ${executables.get(
+                Executable.AWS_CDK
+            )} deploy --output deploy/cdk.out --require-approval never --progress events`,
+            "deploy:production": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=PRODUCTION ${executables.get(
+                Executable.AWS_CDK
+            )} deploy --output deploy/cdk.out --require-approval never --progress events`,
+            eject: `${executables.get(Executable.REACT_SCRIPTS)} eject`,
+        };
+    }
+
+    for (const scriptName of packageToLint.config.ignoreScripts) {
+        const scriptToIgnore = oldPackageJson.scripts?.[scriptName];
+        if (scriptToIgnore != null) {
+            scripts[scriptName] = scriptToIgnore;
+        }
+    }
+
+    draft.scripts = scripts;
 }
 
 function sortDependencies(dependencies: Record<string, string>): Record<string, string> {
