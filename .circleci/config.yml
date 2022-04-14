@@ -46,6 +46,8 @@ jobs:
           command: yarn test -- --ci
 
   publish:
+    docker:
+      - image: cimg/node:17.3.1
     steps:
       - run:
           name: Publish all packages [dry run]
@@ -67,12 +69,15 @@ workflows:
           filters:
             tags:
               only: /.*/
-          requires: [lint]
+          requires:
+            - lint
 
       - publish:
           filters:
             branches:
-              only:
-                - main
-          requires: [compile-and-test]
+              ignore: /.*/
+            tags:
+              only: /.*/
+          requires:
+            - compile-and-test
           context: npm
