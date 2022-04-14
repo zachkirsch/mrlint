@@ -9,9 +9,9 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: yarn-berry
-      # - run:
-      #     name: Lint monorepo
-      #     command: yarn lint:monorepo
+      - run:
+          name: Lint monorepo
+          command: yarn lint:monorepo
       - run:
           name: Lint
           command: yarn lint:eslint
