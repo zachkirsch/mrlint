@@ -17,8 +17,12 @@ export interface RootConfig {
 
 export interface Package {
     relativePath: string;
-    config: PackageConfig;
+    config: PackageConfig | undefined;
     packageJson: IPackageJson | undefined;
+}
+
+export interface LintablePackage extends Package {
+    config: NonNullable<Package["config"]>;
 }
 
 export interface PackageConfig {

@@ -24,9 +24,14 @@ export async function getMonorepoRoot({ cwd = process.cwd() }: getMonorepoRoot.A
         predicate: (filepath) => MONOREPO_ROOT_FILES.has(path.basename(filepath)),
     });
 
+    const config = await readConfig(configPath, (contents) => RootConfigSchema.parse(contents));
+    if (config == null) {
+        throw new Error("Failed to read config: " + configPath);
+    }
+
     return {
         fullPath: path.dirname(configPath),
-        config: await readConfig(configPath, (contents) => RootConfigSchema.parse(contents)),
+        config,
     };
 }
 

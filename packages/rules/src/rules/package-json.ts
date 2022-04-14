@@ -1,4 +1,4 @@
-import { Logger, Package, PackageType, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
+import { LintablePackage, Logger, PackageType, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
 import produce, { Draft } from "immer";
 import { IPackageJson, IScriptsMap } from "package-json-type";
 import path from "path";
@@ -71,7 +71,7 @@ function generatePackageJson({
     logger,
     executables,
 }: {
-    packageToLint: Package;
+    packageToLint: LintablePackage;
     relativePathToRoot: string;
     relativePathToSharedConfigs: string;
     logger: Logger;
@@ -152,7 +152,7 @@ function addScripts({
     executables: Executables;
     pathToEslintIgnore: string;
     pathToPrettierIgnore: string;
-    packageToLint: Package;
+    packageToLint: LintablePackage;
     oldPackageJson: IPackageJson;
 }) {
     let scripts: Partial<IScriptsMap> & Record<string, string> = {
@@ -225,7 +225,7 @@ function sortDependencies(dependencies: Record<string, string>): Record<string, 
         );
 }
 
-function canPackageContainCss(p: Package): boolean {
+function canPackageContainCss(p: LintablePackage): boolean {
     if (p.config.type == null) {
         return false;
     }

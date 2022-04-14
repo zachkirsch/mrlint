@@ -1,7 +1,7 @@
 import { FileSystem } from "@fernapi/mrlint-virtual-file-system";
 import { Logger } from "./logger/Logger";
 import { Result } from "./Result";
-import { Monorepo, Package, PackageType } from "./types";
+import { LintablePackage, Monorepo, Package, PackageType } from "./types";
 
 export type Rule = Rule.MonorepoRule | Rule.PackageRule;
 
@@ -37,7 +37,7 @@ export declare namespace Rule {
     }
 
     export interface PackageRuleRunnerArgs {
-        packageToLint: Package;
+        packageToLint: LintablePackage;
         allPackages: readonly Package[];
         relativePathToRoot: string;
         relativePathToSharedConfigs: string;
