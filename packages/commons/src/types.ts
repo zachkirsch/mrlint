@@ -28,7 +28,6 @@ export interface LintablePackage extends Package {
 export interface PackageConfig {
     type: PackageType | undefined;
     private: boolean;
-    ignoreScripts: string[];
 }
 
 export enum PackageType {

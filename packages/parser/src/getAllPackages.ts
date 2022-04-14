@@ -12,7 +12,6 @@ const promisifiedGlob = promisify(glob);
 const PackageConfigSchema = z.strictObject({
     type: z.enum(["library", "cli", "react-library", "react-app"]),
     private: z.optional(z.boolean()),
-    ignoreScripts: z.optional(z.array(z.string())),
 });
 type RawPackageConfig = z.infer<typeof PackageConfigSchema>;
 
@@ -61,7 +60,6 @@ function convertConfig(rawConfig: RawPackageConfig): PackageConfig {
     return {
         type: getType(rawConfig.type),
         private: rawConfig.private ?? true,
-        ignoreScripts: rawConfig.ignoreScripts ?? [],
     };
 }
 

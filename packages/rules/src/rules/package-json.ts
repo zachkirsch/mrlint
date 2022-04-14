@@ -203,13 +203,6 @@ function addScripts({
         };
     }
 
-    for (const scriptName of packageToLint.config.ignoreScripts) {
-        const scriptToIgnore = oldPackageJson.scripts?.[scriptName];
-        if (scriptToIgnore != null) {
-            scripts[scriptName] = scriptToIgnore;
-        }
-    }
-
     draft.scripts = scripts;
 }
 
