@@ -1,14 +1,12 @@
 {
   "name": "@fernapi/mrlint",
-  "version": "0.1.0",
+  "version": "0.1.8",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib"
   ],
-  "bin": {
-    "mrlint": "./cli"
-  },
+  "bin": "./cli",
   "scripts": {
     "clean": "tsc --build --clean",
     "compile": "tsc --build",
@@ -23,10 +21,10 @@
     "prepublish": "run clean && run compile && run test && run lint:eslint && run lint:style && run format:check && run depcheck"
   },
   "dependencies": {
-    "@fernapi/mrlint-commons": "workspace:^",
-    "@fernapi/mrlint-lint": "workspace:^",
-    "@fernapi/mrlint-parser": "workspace:^",
-    "@fernapi/mrlint-rules": "workspace:^",
+    "@fernapi/mrlint-commons": "workspace:*",
+    "@fernapi/mrlint-lint": "workspace:*",
+    "@fernapi/mrlint-parser": "workspace:*",
+    "@fernapi/mrlint-rules": "workspace:*",
     "chalk": "^4.1.2",
     "yargs": "^17.3.1"
   },

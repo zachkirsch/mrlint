@@ -1,6 +1,6 @@
 {
   "name": "@fernapi/mrlint-parser",
-  "version": "0.1.0",
+  "version": "0.1.8",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
@@ -20,7 +20,7 @@
     "prepublish": "run clean && run compile && run test && run lint:eslint && run lint:style && run format:check && run depcheck"
   },
   "dependencies": {
-    "@fernapi/mrlint-commons": "workspace:^",
+    "@fernapi/mrlint-commons": "workspace:*",
     "glob": "^7.2.0",
     "js-yaml": "^4.1.0",
     "zod": "^3.14.3"

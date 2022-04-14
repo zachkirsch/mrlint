@@ -1,4 +1,4 @@
-import { Monorepo, MonorepoLoggers, Package, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
+import { LintablePackage, Monorepo, MonorepoLoggers, Package, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
 import { LazyVirtualFileSystem } from "@fernapi/mrlint-virtual-file-system";
 import { handleFileSystemDiffs } from "./handleFileSystemDiffs";
 import { lintPackage } from "./package-rules/lintPackage";
@@ -23,7 +23,8 @@ export async function lintMonorepo({ monorepo, rules, loggers, shouldFix }: lint
 
     // TODO: Lint with monorepo rules
 
-    for (const packageToLint of monorepo.packages) {
+    const packagesToLint: LintablePackage[] = monorepo.packages.filter(isLintablePackage);
+    for (const packageToLint of packagesToLint) {
         const loggerForPackage = loggers.getLoggerForPackage(packageToLint);
         loggerForPackage.debug({
             message: "Linting...",
@@ -67,6 +68,20 @@ function partition<A, B>(items: readonly (A | B)[], predicate: (item: A | B) => 
     return [aList, bList];
 }
 
-function ruleAppliesToPackage(rule: Rule.PackageRule, mrlintPackage: Package): boolean {
+function ruleAppliesToPackage(rule: Rule.PackageRule, mrlintPackage: LintablePackage): boolean {
     return mrlintPackage.config.type != null && rule.targetedPackages.includes(mrlintPackage.config.type);
+}
+
+function isLintablePackage(p: Package): p is LintablePackage {
+    return getLintablePackage(p) != null;
+}
+
+function getLintablePackage(p: Package): LintablePackage | undefined {
+    if (p.config == null) {
+        return undefined;
+    }
+    return {
+        ...p,
+        config: p.config,
+    };
 }

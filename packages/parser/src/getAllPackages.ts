@@ -26,15 +26,20 @@ export async function getAllPackages(monorepoRoot: MonorepoRoot): Promise<Packag
         throw new Error("No 'workspaces' found in root package.json");
     }
 
-    const mrlintFiles = await promisifiedGlob(
-        `${monorepoRoot.fullPath}/${rootPackageJson.workspaces.join("|")}/.mrlint.json`
+    const packageJsons = await promisifiedGlob(
+        `${monorepoRoot.fullPath}/${rootPackageJson.workspaces.join("|")}/package.json`,
+        {
+            ignore: "**/node_modules/**",
+        }
     );
-    for (const mrlintFile of mrlintFiles) {
-        const packageDirectory = path.dirname(mrlintFile);
-        const rawConfig = await readConfig(mrlintFile, (contents) => PackageConfigSchema.parse(contents));
+    for (const packageJson of packageJsons) {
+        const packageDirectory = path.dirname(packageJson);
+        const rawConfig = await readConfig(path.join(packageDirectory, ".mrlint.json"), (contents) =>
+            PackageConfigSchema.parse(contents)
+        );
         packages.push({
             relativePath: path.relative(monorepoRoot.fullPath, packageDirectory),
-            config: convertConfig(rawConfig),
+            config: rawConfig != null ? convertConfig(rawConfig) : undefined,
             packageJson: await getPackageJson(packageDirectory),
         });
     }

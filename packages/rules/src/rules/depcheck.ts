@@ -22,8 +22,7 @@ const FILENAME = ".depcheckrc.json";
 
 async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     let depcheckRc: DepcheckConfig = {
-        ignores: ["sass"],
-        "ignore-patterns": ["lib", ".eslintrc.json"],
+        "ignore-patterns": ["lib"],
     };
 
     if (packageToLint.config.type === PackageType.REACT_APP) {
@@ -32,15 +31,10 @@ async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleR
                 draft.ignores = [];
             }
             draft.ignores.push("sass");
-            if (draft["ignore-patterns"] == null) {
-                draft["ignore-patterns"] = [];
-            }
-            draft["ignore-patterns"].push("lib", ".eslintrc.json");
         });
     }
 
     const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
-
     try {
         await fileSystemForPackage.writeFile(FILENAME, JSON.stringify(depcheckRc));
         return Result.success();
