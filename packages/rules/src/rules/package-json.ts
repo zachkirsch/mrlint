@@ -81,8 +81,8 @@ function generatePackageJson({
     if (oldPackageJson == null) {
         throw new Error("Missing package.json");
     }
-    if (oldPackageJson.version == null) {
-        throw new Error("Missing 'version' in package.json");
+    if (!packageToLint.config.private && oldPackageJson.version == null) {
+        throw new Error("Missing 'version' in package.json, but package is public");
     }
 
     const pathToEslintIgnore = path.join(relativePathToRoot, ".eslintignore");

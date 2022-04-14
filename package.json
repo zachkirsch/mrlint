@@ -1,6 +1,5 @@
 {
   "name": "mrlint",
-  "version": "1.0.0",
   "description": "A monorepo linter",
   "repository": "https://github.com/fern-api/mrlint",
   "author": "Birch Solutions, Inc.",
