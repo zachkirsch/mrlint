@@ -108,7 +108,6 @@ function generatePackageJson({
             pathToEslintIgnore,
             pathToPrettierIgnore,
             packageToLint,
-            oldPackageJson,
         });
 
         if (packageToLint.config.type === PackageType.REACT_APP) {
@@ -146,14 +145,12 @@ function addScripts({
     pathToEslintIgnore,
     pathToPrettierIgnore,
     packageToLint,
-    oldPackageJson,
 }: {
     draft: Draft<IPackageJson>;
     executables: Executables;
     pathToEslintIgnore: string;
     pathToPrettierIgnore: string;
     packageToLint: LintablePackage;
-    oldPackageJson: IPackageJson;
 }) {
     let scripts: Partial<IScriptsMap> & Record<string, string> = {
         clean: `${executables.get(Executable.TSC)} --build --clean`,
