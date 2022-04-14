@@ -1,6 +1,6 @@
 {
   "name": "@fernapi/mrlint-rules",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
@@ -20,8 +20,8 @@
     "prepublish": "run clean && run compile && run test && run lint:eslint && run lint:style && run format:check && run depcheck"
   },
   "dependencies": {
-    "@fernapi/mrlint-commons": "workspace:^",
-    "@fernapi/mrlint-virtual-file-system": "workspace:^",
+    "@fernapi/mrlint-commons": "workspace:*",
+    "@fernapi/mrlint-virtual-file-system": "workspace:*",
     "immer": "^9.0.12"
   },
   "devDependencies": {
