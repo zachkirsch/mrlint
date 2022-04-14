@@ -30,6 +30,7 @@ jobs:
       - run:
           name: Ensure no changes to git-tracked files
           command: git --no-pager diff
+
   compile-and-test:
     docker:
       - image: cimg/node:17.3.1
@@ -43,13 +44,35 @@ jobs:
       - run:
           name: Run tests
           command: yarn test -- --ci
+
+  publish:
+    steps:
+      - run:
+          name: Publish all packages [dry run]
+          command: yarn workspaces foreach --no-private --parallel --topological --verbose run prepublish
+      - run:
+          name: Publish all packages
+          command: yarn workspaces foreach --no-private --parallel --topological --verbose npm publish --access public
+
 workflows:
   version: 2
   build:
     jobs:
       - lint:
-          filters: { tags: { only: /.*/ } }
+          filters:
+            tags:
+              only: /.*/
 
       - compile-and-test:
-          filters: { tags: { only: /.*/ } }
+          filters:
+            tags:
+              only: /.*/
           requires: [lint]
+
+      - publish:
+          filters:
+            branches:
+              only:
+                - main
+          requires: [compile-and-test]
+          context: npm
