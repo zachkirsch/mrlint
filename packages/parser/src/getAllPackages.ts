@@ -35,7 +35,9 @@ export async function getAllPackages(monorepoRoot: MonorepoRoot): Promise<Packag
     );
     for (const packageJson of packageJsons) {
         const packageDirectory = path.dirname(packageJson);
-        const rawConfig = await readConfig(packageJson, (contents) => PackageConfigSchema.parse(contents));
+        const rawConfig = await readConfig(path.join(packageDirectory, ".mrlint.json"), (contents) =>
+            PackageConfigSchema.parse(contents)
+        );
         packages.push({
             relativePath: path.relative(monorepoRoot.fullPath, packageDirectory),
             config: rawConfig != null ? convertConfig(rawConfig) : undefined,
