@@ -25,7 +25,7 @@
     "publish": "yarn check && yarn workspaces foreach --no-private --parallel --verbose npm publish --access public"
   },
   "devDependencies": {
-    "@fernapi/mrlint": "0.1.11",
+    "@fernapi/mrlint": "0.1.12",
     "@typescript-eslint/eslint-plugin": "^5.17.0",
     "@typescript-eslint/parser": "^5.17.0",
     "depcheck": "^1.4.3",

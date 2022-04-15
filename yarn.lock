@@ -453,7 +453,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fernapi/mrlint-lint@workspace:packages/lint":
+"@fernapi/mrlint-lint@workspace:*, @fernapi/mrlint-lint@workspace:packages/lint":
   version: 0.0.0-use.local
   resolution: "@fernapi/mrlint-lint@workspace:packages/lint"
   dependencies:
@@ -483,7 +483,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fernapi/mrlint-parser@workspace:packages/parser":
+"@fernapi/mrlint-parser@workspace:*, @fernapi/mrlint-parser@workspace:packages/parser":
   version: 0.0.0-use.local
   resolution: "@fernapi/mrlint-parser@workspace:packages/parser"
   dependencies:
@@ -514,7 +514,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fernapi/mrlint-rules@workspace:packages/rules":
+"@fernapi/mrlint-rules@workspace:*, @fernapi/mrlint-rules@workspace:packages/rules":
   version: 0.0.0-use.local
   resolution: "@fernapi/mrlint-rules@workspace:packages/rules"
   dependencies:
@@ -551,9 +551,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@fernapi/mrlint@npm:0.1.11":
-  version: 0.1.11
-  resolution: "@fernapi/mrlint@npm:0.1.11"
+"@fernapi/mrlint@npm:0.1.12":
+  version: 0.1.12
+  resolution: "@fernapi/mrlint@npm:0.1.12"
   dependencies:
     "@fernapi/mrlint-commons": 0.1.9
     "@fernapi/mrlint-lint": 0.1.9
@@ -563,7 +563,7 @@ __metadata:
     yargs: ^17.3.1
   bin:
     mrlint: ./cli
-  checksum: 7d06a8bf1531c3937a974e849d23b0dd5cb05205dc5a500cd51e290a1255df38e325fb8b32e338edbce971148706c701cb33b1d63b8a092f920ae7dfb6386856
+  checksum: 25245c83a7c51c57bbebb32914bed560281dccfdd4d4d474d1b0edbe3be440372a04435db54120100829d56e8a69f2aa14438fb56be641c72d1facda8ac83b63
   languageName: node
   linkType: hard
 
@@ -571,10 +571,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@fernapi/mrlint@workspace:packages/cli"
   dependencies:
-    "@fernapi/mrlint-commons": 0.1.9
-    "@fernapi/mrlint-lint": 0.1.9
-    "@fernapi/mrlint-parser": 0.1.9
-    "@fernapi/mrlint-rules": 0.1.9
+    "@fernapi/mrlint-commons": "workspace:*"
+    "@fernapi/mrlint-lint": "workspace:*"
+    "@fernapi/mrlint-parser": "workspace:*"
+    "@fernapi/mrlint-rules": "workspace:*"
     "@types/yargs": ^17.0.10
     chalk: ^4.1.2
     depcheck: ^1.4.3
@@ -4638,7 +4638,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mrlint@workspace:."
   dependencies:
-    "@fernapi/mrlint": 0.1.11
+    "@fernapi/mrlint": 0.1.12
     "@typescript-eslint/eslint-plugin": ^5.17.0
     "@typescript-eslint/parser": ^5.17.0
     depcheck: ^1.4.3

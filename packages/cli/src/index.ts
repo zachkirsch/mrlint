@@ -15,7 +15,7 @@ const LOG_LEVELS: Record<CommandLineLogLevel, true> = {
 
 yargs
     .strict()
-    .option("--log-level", {
+    .option("log-level", {
         default: DEFAULT_COMMAND_LINE_LOG_LEVEL,
         choices: keys(LOG_LEVELS),
     })
@@ -24,18 +24,18 @@ yargs
         "Lint the monorepo",
         (argv) =>
             argv
-                .option("--fix", {
+                .option("fix", {
                     boolean: true,
                     default: false,
                 })
-                .option("--version", {
+                .option("monorepo-version", {
                     type: "string",
                 }),
         async (argv) => {
             await lintCommand({
-                loggers: new ConsoleMonorepoLogger(convertLogLevel(argv["--log-level"])),
-                shouldFix: argv["--fix"],
-                monorepoVersion: argv["--version"],
+                loggers: new ConsoleMonorepoLogger(convertLogLevel(argv.logLevel)),
+                shouldFix: argv.fix,
+                monorepoVersion: argv.monorepoVersion,
             });
         }
     )
