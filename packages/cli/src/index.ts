@@ -1,6 +1,7 @@
 import { LogLevel } from "@fernapi/mrlint-commons";
 import yargs from "yargs";
 import { lintCommand } from "./commands/lintCommand";
+import { versionCommand } from "./commands/versionCommand";
 import { ConsoleMonorepoLogger } from "./ConsoleMonorepoLogger";
 
 type CommandLineLogLevel = "debug" | "info" | "warn" | "error";
@@ -23,19 +24,28 @@ yargs
         "lint",
         "Lint the monorepo",
         (argv) =>
-            argv
-                .option("fix", {
-                    boolean: true,
-                    default: false,
-                })
-                .option("monorepo-version", {
-                    type: "string",
-                }),
+            argv.option("fix", {
+                boolean: true,
+                default: false,
+            }),
         async (argv) => {
             await lintCommand({
                 loggers: new ConsoleMonorepoLogger(convertLogLevel(argv.logLevel)),
                 shouldFix: argv.fix,
-                monorepoVersion: argv.monorepoVersion,
+            });
+        }
+    )
+    .command(
+        "version <new_version>",
+        "Apply the provided version to all public package in the monorepo",
+        (argv) =>
+            argv.positional("new_version", {
+                type: "string",
+                demandOption: true,
+            }),
+        async (argv) => {
+            await versionCommand({
+                newVersion: argv.new_version,
             });
         }
     )

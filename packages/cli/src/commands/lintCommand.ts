@@ -6,13 +6,11 @@ import rules from "@fernapi/mrlint-rules";
 export async function lintCommand({
     loggers,
     shouldFix,
-    monorepoVersion,
 }: {
     loggers: MonorepoLoggers;
     shouldFix: boolean;
-    monorepoVersion: string | undefined;
 }): Promise<void> {
-    const monorepo = await parseMonorepo({ monorepoVersion });
+    const monorepo = await parseMonorepo();
 
     const result = await lintMonorepo({
         monorepo,

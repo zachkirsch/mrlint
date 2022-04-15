@@ -2,7 +2,6 @@ import { IPackageJson } from "package-json-type";
 
 export interface Monorepo {
     root: MonorepoRoot;
-    version: string | undefined;
     packages: Package[];
 }
 
