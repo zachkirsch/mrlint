@@ -45,12 +45,11 @@ jobs:
       - node/install-packages:
           pkg-manager: yarn-berry
       - run:
-          name: Compile
-          command: yarn compile
+          name: Check
+          command: yarn prepublish
       - run:
           name: Add version to package.json's
           command: |
-            yarn lint:monorepo
             yarn lint:monorepo:fix --monorepo-version $(git tag --points-at HEAD)
       - run:
           name: Publish all packages
