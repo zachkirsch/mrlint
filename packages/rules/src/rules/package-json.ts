@@ -25,7 +25,6 @@ async function runRule({
     relativePathToSharedConfigs,
     packageToLint,
     logger,
-    monorepoVersion,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const result = Result.success();
 
@@ -39,7 +38,6 @@ async function runRule({
             relativePathToSharedConfigs,
             logger,
             executables,
-            monorepoVersion,
         });
     } catch (error) {
         logger.error({
@@ -72,14 +70,12 @@ function generatePackageJson({
     relativePathToSharedConfigs,
     logger,
     executables,
-    monorepoVersion,
 }: {
     packageToLint: LintablePackage;
     relativePathToRoot: string;
     relativePathToSharedConfigs: string;
     logger: Logger;
     executables: Executables;
-    monorepoVersion: string | undefined;
 }): IPackageJson {
     const oldPackageJson = tryGetPackageJson(packageToLint, logger);
     if (oldPackageJson == null) {
@@ -91,7 +87,6 @@ function generatePackageJson({
 
     const packageJson = produce<IPackageJson>({}, (draft) => {
         draft.name = oldPackageJson.name;
-        draft.version = packageToLint.config.private ? undefined : monorepoVersion;
         if (packageToLint.config.private) {
             draft.private = true;
         }

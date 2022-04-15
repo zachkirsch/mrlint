@@ -5,16 +5,16 @@ export async function formatFiles(filepaths: readonly string[]): Promise<void> {
     await Promise.all(filepaths.map(formatFile));
 }
 
-async function formatFile(filepath: string): Promise<void> {
+export async function formatFile(filepath: string): Promise<void> {
     const fileContents = (await readFile(filepath)).toString();
     if (fileContents == null) {
         throw new Error("File does not exist");
     }
-    const formatted = await format({ fileContents, filepath, prettierParser: undefined });
+    const formatted = await formatFileContents({ fileContents, filepath, prettierParser: undefined });
     await writeFile(filepath, formatted);
 }
 
-export async function format({
+export async function formatFileContents({
     fileContents,
     filepath,
     prettierParser,

@@ -1,11 +1,10 @@
-import { Logger, Monorepo, Package, Result } from "@fernapi/mrlint-commons";
+import { formatFileContents, Logger, Monorepo, Package, Result } from "@fernapi/mrlint-commons";
 import { LazyVirtualFileSystem } from "@fernapi/mrlint-virtual-file-system";
 import { FileSystemWithUtilities } from "@fernapi/mrlint-virtual-file-system/src/FileSystemWithUtilities";
 import chalk from "chalk";
 import { diffLines } from "diff";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
-import { format } from "./formatFiles";
 
 export async function handleFileSystemDiffs({
     monorepo,
@@ -27,7 +26,7 @@ export async function handleFileSystemDiffs({
     // format files
     await fileSystem.visitTouchedFiles(async ({ fullPath, relativePath, contents }) => {
         try {
-            const formatted = await format({
+            const formatted = await formatFileContents({
                 filepath: fullPath,
                 fileContents: contents,
                 prettierParser: undefined,
