@@ -22,10 +22,10 @@
     "depcheck": "yarn workspaces foreach --verbose --parallel run depcheck",
     "prepare": "husky install",
     "check": "run clean && run compile && run test && run lint:eslint && run lint:style && run lint:monorepo && run format:check && run depcheck",
-    "publish": "yarn workspaces foreach --no-private --parallel --topological --verbose npm publish --tolerate-republish --access public"
+    "publish": "yarn workspaces foreach --no-private --parallel --verbose npm publish --access public"
   },
   "devDependencies": {
-    "@fernapi/mrlint": "0.1.8",
+    "@fernapi/mrlint": "0.1.11",
     "@typescript-eslint/eslint-plugin": "^5.17.0",
     "@typescript-eslint/parser": "^5.17.0",
     "depcheck": "^1.4.3",
