@@ -51,10 +51,10 @@ jobs:
     steps:
       - run:
           name: Publish all packages [dry run]
-          command: yarn workspaces foreach --no-private --parallel --topological --verbose run prepublish
+          command: yarn run publish:dry-run
       - run:
           name: Publish all packages
-          command: yarn workspaces foreach --no-private --parallel --topological --verbose npm publish --access public
+          command: yarn run publish
 
 workflows:
   version: 2
@@ -75,7 +75,7 @@ workflows:
       - publish:
           filters:
             branches:
-              ignore: /.*/
+              only: main
             tags:
               only: /.*/
           requires:
