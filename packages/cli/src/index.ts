@@ -23,14 +23,19 @@ yargs
         "lint",
         "Lint the monorepo",
         (argv) =>
-            argv.option("--fix", {
-                boolean: true,
-                default: false,
-            }),
+            argv
+                .option("--fix", {
+                    boolean: true,
+                    default: false,
+                })
+                .option("--version", {
+                    type: "string",
+                }),
         async (argv) => {
             await lintCommand({
                 loggers: new ConsoleMonorepoLogger(convertLogLevel(argv["--log-level"])),
                 shouldFix: argv["--fix"],
+                monorepoVersion: argv["--version"],
             });
         }
     )

@@ -25,6 +25,7 @@ async function runRule({
     relativePathToSharedConfigs,
     packageToLint,
     logger,
+    monorepoVersion,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const result = Result.success();
 
@@ -38,6 +39,7 @@ async function runRule({
             relativePathToSharedConfigs,
             logger,
             executables,
+            monorepoVersion,
         });
     } catch (error) {
         logger.error({
@@ -70,19 +72,18 @@ function generatePackageJson({
     relativePathToSharedConfigs,
     logger,
     executables,
+    monorepoVersion,
 }: {
     packageToLint: LintablePackage;
     relativePathToRoot: string;
     relativePathToSharedConfigs: string;
     logger: Logger;
     executables: Executables;
+    monorepoVersion: string | undefined;
 }): IPackageJson {
     const oldPackageJson = tryGetPackageJson(packageToLint, logger);
     if (oldPackageJson == null) {
         throw new Error("Missing package.json");
-    }
-    if (!packageToLint.config.private && oldPackageJson.version == null) {
-        throw new Error("Missing 'version' in package.json, but package is public");
     }
 
     const pathToEslintIgnore = path.join(relativePathToRoot, ".eslintignore");
@@ -90,7 +91,7 @@ function generatePackageJson({
 
     const packageJson = produce<IPackageJson>({}, (draft) => {
         draft.name = oldPackageJson.name;
-        draft.version = oldPackageJson.version;
+        draft.version = packageToLint.config.private ? undefined : monorepoVersion;
         if (packageToLint.config.private) {
             draft.private = true;
         }
@@ -172,11 +173,6 @@ function addScripts({
         )} --check --ignore-unknown --ignore-path ${pathToPrettierIgnore} "**"`,
         depcheck: executables.get(Executable.DEPCHECK),
     };
-
-    if (!packageToLint.config.private) {
-        scripts.prepublish =
-            "run clean && run compile && run test && run lint:eslint && run lint:style && run format:check && run depcheck";
-    }
 
     if (packageToLint.config.type === PackageType.REACT_APP) {
         scripts = {

@@ -37,6 +37,7 @@ export declare namespace Rule {
     }
 
     export interface PackageRuleRunnerArgs {
+        monorepoVersion: string | undefined;
         packageToLint: LintablePackage;
         allPackages: readonly Package[];
         relativePathToRoot: string;

@@ -21,8 +21,8 @@
     "format:check": "prettier --check --ignore-unknown --ignore-path ./shared/.prettierignore \"**\"",
     "depcheck": "yarn workspaces foreach --verbose --parallel run depcheck",
     "prepare": "husky install",
-    "publish": "yarn workspaces foreach --no-private --parallel --topological --verbose npm publish --tolerate-republish --access public",
-    "publish:dry-run": "yarn workspaces foreach --no-private --parallel --topological --verbose run prepublish"
+    "check": "run clean && run compile && run test && run lint:eslint && run lint:style && run lint:monorepo && run format:check && run depcheck",
+    "publish": "yarn workspaces foreach --no-private --parallel --topological --verbose npm publish --tolerate-republish --access public"
   },
   "devDependencies": {
     "@fernapi/mrlint": "0.1.8",

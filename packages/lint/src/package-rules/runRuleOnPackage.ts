@@ -38,6 +38,7 @@ export async function runRuleOnPackage({
                 getFileSystemForPackage: (p) => fileSystem.getFileSystemForPrefix(p.relativePath),
             },
             logger,
+            monorepoVersion: monorepo.version,
         });
     } catch (error) {
         logger.error({
