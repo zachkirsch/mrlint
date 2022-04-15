@@ -49,6 +49,12 @@ jobs:
     docker:
       - image: cimg/node:17.3.1
     steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+      - run:
+          name: Compile
+          command: yarn compile
       - run:
           name: Publish all packages [dry run]
           command: yarn run publish:dry-run
@@ -75,7 +81,7 @@ workflows:
       - publish:
           filters:
             branches:
-              only: main
+              ignore: /.*/
             tags:
               only: /.*/
           requires:
