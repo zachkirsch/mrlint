@@ -1,6 +1,5 @@
 {
   "name": "@fernapi/mrlint",
-  "version": "0.1.9",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
@@ -17,14 +16,13 @@
     "lint:style:fix": "stylelint '**/*.scss' --allow-empty-input --max-warnings 0 --fix",
     "format": "prettier --write --ignore-unknown --ignore-path ../../shared/.prettierignore \"**\"",
     "format:check": "prettier --check --ignore-unknown --ignore-path ../../shared/.prettierignore \"**\"",
-    "depcheck": "depcheck",
-    "prepublish": "run clean && run compile && run test && run lint:eslint && run lint:style && run format:check && run depcheck"
+    "depcheck": "depcheck"
   },
   "dependencies": {
-    "@fernapi/mrlint-commons": "workspace:*",
-    "@fernapi/mrlint-lint": "workspace:*",
-    "@fernapi/mrlint-parser": "workspace:*",
-    "@fernapi/mrlint-rules": "workspace:*",
+    "@fernapi/mrlint-commons": "0.1.9",
+    "@fernapi/mrlint-lint": "0.1.9",
+    "@fernapi/mrlint-parser": "0.1.9",
+    "@fernapi/mrlint-rules": "0.1.9",
     "chalk": "^4.1.2",
     "yargs": "^17.3.1"
   },
