@@ -1,9 +1,0 @@
-releases:
-  "@fernapi/mrlint": patch
-  "@fernapi/mrlint-rules": patch
-
-declined:
-  - "@fernapi/mrlint-commons"
-  - "@fernapi/mrlint-lint"
-  - "@fernapi/mrlint-parser"
-  - "@fernapi/mrlint-virtual-file-system"

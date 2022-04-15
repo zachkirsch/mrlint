@@ -2,13 +2,16 @@ version: 2.1
 orbs:
   node: circleci/node@5.0.1
 jobs:
-  lint:
+  check:
     docker:
       - image: cimg/node:17.3.1
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: yarn-berry
+      - run:
+          name: Check
+          command: yarn check
       - run:
           name: Lint monorepo
           command: yarn lint:monorepo
@@ -25,25 +28,14 @@ jobs:
           name: Check dependencies
           command: yarn depcheck
       - run:
-          name: Ensure changelong
-          command: yarn version check
-      - run:
-          name: Ensure no changes to git-tracked files
-          command: git --no-pager diff
-
-  compile-and-test:
-    docker:
-      - image: cimg/node:17.3.1
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: yarn-berry
-      - run:
           name: Compile
           command: yarn compile
       - run:
           name: Run tests
           command: yarn test -- --ci
+      - run:
+          name: Ensure no changes to git-tracked files
+          command: git --no-pager diff
 
   publish:
     docker:
@@ -56,9 +48,6 @@ jobs:
           name: Compile
           command: yarn compile
       - run:
-          name: Publish all packages [dry run]
-          command: yarn run publish:dry-run
-      - run:
           name: Publish all packages
           command: yarn run publish
 
@@ -66,17 +55,10 @@ workflows:
   version: 2
   build:
     jobs:
-      - lint:
+      - check:
           filters:
             tags:
               only: /.*/
-
-      - compile-and-test:
-          filters:
-            tags:
-              only: /.*/
-          requires:
-            - lint
 
       - publish:
           filters:
@@ -85,5 +67,5 @@ workflows:
             tags:
               only: /.*/
           requires:
-            - compile-and-test
+            - check
           context: npm
