@@ -1,4 +1,4 @@
-import { Logger, Package } from "@fernapi/mrlint-commons";
+import { Logger, Package } from "@fern-api/mrlint-commons";
 import { IPackageJson } from "package-json-type";
 
 export interface PackageJsonWithName extends IPackageJson {

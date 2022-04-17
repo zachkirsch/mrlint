@@ -1,4 +1,4 @@
-import { PackageType, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
+import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import produce from "immer";
 
 interface DepcheckConfig {

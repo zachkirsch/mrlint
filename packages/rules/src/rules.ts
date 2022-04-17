@@ -1,9 +1,10 @@
-import { Rule } from "@fernapi/mrlint-commons";
+import { Rule } from "@fern-api/mrlint-commons";
 import { CdkRule } from "./rules/cdk";
 import { CliRule } from "./rules/cli";
 import { CracoRule } from "./rules/craco";
 import { DeclarationsRule } from "./rules/declarations";
 import { DepcheckRule } from "./rules/depcheck";
+import { DuplicateDependenciesRule } from "./rules/duplicate-dependencies";
 import { JestRule } from "./rules/jest";
 import { PackageJsonRule } from "./rules/package-json";
 import { PrettierRule } from "./rules/prettier";
@@ -26,5 +27,6 @@ export const RULES: Rules = {
         PrettierRule,
         StyleLintRule,
         CliRule,
+        DuplicateDependenciesRule,
     ],
 };

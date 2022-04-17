@@ -1,4 +1,4 @@
-import { MonorepoRoot, Package, PackageConfig, PackageType } from "@fernapi/mrlint-commons";
+import { MonorepoRoot, Package, PackageConfig, PackageType } from "@fern-api/mrlint-commons";
 import { readFile } from "fs/promises";
 import glob from "glob";
 import { IPackageJson } from "package-json-type";

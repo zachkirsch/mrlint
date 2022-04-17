@@ -15,6 +15,10 @@ export class Result {
         }
     }
 
+    public fail(): void {
+        this._isSuccess = false;
+    }
+
     public isSuccess(): boolean {
         return this._isSuccess;
     }

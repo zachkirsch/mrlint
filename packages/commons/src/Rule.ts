@@ -1,4 +1,4 @@
-import { FileSystem } from "@fernapi/mrlint-virtual-file-system";
+import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
 import { Logger } from "./logger/Logger";
 import { Result } from "./Result";
 import { LintablePackage, Monorepo, Package, PackageType } from "./types";

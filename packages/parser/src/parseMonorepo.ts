@@ -1,4 +1,4 @@
-import { Monorepo } from "@fernapi/mrlint-commons";
+import { Monorepo } from "@fern-api/mrlint-commons";
 import { getAllPackages } from "./getAllPackages";
 import { getMonorepoRoot } from "./getMonorepoRoot";
 

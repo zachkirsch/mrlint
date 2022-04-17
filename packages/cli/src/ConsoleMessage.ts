@@ -1,4 +1,4 @@
-import { LogLevel, Package, Rule } from "@fernapi/mrlint-commons";
+import { LogLevel, Package, Rule } from "@fern-api/mrlint-commons";
 import chalk from "chalk";
 import { isNativeError } from "util/types";
 

@@ -1,4 +1,4 @@
-import { PackageType, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
+import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import path from "path";
 
 export const PrettierRule: Rule.PackageRule = {

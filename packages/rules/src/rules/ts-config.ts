@@ -1,4 +1,4 @@
-import { Logger, Package, PackageType, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
+import { Logger, Package, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import path from "path";
 import { CompilerOptions, ProjectReference } from "typescript";
 import { keyPackagesByNpmName } from "../utils/keyPackagesByNpmName";
