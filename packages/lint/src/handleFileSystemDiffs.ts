@@ -1,27 +1,21 @@
-import { formatFileContents, Logger, Monorepo, Package, Result } from "@fernapi/mrlint-commons";
-import { LazyVirtualFileSystem } from "@fernapi/mrlint-virtual-file-system";
-import { FileSystemWithUtilities } from "@fernapi/mrlint-virtual-file-system/src/FileSystemWithUtilities";
+import { formatFileContents, Logger, Result } from "@fern-api/mrlint-commons";
+import { LazyVirtualFileSystem } from "@fern-api/mrlint-virtual-file-system";
+import { FileSystemWithUtilities } from "@fern-api/mrlint-virtual-file-system/src/FileSystemWithUtilities";
 import chalk from "chalk";
 import { diffLines } from "diff";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 
 export async function handleFileSystemDiffs({
-    monorepo,
-    packageToLint,
     fileSystem,
     logger,
     shouldFix,
 }: {
-    monorepo: Monorepo;
-    packageToLint: Package;
     fileSystem: LazyVirtualFileSystem;
     logger: Logger;
     shouldFix: boolean;
 }): Promise<Result> {
-    let result = Result.success();
-
-    const absolutePackagePath = path.join(monorepo.root.fullPath, packageToLint.relativePath);
+    const result = Result.success();
 
     // format files
     await fileSystem.visitTouchedFiles(async ({ fullPath, relativePath, contents }) => {
@@ -34,7 +28,7 @@ export async function handleFileSystemDiffs({
             await fileSystem.writeFile(relativePath, formatted);
         } catch (error) {
             logger.warn({
-                message: `Failed to prettify ${path.relative(absolutePackagePath, fullPath)}`,
+                message: `Failed to prettify ${relativePath}`,
                 error,
             });
         }
@@ -45,13 +39,12 @@ export async function handleFileSystemDiffs({
         await writeFiles({
             touchedFiles,
             logger,
-            absolutePackagePath,
         });
     } else if (touchedFiles.length > 0) {
-        result = Result.failure();
+        result.fail();
         for (const touchedFile of touchedFiles) {
             logger.error({
-                message: `${path.relative(absolutePackagePath, touchedFile.fullPath)} differs from expected value`,
+                message: `${touchedFile.relativePath} differs from expected value`,
                 additionalContent: getDiff(touchedFile.originalContents ?? "", touchedFile.newContents),
             });
         }
@@ -64,29 +57,26 @@ export async function handleFileSystemDiffs({
 async function writeFiles({
     touchedFiles,
     logger,
-    absolutePackagePath,
 }: {
     touchedFiles: FileSystemWithUtilities.TouchedFile[];
     logger: Logger;
-    absolutePackagePath: string;
 }): Promise<Result> {
-    let result = Result.success();
+    const result = Result.success();
 
     for (const touchedFile of touchedFiles) {
-        const relativePath = path.relative(absolutePackagePath, touchedFile.fullPath);
         const fileDirectory = path.dirname(touchedFile.fullPath);
         try {
             await mkdir(fileDirectory, { recursive: true });
             await writeFile(touchedFile.fullPath, touchedFile.newContents);
             logger.info({
-                message: chalk.green(`Fixed ${relativePath}`),
+                message: chalk.green(`Fixed ${touchedFile.relativePath}`),
             });
         } catch (error) {
             logger.error({
-                message: `Failed to write ${relativePath}`,
+                message: `Failed to write ${touchedFile.relativePath}`,
                 error,
             });
-            result = Result.failure();
+            result.fail();
         }
     }
 

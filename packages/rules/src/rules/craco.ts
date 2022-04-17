@@ -1,4 +1,4 @@
-import { PackageType, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
+import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 
 export const CracoRule: Rule.PackageRule = {
     ruleId: "craco",

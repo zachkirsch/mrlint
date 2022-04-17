@@ -1,4 +1,4 @@
-import { LintablePackage, Logger, PackageType, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
+import { LintablePackage, Logger, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import produce, { Draft } from "immer";
 import { IPackageJson, IScriptsMap } from "package-json-type";
 import path from "path";
@@ -46,6 +46,12 @@ async function runRule({
         });
         return Result.failure();
     }
+
+    // warn about invalid workspace versions
+    packageJson = produce(packageJson, (draft) => {
+        draft.dependencies = updateWorkspaceVersions(packageJson.dependencies);
+        draft.devDependencies = updateWorkspaceVersions(packageJson.devDependencies);
+    });
 
     const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
     await fileSystemForPackage.writeFile("package.json", JSON.stringify(packageJson));
@@ -253,4 +259,18 @@ function checkDependencyForExecutable({
     }
 
     return Result.success();
+}
+
+function updateWorkspaceVersions(dependencies: Record<string, string> | undefined): Record<string, string> | undefined {
+    if (dependencies == null) {
+        return undefined;
+    }
+
+    return produce(dependencies, (draft) => {
+        for (const [dep, version] of Object.entries(dependencies)) {
+            if (version.startsWith("workspace")) {
+                draft[dep] = "workspace:*";
+            }
+        }
+    });
 }

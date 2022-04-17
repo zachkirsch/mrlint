@@ -1,12 +1,10 @@
-import { Monorepo, Result, Rule } from "@fernapi/mrlint-commons";
-import { FileSystem } from "@fernapi/mrlint-virtual-file-system";
+import { Monorepo, Result, Rule } from "@fern-api/mrlint-commons";
 import path from "path/posix";
 
 export declare namespace runRuleOnPackage {
-    export interface Args extends Pick<Rule.PackageRuleRunnerArgs, "packageToLint" | "logger"> {
+    export interface Args extends Pick<Rule.PackageRuleRunnerArgs, "packageToLint" | "logger" | "fileSystems"> {
         monorepo: Monorepo;
         rule: Rule.PackageRule;
-        fileSystem: FileSystem;
     }
 }
 
@@ -14,7 +12,7 @@ export async function runRuleOnPackage({
     monorepo,
     packageToLint,
     rule,
-    fileSystem,
+    fileSystems,
     logger,
 }: runRuleOnPackage.Args): Promise<Result> {
     const relativePathToRoot = path.relative(
@@ -26,17 +24,14 @@ export async function runRuleOnPackage({
         message: "Running rule...",
     });
 
-    let result: Result;
+    let result = Result.success();
     try {
         result = await rule.run({
             packageToLint,
             allPackages: monorepo.packages,
             relativePathToRoot,
             relativePathToSharedConfigs: path.join(relativePathToRoot, monorepo.root.config.sharedConfigs),
-            fileSystems: {
-                getFileSystemForMonorepo: () => fileSystem,
-                getFileSystemForPackage: (p) => fileSystem.getFileSystemForPrefix(p.relativePath),
-            },
+            fileSystems,
             logger,
         });
     } catch (error) {
@@ -44,7 +39,7 @@ export async function runRuleOnPackage({
             message: "Encountered exception when running rule",
             error,
         });
-        result = Result.failure();
+        result.fail();
     }
 
     logger.debug({

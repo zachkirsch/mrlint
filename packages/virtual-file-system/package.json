@@ -1,5 +1,5 @@
 {
-  "name": "@fernapi/mrlint-virtual-file-system",
+  "name": "@fern-api/mrlint-virtual-file-system",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [

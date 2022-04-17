@@ -1,5 +1,5 @@
-import { LintablePackage, Monorepo, MonorepoLoggers, Package, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
-import { LazyVirtualFileSystem } from "@fernapi/mrlint-virtual-file-system";
+import { LintablePackage, Monorepo, MonorepoLoggers, Package, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { LazyVirtualFileSystem } from "@fern-api/mrlint-virtual-file-system";
 import { handleFileSystemDiffs } from "./handleFileSystemDiffs";
 import { lintPackage } from "./package-rules/lintPackage";
 
@@ -14,14 +14,17 @@ export declare namespace lintMonorepo {
 
 export async function lintMonorepo({ monorepo, rules, loggers, shouldFix }: lintMonorepo.Args): Promise<Result> {
     const result = Result.success();
-    const fileSystem = new LazyVirtualFileSystem(monorepo.root.fullPath);
 
-    const [, packageRules] = partition<Rule.MonorepoRule, Rule.PackageRule>(
+    const fileSystem = new LazyVirtualFileSystem(monorepo.root.fullPath);
+    const fileSystems: Rule.FileSystems = {
+        getFileSystemForMonorepo: () => fileSystem,
+        getFileSystemForPackage: (p) => fileSystem.getFileSystemForPrefix(p.relativePath),
+    };
+
+    const [monorepoRules, packageRules] = partition<Rule.MonorepoRule, Rule.PackageRule>(
         rules,
         (rule): rule is Rule.MonorepoRule => rule.type === RuleType.MONOREPO
     );
-
-    // TODO: Lint with monorepo rules
 
     const packagesToLint: LintablePackage[] = monorepo.packages.filter(isLintablePackage);
     for (const packageToLint of packagesToLint) {
@@ -34,23 +37,32 @@ export async function lintMonorepo({ monorepo, rules, loggers, shouldFix }: lint
                 monorepo,
                 packageToLint,
                 rules: packageRules.filter((rule) => ruleAppliesToPackage(rule, packageToLint)),
-                fileSystem,
+                fileSystems,
                 getLoggerForRule: loggers.getLoggerForRule,
-            })
-        );
-        result.accumulate(
-            await handleFileSystemDiffs({
-                monorepo,
-                packageToLint,
-                fileSystem,
-                logger: loggerForPackage,
-                shouldFix,
             })
         );
         loggerForPackage.debug({
             message: "Done linting.",
         });
     }
+
+    for (const monorepoRule of monorepoRules) {
+        result.accumulate(
+            await monorepoRule.run({
+                monorepo,
+                fileSystems,
+                logger: loggers.getLoggerForRule({ rule: monorepoRule, package: undefined }),
+            })
+        );
+    }
+
+    result.accumulate(
+        await handleFileSystemDiffs({
+            fileSystem,
+            logger: loggers.getLogger(),
+            shouldFix,
+        })
+    );
 
     return result;
 }

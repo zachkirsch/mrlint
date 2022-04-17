@@ -1,4 +1,4 @@
-import { LogLevel } from "@fernapi/mrlint-commons";
+import { LogLevel } from "@fern-api/mrlint-commons";
 import yargs from "yargs";
 import { lintCommand } from "./commands/lintCommand";
 import { versionCommand } from "./commands/versionCommand";

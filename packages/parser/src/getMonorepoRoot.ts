@@ -1,4 +1,4 @@
-import { MonorepoRoot } from "@fernapi/mrlint-commons";
+import { MonorepoRoot } from "@fern-api/mrlint-commons";
 import { readdir } from "fs/promises";
 import path from "path";
 import { parse } from "path/posix";

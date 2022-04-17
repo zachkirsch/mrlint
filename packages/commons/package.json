@@ -1,5 +1,5 @@
 {
-  "name": "@fernapi/mrlint-commons",
+  "name": "@fern-api/mrlint-commons",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
@@ -18,7 +18,7 @@
     "depcheck": "depcheck"
   },
   "dependencies": {
-    "@fernapi/mrlint-virtual-file-system": "workspace:^"
+    "@fern-api/mrlint-virtual-file-system": "workspace:*"
   },
   "devDependencies": {
     "depcheck": "^1.4.3",

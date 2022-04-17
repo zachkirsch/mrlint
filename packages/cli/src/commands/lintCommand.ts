@@ -1,7 +1,7 @@
-import { MonorepoLoggers } from "@fernapi/mrlint-commons";
-import { lintMonorepo } from "@fernapi/mrlint-lint";
-import { parseMonorepo } from "@fernapi/mrlint-parser";
-import rules from "@fernapi/mrlint-rules";
+import { MonorepoLoggers } from "@fern-api/mrlint-commons";
+import { lintMonorepo } from "@fern-api/mrlint-lint";
+import { parseMonorepo } from "@fern-api/mrlint-parser";
+import rules from "@fern-api/mrlint-rules";
 
 export async function lintCommand({
     loggers,

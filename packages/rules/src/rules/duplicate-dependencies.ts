@@ -1,4 +1,4 @@
-import { Result, Rule, RuleType } from "@fernapi/mrlint-commons";
+import { Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 
 type DependencyName = string;
 type DependencyVersion = string;
@@ -11,7 +11,7 @@ export const DuplicateDependenciesRule: Rule.MonorepoRule = {
 };
 
 function runRule({ monorepo, logger }: Rule.MonorepoRuleRunnerArgs): Result {
-    let result = Result.success();
+    const result = Result.success();
 
     const dependenciesByName: Record<DependencyName, Record<DependencyVersion, PackagePath[]>> = {};
     for (const p of monorepo.packages) {
@@ -30,7 +30,7 @@ function runRule({ monorepo, logger }: Rule.MonorepoRuleRunnerArgs): Result {
     for (const [dependency, versionToPackageNames] of Object.entries(dependenciesByName)) {
         const entries = Object.entries(versionToPackageNames);
         if (entries.length > 1) {
-            result = Result.failure();
+            result.fail();
             logger.error({
                 message: `Found multiple versions of ${dependency}`,
                 additionalContent: entries

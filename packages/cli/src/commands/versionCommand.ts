@@ -1,5 +1,5 @@
-import { formatFileContents } from "@fernapi/mrlint-commons";
-import { parseMonorepo } from "@fernapi/mrlint-parser";
+import { formatFileContents } from "@fern-api/mrlint-commons";
+import { parseMonorepo } from "@fern-api/mrlint-parser";
 import { writeFile } from "fs/promises";
 import path from "path";
 

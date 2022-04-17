@@ -1,13 +1,11 @@
-import { Logger, Monorepo, Package, Result, Rule } from "@fernapi/mrlint-commons";
-import { FileSystem } from "@fernapi/mrlint-virtual-file-system";
+import { Logger, Monorepo, Package, Result, Rule } from "@fern-api/mrlint-commons";
 import { runRuleOnPackage } from "./runRuleOnPackage";
 
 export declare namespace lintPackage {
-    export interface Args extends Pick<Rule.PackageRuleRunnerArgs, "packageToLint"> {
+    export interface Args extends Pick<Rule.PackageRuleRunnerArgs, "packageToLint" | "fileSystems"> {
         monorepo: Monorepo;
         rules: Rule.PackageRule[];
         getLoggerForRule: (args: { rule: Rule; package: Package | undefined }) => Logger;
-        fileSystem: FileSystem;
     }
 }
 
@@ -15,7 +13,7 @@ export async function lintPackage({
     monorepo,
     packageToLint,
     rules,
-    fileSystem,
+    fileSystems,
     getLoggerForRule,
 }: lintPackage.Args): Promise<Result> {
     const result = Result.success();
@@ -25,7 +23,7 @@ export async function lintPackage({
                 monorepo,
                 packageToLint,
                 rule,
-                fileSystem,
+                fileSystems,
                 logger: getLoggerForRule({
                     rule,
                     package: packageToLint,

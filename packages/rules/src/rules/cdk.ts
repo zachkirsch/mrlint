@@ -1,5 +1,5 @@
-import { Logger, Package, PackageType, Result, Rule, RuleType } from "@fernapi/mrlint-commons";
-import { FileSystem } from "@fernapi/mrlint-virtual-file-system";
+import { Logger, Package, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
 import path from "path";
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
 import { TsConfig } from "./ts-config";
@@ -112,7 +112,7 @@ async function writeDeployTs({
             "deploy.ts",
             `#!/usr/bin/env node
 
-import { createCdkStack } from "@fernapi/cdk-utils";
+import { createCdkStack } from "@fern-api/cdk-utils";
 import path from "path";
 	
 createCdkStack({
@@ -146,10 +146,10 @@ async function writeTsConfig({
     fileSystemForDeploy: FileSystem;
     logger: Logger;
 }): Promise<Result> {
-    const cdkUtils = allPackages.find((p) => p.packageJson?.name === "@fernapi/cdk-utils");
+    const cdkUtils = allPackages.find((p) => p.packageJson?.name === "@fern-api/cdk-utils");
     if (cdkUtils == null) {
         logger.error({
-            message: "Could not find @fernapi/cdk-utils",
+            message: "Could not find @fern-api/cdk-utils",
         });
         return Result.failure();
     }
