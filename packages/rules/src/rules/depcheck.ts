@@ -20,7 +20,7 @@ export const DepcheckRule: Rule.PackageRule = {
 
 async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const depcheckRc: DepcheckConfig = {
-        ignores: ["@types/jest"],
+        ignores: ["@types/jest", "@types/node"],
         "ignore-patterns": ["lib"],
     };
 
