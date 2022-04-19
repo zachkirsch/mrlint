@@ -10,9 +10,6 @@ jobs:
       - node/install-packages:
           pkg-manager: yarn-berry
       - run:
-          name: Lint monorepo
-          command: yarn lint:monorepo
-      - run:
           name: Lint
           command: yarn lint:eslint
       - run:
@@ -27,6 +24,9 @@ jobs:
       - run:
           name: Compile
           command: yarn compile
+      - run:
+          name: Lint monorepo
+          command: yarn lint:monorepo
       - run:
           name: Run tests
           command: yarn test -- --ci

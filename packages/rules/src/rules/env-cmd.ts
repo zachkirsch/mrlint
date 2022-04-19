@@ -1,4 +1,5 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { writePackageFile } from "../utils/writePackageFile";
 
 const FILENAME = ".env-cmdrc";
 
@@ -20,13 +21,10 @@ async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleR
         production: existing.production ?? {},
     };
 
-    try {
-        await fileSystemForPackage.writeFile(FILENAME, JSON.stringify(contents));
-        return Result.success();
-    } catch (e) {
-        logger.error({
-            message: `Failed to write ${FILENAME}`,
-        });
-        return Result.failure();
-    }
+    return writePackageFile({
+        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+        filename: FILENAME,
+        contents: JSON.stringify(contents),
+        logger,
+    });
 }

@@ -1,5 +1,11 @@
 import { LintablePackage, Monorepo, MonorepoLoggers, Package, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import { LazyVirtualFileSystem } from "@fern-api/mrlint-virtual-file-system";
+import {
+    addDevDependencies,
+    DependencyName,
+    PackageName,
+    PackageWithRequiredDevDependencies,
+} from "./addDevDependencies";
 import { handleFileSystemDiffs } from "./handleFileSystemDiffs";
 import { lintPackage } from "./package-rules/lintPackage";
 
@@ -26,12 +32,15 @@ export async function lintMonorepo({ monorepo, rules, loggers, shouldFix }: lint
         (rule): rule is Rule.MonorepoRule => rule.type === RuleType.MONOREPO
     );
 
+    const devDependenciesToAdd: Record<PackageName, PackageWithRequiredDevDependencies> = {};
+
     const packagesToLint: LintablePackage[] = monorepo.packages.filter(isLintablePackage);
     for (const packageToLint of packagesToLint) {
         const loggerForPackage = loggers.getLoggerForPackage(packageToLint);
-        loggerForPackage.debug({
-            message: "Linting...",
-        });
+        loggerForPackage.debug("Linting...");
+
+        const devDependenciesForPackage = new Set<DependencyName>();
+
         result.accumulate(
             await lintPackage({
                 monorepo,
@@ -39,11 +48,26 @@ export async function lintMonorepo({ monorepo, rules, loggers, shouldFix }: lint
                 rules: packageRules.filter((rule) => ruleAppliesToPackage(rule, packageToLint)),
                 fileSystems,
                 getLoggerForRule: loggers.getLoggerForRule,
+                addDevDependency: (dependency) => {
+                    devDependenciesForPackage.add(dependency);
+                },
             })
         );
-        loggerForPackage.debug({
-            message: "Done linting.",
-        });
+
+        if (devDependenciesForPackage.size > 0) {
+            if (packageToLint.packageJson == null) {
+                loggerForPackage.error("Cannot add dependencies because package.json does not exist");
+            } else if (packageToLint.packageJson.name == null) {
+                loggerForPackage.error('Cannot add dependencies because package.json does not have a "name"');
+            } else {
+                devDependenciesToAdd[packageToLint.packageJson.name] = {
+                    package: packageToLint,
+                    devDependenciesToAdd: devDependenciesForPackage,
+                };
+            }
+        }
+
+        loggerForPackage.debug("Done linting.");
     }
 
     for (const monorepoRule of monorepoRules) {
@@ -61,6 +85,14 @@ export async function lintMonorepo({ monorepo, rules, loggers, shouldFix }: lint
             fileSystem,
             logger: loggers.getLogger(),
             shouldFix,
+        })
+    );
+
+    result.accumulate(
+        await addDevDependencies({
+            devDependencies: devDependenciesToAdd,
+            shouldFix,
+            loggers,
         })
     );
 

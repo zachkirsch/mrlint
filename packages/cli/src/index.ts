@@ -15,6 +15,7 @@ const LOG_LEVELS: Record<CommandLineLogLevel, true> = {
 };
 
 yargs
+    .scriptName("mrlint")
     .strict()
     .option("log-level", {
         default: DEFAULT_COMMAND_LINE_LOG_LEVEL,

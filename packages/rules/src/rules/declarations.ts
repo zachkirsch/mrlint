@@ -1,4 +1,5 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { writePackageFile } from "../utils/writePackageFile";
 
 export const DeclarationsRule: Rule.PackageRule = {
     ruleId: "declarations",
@@ -7,23 +8,14 @@ export const DeclarationsRule: Rule.PackageRule = {
     run: runRule,
 };
 
-const FILENAME = "src/declarations.d.ts";
-
-const CONTENTS = `declare module "*.module.scss";
+async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
+    return writePackageFile({
+        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+        filename: "src/declarations.d.ts",
+        contents: `declare module "*.module.scss";
 declare module "*.png";
 declare module "*.jpg";
-declare module "*.jpeg";`;
-
-async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
-    const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
-    try {
-        await fileSystemForPackage.writeFile(FILENAME, CONTENTS);
-        return Result.success();
-    } catch (error) {
-        logger.error({
-            message: `Failed to write ${FILENAME}`,
-            error,
-        });
-        return Result.failure();
-    }
+declare module "*.jpeg";`,
+        logger,
+    });
 }

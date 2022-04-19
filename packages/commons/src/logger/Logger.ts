@@ -10,11 +10,13 @@ export type Logger = {
 export declare namespace Logger {
     export type LogFunction = (args: LogFunctionArgs) => void;
 
-    export interface LogFunctionArgs {
-        message: string;
-        additionalContent?: string;
-        error?: unknown;
-    }
+    export type LogFunctionArgs =
+        | string
+        | {
+              message: string;
+              additionalContent?: string | readonly string[];
+              error?: unknown;
+          };
 }
 
 export enum LogLevel {

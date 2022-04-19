@@ -1,5 +1,6 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import path from "path";
+import { writePackageFile } from "../utils/writePackageFile";
 
 export const StyleLintRule: Rule.PackageRule = {
     ruleId: "stylelint",
@@ -7,8 +8,6 @@ export const StyleLintRule: Rule.PackageRule = {
     targetedPackages: [PackageType.REACT_APP, PackageType.REACT_LIBRARY],
     run: runRule,
 };
-
-const FILENAME = ".stylelintrc.json";
 
 async function runRule({
     fileSystems,
@@ -20,17 +19,10 @@ async function runRule({
         extends: [path.join(relativePathToSharedConfigs, "stylelintrc.shared.json")],
     };
 
-    const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
-
-    try {
-        await fileSystemForPackage.writeFile(FILENAME, JSON.stringify(contents));
-    } catch (error) {
-        logger.error({
-            message: `Failed to write ${FILENAME}`,
-            error,
-        });
-        return Result.failure();
-    }
-
-    return Result.success();
+    return writePackageFile({
+        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+        filename: ".stylelintrc.json",
+        contents: JSON.stringify(contents),
+        logger,
+    });
 }

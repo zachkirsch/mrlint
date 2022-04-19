@@ -1,1 +1,1 @@
-{ "ignore-patterns": ["lib"] }
+{ "ignores": ["@types/jest"], "ignore-patterns": ["lib"] }
