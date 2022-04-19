@@ -1,11 +1,12 @@
 {
   "name": "mrlint",
+  "private": true,
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib"
   ],
-  "bin": "./cli",
+  "bin": "./lib/cli.js",
   "scripts": {
     "clean": "tsc --build --clean",
     "compile": "tsc --build",

@@ -5583,9 +5583,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"mrlint@workspace:*, mrlint@workspace:packages/cli":
+"mrlint@workspace:*, mrlint@workspace:packages/mrlint":
   version: 0.0.0-use.local
-  resolution: "mrlint@workspace:packages/cli"
+  resolution: "mrlint@workspace:packages/mrlint"
   dependencies:
     "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
@@ -5606,7 +5606,7 @@ __metadata:
     typescript: ^4.6.3
     yargs: ^17.3.1
   bin:
-    mrlint: ./cli
+    mrlint: ./lib/cli.js
   languageName: unknown
   linkType: soft
 

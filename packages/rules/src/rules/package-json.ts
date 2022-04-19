@@ -109,7 +109,12 @@ function generatePackageJson({
         draft.files = ["lib"];
 
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-            draft.bin = "./cli";
+            draft.bin =
+                packageToLint.config.cliName == null
+                    ? packageToLint.config.pathToCli
+                    : {
+                          [packageToLint.config.cliName]: packageToLint.config.pathToCli,
+                      };
         }
 
         addScripts({
@@ -230,6 +235,7 @@ function canPackageContainCss(p: LintablePackage): boolean {
             return true;
         case PackageType.TYPESCRIPT_CLI:
         case PackageType.TYPESCRIPT_LIBRARY:
+        case PackageType.CUSTOM:
             return false;
     }
 }
