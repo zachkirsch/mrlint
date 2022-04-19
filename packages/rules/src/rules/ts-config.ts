@@ -3,6 +3,7 @@ import path from "path";
 import { CompilerOptions, ProjectReference } from "typescript";
 import { keyPackagesByNpmName } from "../utils/keyPackagesByNpmName";
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
+import { writePackageFile } from "../utils/writePackageFile";
 
 export const TsConfigRule: Rule.PackageRule = {
     ruleId: "ts-config",
@@ -22,8 +23,6 @@ export type TsConfig = {
     include?: string[];
     references: ProjectReference[];
 };
-
-const FILENAME = "tsconfig.json";
 
 async function runRule({
     fileSystems,
@@ -48,19 +47,12 @@ async function runRule({
         return Result.failure();
     }
 
-    const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
-
-    try {
-        await fileSystemForPackage.writeFile(FILENAME, JSON.stringify(tsConfig));
-    } catch (error) {
-        logger.error({
-            message: `Failed to write ${FILENAME}`,
-            error,
-        });
-        return Result.failure();
-    }
-
-    return Result.success();
+    return writePackageFile({
+        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+        filename: "tsconfig.json",
+        contents: JSON.stringify(tsConfig),
+        logger,
+    });
 }
 
 async function generateTsConfig({

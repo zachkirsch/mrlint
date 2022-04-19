@@ -1,4 +1,5 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { writePackageFile } from "../utils/writePackageFile";
 
 export const CracoRule: Rule.PackageRule = {
     ruleId: "craco",
@@ -6,8 +7,6 @@ export const CracoRule: Rule.PackageRule = {
     targetedPackages: [PackageType.REACT_APP],
     run: runRule,
 };
-
-const FILENAME = "craco.config.js";
 
 const CONTENTS = `const { getLoader, loaderByName } = require("@craco/craco");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
@@ -43,15 +42,10 @@ module.exports = async function () {
 };`;
 
 async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
-    const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
-    try {
-        await fileSystemForPackage.writeFile(FILENAME, CONTENTS);
-        return Result.success();
-    } catch (error) {
-        logger.error({
-            message: `Failed to write ${FILENAME}`,
-            error,
-        });
-        return Result.failure();
-    }
+    return writePackageFile({
+        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+        filename: "craco.config.js",
+        contents: CONTENTS,
+        logger,
+    });
 }

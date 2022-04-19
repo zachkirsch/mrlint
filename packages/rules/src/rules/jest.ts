@@ -1,5 +1,7 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import path from "path";
+import { tryGetPackageJson } from "../utils/tryGetPackageJson";
+import { writePackageFile } from "../utils/writePackageFile";
 
 export const JestRule: Rule.PackageRule = {
     ruleId: "jest",
@@ -13,27 +15,47 @@ export const JestRule: Rule.PackageRule = {
     run: runRule,
 };
 
-const FILENAME = "jest.config.js";
+const EXPECTED_DEV_DEPENDENCIES = ["jest", "@types/jest", "@babel/preset-env", "@babel/preset-typescript"];
 
 async function runRule({
     fileSystems,
     packageToLint,
     relativePathToSharedConfigs,
     logger,
+    addDevDependency,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
-    const contents = `module.exports = {
-...require("${path.join(relativePathToSharedConfigs, "jest.config.shared.json")}"),
-};`;
+    const result = Result.success();
 
-    const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
-    try {
-        await fileSystemForPackage.writeFile(FILENAME, contents);
-        return Result.success();
-    } catch (error) {
-        logger.error({
-            message: `Failed to write ${FILENAME}`,
-            error,
-        });
-        return Result.failure();
+    result.accumulate(
+        await writePackageFile({
+            fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+            filename: "jest.config.js",
+            contents: `module.exports = {
+    ...require("${path.join(relativePathToSharedConfigs, "jest.config.shared.json")}"),
+        };`,
+            logger,
+        })
+    );
+
+    result.accumulate(
+        await writePackageFile({
+            fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+            filename: "babel.config.js",
+            contents: `module.exports = {
+    presets: [["@babel/preset-env", { targets: { node: "current" } }], "@babel/preset-typescript"],
+        };`,
+            logger,
+        })
+    );
+
+    const packageJson = tryGetPackageJson(packageToLint, logger);
+    if (packageJson == null) {
+        result.fail();
+    } else {
+        for (const dependency of EXPECTED_DEV_DEPENDENCIES) {
+            addDevDependency(dependency);
+        }
     }
+
+    return result;
 }

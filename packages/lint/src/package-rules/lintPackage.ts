@@ -2,7 +2,8 @@ import { Logger, Monorepo, Package, Result, Rule } from "@fern-api/mrlint-common
 import { runRuleOnPackage } from "./runRuleOnPackage";
 
 export declare namespace lintPackage {
-    export interface Args extends Pick<Rule.PackageRuleRunnerArgs, "packageToLint" | "fileSystems"> {
+    export interface Args
+        extends Pick<Rule.PackageRuleRunnerArgs, "packageToLint" | "fileSystems" | "addDevDependency"> {
         monorepo: Monorepo;
         rules: Rule.PackageRule[];
         getLoggerForRule: (args: { rule: Rule; package: Package | undefined }) => Logger;
@@ -15,6 +16,7 @@ export async function lintPackage({
     rules,
     fileSystems,
     getLoggerForRule,
+    addDevDependency,
 }: lintPackage.Args): Promise<Result> {
     const result = Result.success();
     for (const rule of rules) {
@@ -28,6 +30,7 @@ export async function lintPackage({
                     rule,
                     package: packageToLint,
                 }),
+                addDevDependency,
             })
         );
     }

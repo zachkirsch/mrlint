@@ -1,4 +1,5 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { writePackageFile } from "../utils/writePackageFile";
 
 export const CliRule: Rule.PackageRule = {
     ruleId: "cli",
@@ -7,22 +8,13 @@ export const CliRule: Rule.PackageRule = {
     run: runRule,
 };
 
-const FILENAME = "cli";
-
-const CONTENTS = `#!/usr/bin/env node
-
-require("./lib/index");`;
-
 async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
-    const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
-    try {
-        await fileSystemForPackage.writeFile(FILENAME, CONTENTS);
-        return Result.success();
-    } catch (error) {
-        logger.error({
-            message: `Failed to write ${FILENAME}`,
-            error,
-        });
-        return Result.failure();
-    }
+    return writePackageFile({
+        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+        filename: "cli",
+        contents: `#!/usr/bin/env node
+
+require("./lib/index");`,
+        logger,
+    });
 }

@@ -2,6 +2,7 @@ import { Logger, Package, PackageType, Result, Rule, RuleType } from "@fern-api/
 import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
 import path from "path";
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
+import { writePackageFile } from "../utils/writePackageFile";
 import { TsConfig } from "./ts-config";
 
 export const CdkRule: Rule.PackageRule = {
@@ -21,12 +22,14 @@ async function runRule({
     logger,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
+    const result = Result.success();
 
     // write cdk.json
-    try {
-        await fileSystemForPackage.writeFile(
-            "cdk.json",
-            JSON.stringify({
+    result.accumulate(
+        await writePackageFile({
+            fileSystem: fileSystemForPackage,
+            filename: "cdk.json",
+            contents: JSON.stringify({
                 app: "npx ts-node --prefer-ts-exts deploy/deploy.ts",
                 context: {
                     "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
@@ -38,24 +41,21 @@ async function runRule({
                     "@aws-cdk/aws-ec2:uniqueImdsv2TemplateName": true,
                     "@aws-cdk/core:target-partitions": ["aws", "aws-cn"],
                 },
-            })
-        );
-    } catch (error) {
-        logger.error({
-            message: "Failed to write cdk.json",
-            error,
-        });
-        return Result.failure();
-    }
+            }),
+            logger,
+        })
+    );
 
     // write deploy/
-    await writeDeployDirectory({
-        packageToLint,
-        allPackages,
-        relativePathToSharedConfigs,
-        fileSystemForPackage,
-        logger,
-    });
+    result.accumulate(
+        await writeDeployDirectory({
+            packageToLint,
+            allPackages,
+            relativePathToSharedConfigs,
+            fileSystemForPackage,
+            logger,
+        })
+    );
 
     return Result.success();
 }
@@ -80,22 +80,22 @@ async function writeDeployDirectory({
     if (packageJson == null) {
         return Result.failure();
     }
+    const packageName = packageJson.name;
 
-    await writeDeployTs({
-        packageName: packageJson.name,
-        fileSystemForDeploy,
-        logger,
-    });
+    const result = Result.success();
 
-    await writeTsConfig({
-        packageToLint,
-        allPackages,
-        relativePathToSharedConfigs,
-        fileSystemForDeploy,
-        logger,
-    });
+    result.accumulate(await writeDeployTs({ packageName, fileSystemForDeploy, logger }));
+    result.accumulate(
+        await writeTsConfig({
+            packageToLint,
+            allPackages,
+            relativePathToSharedConfigs,
+            fileSystemForDeploy,
+            logger,
+        })
+    );
 
-    return Result.success();
+    return result;
 }
 
 async function writeDeployTs({
@@ -107,30 +107,23 @@ async function writeDeployTs({
     fileSystemForDeploy: FileSystem;
     logger: Logger;
 }): Promise<Result> {
-    try {
-        fileSystemForDeploy.writeFile(
-            "deploy.ts",
-            `#!/usr/bin/env node
+    return writePackageFile({
+        fileSystem: fileSystemForDeploy,
+        filename: "deploy.ts",
+        contents: `#!/usr/bin/env node
 
 import { createCdkStack } from "@fern-api/cdk-utils";
 import path from "path";
-	
+
 createCdkStack({
-	id: "${packageName}", 
-	bundleLocation: path.join(__dirname, ".."),
-	environmentToDomain: {
-		STAGING: "<TODO>",
-	},
-});`
-        );
-        return Result.success();
-    } catch (error) {
-        logger.error({
-            message: "Failed to write deploy.ts",
-            error,
-        });
-        return Result.failure();
-    }
+id: "${packageName}", 
+bundleLocation: path.join(__dirname, ".."),
+environmentToDomain: {
+    STAGING: "<TODO>",
+},
+});`,
+        logger,
+    });
 }
 
 async function writeTsConfig({
@@ -148,9 +141,7 @@ async function writeTsConfig({
 }): Promise<Result> {
     const cdkUtils = allPackages.find((p) => p.packageJson?.name === "@fern-api/cdk-utils");
     if (cdkUtils == null) {
-        logger.error({
-            message: "Could not find @fern-api/cdk-utils",
-        });
+        logger.error("Could not find @fern-api/cdk-utils");
         return Result.failure();
     }
 
@@ -168,15 +159,10 @@ async function writeTsConfig({
         ],
     };
 
-    try {
-        fileSystemForDeploy.writeFile("tsconfig.json", JSON.stringify(tsConfig));
-    } catch (error) {
-        logger.error({
-            message: "Failed to write deploy.ts",
-            error,
-        });
-        return Result.failure();
-    }
-
-    return Result.success();
+    return writePackageFile({
+        fileSystem: fileSystemForDeploy,
+        filename: "tsconfig.json",
+        contents: JSON.stringify(tsConfig),
+        logger,
+    });
 }

@@ -26,9 +26,9 @@ export class ConsoleMonorepoLogger implements MonorepoLoggers {
             error: (args) => {
                 const message = new ConsoleMessage({
                     ...defaultMetadata,
-                    title: args.message,
-                    error: args.error,
-                    additionalContent: args.additionalContent,
+                    title: typeof args === "string" ? args : args.message,
+                    error: typeof args !== "string" ? args.error : undefined,
+                    additionalContent: typeof args !== "string" ? args.additionalContent : undefined,
                     level: LogLevel.ERROR,
                     maxLevel: this.maxLevel,
                 });
@@ -37,8 +37,8 @@ export class ConsoleMonorepoLogger implements MonorepoLoggers {
             warn: (args) => {
                 const message = new ConsoleMessage({
                     ...defaultMetadata,
-                    title: args.message,
-                    additionalContent: args.additionalContent,
+                    title: typeof args === "string" ? args : args.message,
+                    additionalContent: typeof args !== "string" ? args.additionalContent : undefined,
                     level: LogLevel.WARN,
                     maxLevel: this.maxLevel,
                 });
@@ -47,8 +47,8 @@ export class ConsoleMonorepoLogger implements MonorepoLoggers {
             info: (args) => {
                 const message = new ConsoleMessage({
                     ...defaultMetadata,
-                    title: args.message,
-                    additionalContent: args.additionalContent,
+                    title: typeof args === "string" ? args : args.message,
+                    additionalContent: typeof args !== "string" ? args.additionalContent : undefined,
                     level: LogLevel.INFO,
                     maxLevel: this.maxLevel,
                 });
@@ -57,8 +57,8 @@ export class ConsoleMonorepoLogger implements MonorepoLoggers {
             debug: (args) => {
                 const message = new ConsoleMessage({
                     ...defaultMetadata,
-                    title: args.message,
-                    additionalContent: args.additionalContent,
+                    title: typeof args === "string" ? args : args.message,
+                    additionalContent: typeof args !== "string" ? args.additionalContent : undefined,
                     level: LogLevel.DEBUG,
                     maxLevel: this.maxLevel,
                 });
@@ -67,8 +67,8 @@ export class ConsoleMonorepoLogger implements MonorepoLoggers {
             log: (args, level = LogLevel.INFO) => {
                 const message = new ConsoleMessage({
                     ...defaultMetadata,
-                    title: args.message,
-                    additionalContent: args.additionalContent,
+                    title: typeof args === "string" ? args : args.message,
+                    additionalContent: typeof args !== "string" ? args.additionalContent : undefined,
                     level,
                     maxLevel: this.maxLevel,
                 });

@@ -2,7 +2,8 @@ import { Monorepo, Result, Rule } from "@fern-api/mrlint-commons";
 import path from "path/posix";
 
 export declare namespace runRuleOnPackage {
-    export interface Args extends Pick<Rule.PackageRuleRunnerArgs, "packageToLint" | "logger" | "fileSystems"> {
+    export interface Args
+        extends Pick<Rule.PackageRuleRunnerArgs, "packageToLint" | "logger" | "fileSystems" | "addDevDependency"> {
         monorepo: Monorepo;
         rule: Rule.PackageRule;
     }
@@ -14,15 +15,14 @@ export async function runRuleOnPackage({
     rule,
     fileSystems,
     logger,
+    addDevDependency,
 }: runRuleOnPackage.Args): Promise<Result> {
     const relativePathToRoot = path.relative(
         path.join(monorepo.root.fullPath, packageToLint.relativePath),
         monorepo.root.fullPath
     );
 
-    logger.debug({
-        message: "Running rule...",
-    });
+    logger.debug("Running rule...");
 
     let result = Result.success();
     try {
@@ -33,6 +33,7 @@ export async function runRuleOnPackage({
             relativePathToSharedConfigs: path.join(relativePathToRoot, monorepo.root.config.sharedConfigs),
             fileSystems,
             logger,
+            addDevDependency,
         });
     } catch (error) {
         logger.error({
@@ -42,9 +43,7 @@ export async function runRuleOnPackage({
         result.fail();
     }
 
-    logger.debug({
-        message: "Done running rule.",
-    });
+    logger.debug("Done running rule.");
 
     return result;
 }

@@ -33,9 +33,7 @@ function runRule({ monorepo, logger }: Rule.MonorepoRuleRunnerArgs): Result {
             result.fail();
             logger.error({
                 message: `Found multiple versions of ${dependency}`,
-                additionalContent: entries
-                    .map(([version, packageNames]) => `${version} (${packageNames.join(", ")})`)
-                    .join("\n"),
+                additionalContent: entries.map(([version, packageNames]) => `${version} (${packageNames.join(", ")})`),
             });
         }
     }

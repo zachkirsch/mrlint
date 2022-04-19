@@ -1,5 +1,6 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import path from "path";
+import { writePackageFile } from "../utils/writePackageFile";
 
 export const PrettierRule: Rule.PackageRule = {
     ruleId: "prettier",
@@ -13,8 +14,6 @@ export const PrettierRule: Rule.PackageRule = {
     run: runRule,
 };
 
-const FILENAME = ".prettierrc.js";
-
 async function runRule({
     fileSystems,
     packageToLint,
@@ -25,17 +24,10 @@ async function runRule({
 ...require("${path.join(relativePathToRoot, ".prettierrc.json")}"),
 };`;
 
-    const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
-
-    try {
-        await fileSystemForPackage.writeFile(FILENAME, contents);
-    } catch (error) {
-        logger.error({
-            message: `Failed to write ${FILENAME}`,
-            error,
-        });
-        return Result.failure();
-    }
-
-    return Result.success();
+    return writePackageFile({
+        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+        filename: ".prettierrc.js",
+        contents,
+        logger,
+    });
 }

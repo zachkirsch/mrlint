@@ -2,10 +2,14 @@ import { LintablePackage, Logger, PackageType, Result, Rule, RuleType } from "@f
 import produce, { Draft } from "immer";
 import { IPackageJson, IScriptsMap } from "package-json-type";
 import path from "path";
-import { Executable, EXECUTABLES, Executables, RequiredDependency } from "../utils/Executables";
+import { Executable, Executables } from "../utils/Executables";
+import { getDependencies } from "../utils/getDependencies";
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
+import { writePackageFile } from "../utils/writePackageFile";
 
 const PRODUCTION_ENVIRONMENT_ENV_VAR = "REACT_APP_PRODUCTION_ENVIRONMENT";
+
+const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 
 export const PackageJsonRule: Rule.PackageRule = {
     ruleId: "package-json",
@@ -25,6 +29,7 @@ async function runRule({
     relativePathToSharedConfigs,
     packageToLint,
     logger,
+    addDevDependency,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const result = Result.success();
 
@@ -53,18 +58,21 @@ async function runRule({
         draft.devDependencies = updateWorkspaceVersions(packageJson.devDependencies);
     });
 
-    const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
-    await fileSystemForPackage.writeFile("package.json", JSON.stringify(packageJson));
+    result.accumulate(
+        await writePackageFile({
+            fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+            filename: "package.json",
+            contents: JSON.stringify(packageJson),
+            logger,
+        })
+    );
 
     // warn about missing deps
     for (const requiredDependency of executables.getRequiredDependencies()) {
-        result.accumulate(
-            checkDependencyForExecutable({
-                requiredDependency,
-                packageJson,
-                logger,
-            })
-        );
+        addDevDependency(requiredDependency.dependency);
+    }
+    for (const dependency of EXPECTED_DEV_DEPENDENCIES) {
+        addDevDependency(dependency);
     }
 
     return result;
@@ -224,41 +232,6 @@ function canPackageContainCss(p: LintablePackage): boolean {
         case PackageType.TYPESCRIPT_LIBRARY:
             return false;
     }
-}
-
-function getDependencies(dependencies: Record<string, string> | undefined): string[] {
-    if (dependencies == null) {
-        return [];
-    }
-    return Object.keys(dependencies);
-}
-
-function checkDependencyForExecutable({
-    requiredDependency,
-    packageJson,
-    logger,
-}: {
-    requiredDependency: RequiredDependency;
-    packageJson: IPackageJson;
-    logger: Logger;
-}): Result {
-    const allDependencies = new Set([
-        ...getDependencies(packageJson.dependencies),
-        ...getDependencies(packageJson.devDependencies),
-    ]);
-
-    if (!allDependencies.has(requiredDependency.dependency)) {
-        logger.error({
-            message: `${
-                requiredDependency.dependency
-            } is not listed as a dependency in package.json, but is required for ${
-                EXECUTABLES[requiredDependency.executable]
-            }`,
-        });
-        return Result.failure();
-    }
-
-    return Result.success();
 }
 
 function updateWorkspaceVersions(dependencies: Record<string, string> | undefined): Record<string, string> | undefined {

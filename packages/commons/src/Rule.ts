@@ -43,6 +43,7 @@ export declare namespace Rule {
         relativePathToSharedConfigs: string;
         fileSystems: FileSystems;
         logger: Logger;
+        addDevDependency: (dependency: string) => void;
     }
 
     interface Issue {

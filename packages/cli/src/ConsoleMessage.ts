@@ -18,7 +18,7 @@ const LABELS: Record<LogLevel, string> = {
 
 export interface ConsoleMessageMetadata {
     title: string;
-    additionalContent: string | undefined;
+    additionalContent: string | readonly string[] | undefined;
     error?: unknown;
     package?: Package;
     rule?: Rule;
@@ -52,11 +52,17 @@ export class ConsoleMessage {
         console.group(titleParts.join(" "));
 
         if (this.metadata.additionalContent != null) {
-            console.log(this.metadata.additionalContent);
+            const additionalContentStr =
+                typeof this.metadata.additionalContent === "string"
+                    ? this.metadata.additionalContent
+                    : this.metadata.additionalContent.map((x) => `- ${x}`).join("\n");
+            console.log(additionalContentStr);
         }
         if (this.metadata.error != null) {
             console.log(
-                isNativeError(this.metadata.error)
+                typeof this.metadata.error === "string"
+                    ? this.metadata.error
+                    : isNativeError(this.metadata.error)
                     ? `${this.metadata.error.name} ${this.metadata.error.message}`
                     : JSON.stringify(this.metadata.error)
             );
