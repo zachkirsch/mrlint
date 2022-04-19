@@ -1,10 +1,9 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
-import produce from "immer";
 import { writePackageFile } from "../utils/writePackageFile";
 
 interface DepcheckConfig {
-    ignores?: string[];
-    "ignore-patterns"?: string[];
+    ignores: string[];
+    "ignore-patterns": string[];
 }
 
 export const DepcheckRule: Rule.PackageRule = {
@@ -20,17 +19,13 @@ export const DepcheckRule: Rule.PackageRule = {
 };
 
 async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
-    let depcheckRc: DepcheckConfig = {
+    const depcheckRc: DepcheckConfig = {
+        ignores: ["@types/jest"],
         "ignore-patterns": ["lib"],
     };
 
     if (packageToLint.config.type === PackageType.REACT_APP) {
-        depcheckRc = produce(depcheckRc, (draft) => {
-            if (draft.ignores == null) {
-                draft.ignores = [];
-            }
-            draft.ignores.push("sass");
-        });
+        depcheckRc.ignores.push("sass");
     }
 
     return writePackageFile({
