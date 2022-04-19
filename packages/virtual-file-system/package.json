@@ -1,6 +1,5 @@
 {
   "name": "@fern-api/mrlint-virtual-file-system",
-  "private": true,
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [

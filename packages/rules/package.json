@@ -1,6 +1,5 @@
 {
   "name": "@fern-api/mrlint-rules",
-  "private": true,
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
