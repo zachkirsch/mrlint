@@ -11,6 +11,8 @@ const PRODUCTION_ENVIRONMENT_ENV_VAR = "REACT_APP_PRODUCTION_ENVIRONMENT";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 
+const CLI_WRAPPER = "./cli";
+
 export const PackageJsonRule: Rule.PackageRule = {
     ruleId: "package-json",
     type: RuleType.PACKAGE,
@@ -109,7 +111,12 @@ function generatePackageJson({
         draft.files = ["lib"];
 
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-            draft.bin = "./cli";
+            draft.bin =
+                packageToLint.config.cliName == null
+                    ? CLI_WRAPPER
+                    : {
+                          [packageToLint.config.cliName]: CLI_WRAPPER,
+                      };
         }
 
         addScripts({
@@ -230,6 +237,7 @@ function canPackageContainCss(p: LintablePackage): boolean {
             return true;
         case PackageType.TYPESCRIPT_CLI:
         case PackageType.TYPESCRIPT_LIBRARY:
+        case PackageType.CUSTOM:
             return false;
     }
 }

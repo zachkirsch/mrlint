@@ -1,4 +1,4 @@
-import { MonorepoRoot, Package, PackageConfig, PackageType } from "@fern-api/mrlint-commons";
+import { BasePackageConfig, MonorepoRoot, Package, PackageConfig, PackageType } from "@fern-api/mrlint-commons";
 import { readFile } from "fs/promises";
 import glob from "glob";
 import { IPackageJson } from "package-json-type";
@@ -6,13 +6,10 @@ import path from "path";
 import { promisify } from "util";
 import { z } from "zod";
 import { readConfig } from "./readConfig";
+import { PackageConfigSchema } from "./schemas/PackageConfigSchema";
 
 const promisifiedGlob = promisify(glob);
 
-const PackageConfigSchema = z.strictObject({
-    type: z.enum(["library", "cli", "react-library", "react-app"]),
-    private: z.optional(z.boolean()),
-});
 type RawPackageConfig = z.infer<typeof PackageConfigSchema>;
 
 export async function getAllPackages(monorepoRoot: MonorepoRoot): Promise<Package[]> {
@@ -57,21 +54,34 @@ async function getPackageJson(packageDirectory: string): Promise<IPackageJson | 
 }
 
 function convertConfig(rawConfig: RawPackageConfig): PackageConfig {
-    return {
-        type: getType(rawConfig.type),
-        private: rawConfig.private ?? true,
-    };
-}
-
-function getType(rawType: RawPackageConfig["type"]): PackageType {
-    switch (rawType) {
+    const baseConfig: BasePackageConfig = { private: true };
+    switch (rawConfig.type) {
         case "cli":
-            return PackageType.TYPESCRIPT_CLI;
+            return {
+                ...baseConfig,
+                type: PackageType.TYPESCRIPT_CLI,
+                cliName: rawConfig.cliName,
+                pathToCli: rawConfig.pathToCli,
+            };
         case "library":
-            return PackageType.TYPESCRIPT_LIBRARY;
+            return {
+                ...baseConfig,
+                type: PackageType.TYPESCRIPT_LIBRARY,
+            };
         case "react-library":
-            return PackageType.REACT_LIBRARY;
+            return {
+                ...baseConfig,
+                type: PackageType.REACT_LIBRARY,
+            };
         case "react-app":
-            return PackageType.REACT_APP;
+            return {
+                ...baseConfig,
+                type: PackageType.REACT_APP,
+            };
+        case "custom":
+            return {
+                ...baseConfig,
+                type: PackageType.CUSTOM,
+            };
     }
 }

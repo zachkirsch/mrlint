@@ -9,12 +9,17 @@ export const CliRule: Rule.PackageRule = {
 };
 
 async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
+    if (packageToLint.config.type !== PackageType.TYPESCRIPT_CLI) {
+        logger.error("Package is not a cli. This is a product error.");
+        return Result.failure();
+    }
+
     return writePackageFile({
         fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
         filename: "cli",
         contents: `#!/usr/bin/env node
 
-require("./lib/index");`,
+  require("${packageToLint.config.pathToCli}");`,
         logger,
     });
 }
