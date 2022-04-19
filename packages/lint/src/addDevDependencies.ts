@@ -1,4 +1,5 @@
 import { Logger, MonorepoLoggers, Package, Result } from "@fern-api/mrlint-commons";
+import chalk from "chalk";
 import { exec } from "child_process";
 
 export type PackageName = string;
@@ -76,14 +77,20 @@ export async function addDevDependenciesForPackage({
 
     return new Promise((resolve) => {
         exec(`yarn workspace ${packageName} add --prefer-dev ${filteredDependencies.join(" ")}`, (error, stdout) => {
-            if (error != null) {
+            if (error == null) {
+                logger.info({
+                    message: chalk.green("Installed missing devDependencies"),
+                    additionalContent: filteredDependencies,
+                });
+                resolve(Result.success());
+            } else {
                 logger.error({
                     message: "Failed to install devDependencies",
                     additionalContent: filteredDependencies,
                     error: stdout.length > 0 ? stdout : undefined,
                 });
+                resolve(Result.failure());
             }
-            resolve(Result.success());
         });
     });
 }

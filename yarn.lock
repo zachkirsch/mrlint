@@ -30,7 +30,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^7.1.0, @babel/core@npm:^7.12.3, @babel/core@npm:^7.7.2, @babel/core@npm:^7.8.0":
+"@babel/core@npm:^7.1.0, @babel/core@npm:^7.12.3, @babel/core@npm:^7.17.9, @babel/core@npm:^7.7.2, @babel/core@npm:^7.8.0":
   version: 7.17.9
   resolution: "@babel/core@npm:7.17.9"
   dependencies:
@@ -1326,6 +1326,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@fern-api/mrlint-commons@workspace:packages/commons"
   dependencies:
+    "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
     "@babel/preset-typescript": ^7.16.7
     "@fern-api/mrlint-virtual-file-system": "workspace:*"
@@ -1345,6 +1346,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@fern-api/mrlint-lint@workspace:packages/lint"
   dependencies:
+    "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
     "@babel/preset-typescript": ^7.16.7
     "@fern-api/mrlint-commons": "workspace:*"
@@ -1367,6 +1369,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@fern-api/mrlint-parser@workspace:packages/parser"
   dependencies:
+    "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
     "@babel/preset-typescript": ^7.16.7
     "@fern-api/mrlint-commons": "workspace:*"
@@ -1391,6 +1394,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@fern-api/mrlint-rules@workspace:packages/rules"
   dependencies:
+    "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
     "@babel/preset-typescript": ^7.16.7
     "@fern-api/mrlint-commons": "workspace:*"
@@ -1412,6 +1416,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@fern-api/mrlint-virtual-file-system@workspace:packages/virtual-file-system"
   dependencies:
+    "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
     "@babel/preset-typescript": ^7.16.7
     "@types/jest": ^27.4.1
@@ -5582,6 +5587,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mrlint@workspace:packages/cli"
   dependencies:
+    "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
     "@babel/preset-typescript": ^7.16.7
     "@fern-api/mrlint-commons": "workspace:*"
