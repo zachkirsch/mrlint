@@ -11,8 +11,6 @@ const PRODUCTION_ENVIRONMENT_ENV_VAR = "REACT_APP_PRODUCTION_ENVIRONMENT";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 
-const CLI_WRAPPER = "./cli";
-
 export const PackageJsonRule: Rule.PackageRule = {
     ruleId: "package-json",
     type: RuleType.PACKAGE,
@@ -113,9 +111,9 @@ function generatePackageJson({
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
             draft.bin =
                 packageToLint.config.cliName == null
-                    ? CLI_WRAPPER
+                    ? packageToLint.config.pathToCli
                     : {
-                          [packageToLint.config.cliName]: CLI_WRAPPER,
+                          [packageToLint.config.cliName]: packageToLint.config.pathToCli,
                       };
         }
 

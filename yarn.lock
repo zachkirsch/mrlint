@@ -5606,7 +5606,7 @@ __metadata:
     typescript: ^4.6.3
     yargs: ^17.3.1
   bin:
-    mrlint: ./cli
+    mrlint: ./lib/cli.js
   languageName: unknown
   linkType: soft
 
