@@ -8,8 +8,8 @@ import { tryGetPackageJson } from "../utils/tryGetPackageJson";
 import { writePackageFile } from "../utils/writePackageFile";
 
 const PRODUCTION_ENVIRONMENT_ENV_VAR = "REACT_APP_PRODUCTION_ENVIRONMENT";
-
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
+const PATH_TO_CLI_SCRIPT = "./cli";
 
 export const PackageJsonRule: Rule.PackageRule = {
     ruleId: "package-json",
@@ -111,9 +111,9 @@ function generatePackageJson({
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
             draft.bin =
                 packageToLint.config.cliName == null
-                    ? packageToLint.config.pathToCli
+                    ? PATH_TO_CLI_SCRIPT
                     : {
-                          [packageToLint.config.cliName]: packageToLint.config.pathToCli,
+                          [packageToLint.config.cliName]: PATH_TO_CLI_SCRIPT,
                       };
         }
 
