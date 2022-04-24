@@ -84,7 +84,7 @@ async function generateTsConfig({
         },
         include: ["./src"],
         exclude: ["./src/**/__test__"],
-        references: Object.entries(packageJson.dependencies ?? {})
+        references: Object.entries({ ...packageJson.dependencies, ...packageJson.devDependencies })
             .reduce<string[]>((acc, [dependency, version]) => {
                 if (version.startsWith("workspace:")) {
                     const packageOfDependency = packagesByNpmName[dependency];
