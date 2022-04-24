@@ -21,7 +21,6 @@ export type TsConfig = {
     extends?: string;
     compilerOptions?: CompilerOptions;
     include?: string[];
-    exclude?: string[];
     references: ProjectReference[];
 };
 
@@ -83,7 +82,6 @@ async function generateTsConfig({
             module: "CommonJS" as any,
         },
         include: ["./src"],
-        exclude: ["./src/**/__test__"],
         references: Object.entries({ ...packageJson.dependencies, ...packageJson.devDependencies })
             .reduce<string[]>((acc, [dependency, version]) => {
                 if (version.startsWith("workspace:")) {
