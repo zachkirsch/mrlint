@@ -26,8 +26,10 @@ export async function addDevDependencies({
             await addDevDependenciesForPackage({
                 packageName,
                 devDependenciesToAdd: [...devDependenciesToAdd],
-                existingDevDependencies:
-                    p.packageJson?.devDependencies != null ? Object.keys(p.packageJson.devDependencies) : [],
+                existingDevDependencies: Object.keys({
+                    ...p.packageJson?.dependencies,
+                    ...p.packageJson?.devDependencies,
+                }),
                 shouldFix,
                 logger: loggers.getLoggerForPackage(p),
             })
