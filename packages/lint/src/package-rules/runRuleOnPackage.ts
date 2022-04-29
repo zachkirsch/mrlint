@@ -34,6 +34,7 @@ export async function runRuleOnPackage({
             fileSystems,
             logger,
             addDevDependency,
+            ruleConfig: packageToLint.config.rules[rule.ruleId],
         });
     } catch (error) {
         logger.error({

@@ -44,6 +44,7 @@ export declare namespace Rule {
         fileSystems: FileSystems;
         logger: Logger;
         addDevDependency: (dependency: string) => void;
+        ruleConfig: unknown | undefined;
     }
 
     interface Issue {

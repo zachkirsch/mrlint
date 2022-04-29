@@ -1,9 +1,14 @@
-import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { getRuleConfig, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import { writePackageFile } from "../utils/writePackageFile";
 
 interface DepcheckConfig {
     ignores: string[];
     "ignore-patterns": string[];
+}
+
+interface RuleConfig {
+    ignores?: string[];
+    "ignore-patterns"?: string[];
 }
 
 export const DepcheckRule: Rule.PackageRule = {
@@ -18,7 +23,12 @@ export const DepcheckRule: Rule.PackageRule = {
     run: runRule,
 };
 
-async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
+async function runRule({
+    fileSystems,
+    packageToLint,
+    logger,
+    ruleConfig,
+}: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const depcheckRc: DepcheckConfig = {
         ignores: ["@types/jest", "@types/node"],
         "ignore-patterns": ["lib"],
@@ -26,6 +36,16 @@ async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleR
 
     if (packageToLint.config.type === PackageType.REACT_APP) {
         depcheckRc.ignores.push("sass");
+    }
+
+    const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);
+    if (castedRuleConfig != null) {
+        if (castedRuleConfig["ignore-patterns"] != null) {
+            depcheckRc["ignore-patterns"].push(...castedRuleConfig["ignore-patterns"]);
+        }
+        if (castedRuleConfig["ignores"] != null) {
+            depcheckRc["ignores"].push(...castedRuleConfig["ignores"]);
+        }
     }
 
     return writePackageFile({

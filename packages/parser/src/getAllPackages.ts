@@ -54,7 +54,10 @@ async function getPackageJson(packageDirectory: string): Promise<IPackageJson | 
 }
 
 function convertConfig(rawConfig: RawPackageConfig): PackageConfig {
-    const baseConfig: BasePackageConfig = { private: rawConfig.private };
+    const baseConfig: BasePackageConfig = {
+        private: rawConfig.private,
+        rules: rawConfig.rules ?? {},
+    };
     switch (rawConfig.type) {
         case "cli":
             return {
