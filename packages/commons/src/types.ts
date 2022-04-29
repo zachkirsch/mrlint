@@ -56,6 +56,7 @@ export interface CustomPackageConfig extends BasePackageConfig {
 
 export interface BasePackageConfig {
     private: boolean;
+    rules: Record<string, unknown>;
 }
 
 export enum PackageType {

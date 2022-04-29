@@ -1,4 +1,5 @@
 export { formatFile, formatFileContents, formatFiles } from "./formatFiles";
+export { getRuleConfig } from "./getRuleConfig";
 export { LogLevel } from "./logger/Logger";
 export type { Logger } from "./logger/Logger";
 export type { MonorepoLoggers } from "./logger/MonorepoLoggers";
