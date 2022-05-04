@@ -101,6 +101,7 @@ function generatePackageJson({
 
     const packageJson = produce<IPackageJson>({}, (draft) => {
         draft.name = oldPackageJson.name;
+        draft.version = "0.0.0";
         if (packageToLint.config.private) {
             draft.private = true;
         }
