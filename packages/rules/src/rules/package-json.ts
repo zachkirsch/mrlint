@@ -1,6 +1,6 @@
-import { LintablePackage, Logger, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { getRuleConfig, LintablePackage, Logger, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import produce, { Draft } from "immer";
-import { IPackageJson, IScriptsMap } from "package-json-type";
+import { IPackageJson } from "package-json-type";
 import path from "path";
 import { Executable, Executables } from "../utils/Executables";
 import { getDependencies } from "../utils/getDependencies";
@@ -10,6 +10,10 @@ import { writePackageFile } from "../utils/writePackageFile";
 const PRODUCTION_ENVIRONMENT_ENV_VAR = "REACT_APP_PRODUCTION_ENVIRONMENT";
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 const PATH_TO_CLI_SCRIPT = "./cli";
+
+interface RuleConfig {
+    scripts?: Record<string, string>;
+}
 
 export const PackageJsonRule: Rule.PackageRule = {
     ruleId: "package-json",
@@ -30,6 +34,7 @@ async function runRule({
     packageToLint,
     logger,
     addDevDependency,
+    ruleConfig,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const result = Result.success();
 
@@ -43,6 +48,7 @@ async function runRule({
             relativePathToSharedConfigs,
             logger,
             executables,
+            ruleConfig: getRuleConfig(ruleConfig),
         });
     } catch (error) {
         logger.error({
@@ -84,12 +90,14 @@ function generatePackageJson({
     relativePathToSharedConfigs,
     logger,
     executables,
+    ruleConfig,
 }: {
     packageToLint: LintablePackage;
     relativePathToRoot: string;
     relativePathToSharedConfigs: string;
     logger: Logger;
     executables: Executables;
+    ruleConfig: RuleConfig | undefined;
 }): IPackageJson {
     const oldPackageJson = tryGetPackageJson(packageToLint, logger);
     if (oldPackageJson == null) {
@@ -124,6 +132,7 @@ function generatePackageJson({
             pathToEslintIgnore,
             pathToPrettierIgnore,
             packageToLint,
+            customScripts: ruleConfig?.scripts ?? {},
         });
 
         if (packageToLint.config.type === PackageType.REACT_APP) {
@@ -161,14 +170,16 @@ function addScripts({
     pathToEslintIgnore,
     pathToPrettierIgnore,
     packageToLint,
+    customScripts,
 }: {
     draft: Draft<IPackageJson>;
     executables: Executables;
     pathToEslintIgnore: string;
     pathToPrettierIgnore: string;
     packageToLint: LintablePackage;
+    customScripts: Record<string, string>;
 }) {
-    let scripts: Partial<IScriptsMap> & Record<string, string> = {
+    draft.scripts = {
         clean: `${executables.get(Executable.TSC)} --build --clean`,
         compile: `${executables.get(Executable.TSC)} --build`,
         test: `${executables.get(Executable.JEST)} --passWithNoTests`,
@@ -190,8 +201,8 @@ function addScripts({
     };
 
     if (packageToLint.config.type === PackageType.REACT_APP) {
-        scripts = {
-            ...scripts,
+        draft.scripts = {
+            ...draft.scripts,
             start: `${executables.get(Executable.ENV_CMD)} -e development ${executables.get(
                 Executable.ENV_CMD
             )} -f .env.local --silent craco start`,
@@ -211,7 +222,10 @@ function addScripts({
         };
     }
 
-    draft.scripts = scripts;
+    draft.scripts = {
+        ...draft.scripts,
+        ...customScripts,
+    };
 }
 
 function sortDependencies(dependencies: Record<string, string>): Record<string, string> {

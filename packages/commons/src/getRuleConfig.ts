@@ -1,3 +1,3 @@
-export function getRuleConfig<T>(pluginConfig: unknown | undefined): T | undefined {
-    return pluginConfig as T;
+export function getRuleConfig<T>(ruleConfig: unknown | undefined): T | undefined {
+    return ruleConfig as T;
 }
