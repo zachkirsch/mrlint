@@ -1,7 +1,6 @@
 import { MonorepoRoot } from "@fern-api/mrlint-commons";
 import { readdir } from "fs/promises";
-import path from "path";
-import { parse } from "path/posix";
+import path, { parse } from "path";
 import { z } from "zod";
 import { readConfig } from "./readConfig";
 
