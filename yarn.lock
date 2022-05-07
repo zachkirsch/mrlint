@@ -5603,9 +5603,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"mrlint@workspace:*, mrlint@workspace:packages/mrlint":
+"mrlint@workspace:*, mrlint@workspace:packages/cli":
   version: 0.0.0-use.local
-  resolution: "mrlint@workspace:packages/mrlint"
+  resolution: "mrlint@workspace:packages/cli"
   dependencies:
     "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
