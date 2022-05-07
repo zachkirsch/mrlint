@@ -1,6 +1,7 @@
 import { LogLevel } from "@fern-api/mrlint-commons";
 import yargs from "yargs";
 import { lintCommand } from "./commands/lintCommand";
+import { listCommand } from "./commands/listCommand";
 import { versionCommand } from "./commands/versionCommand";
 import { ConsoleMonorepoLogger } from "./ConsoleMonorepoLogger";
 
@@ -50,6 +51,7 @@ yargs
             });
         }
     )
+    .command("list", "List the packages in the monorepo", listCommand)
     .demandCommand()
     .showHelpOnFail(true)
     .parse();
