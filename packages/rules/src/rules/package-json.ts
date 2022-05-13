@@ -123,6 +123,7 @@ function generatePackageJson({
         }
         draft.files = [OUTPUT_DIR];
         draft.main = `./${path.join(CJS_OUTPUT_DIR, ENTRYPOINT)}`;
+        draft.types = `./${path.join(ESM_OUTPUT_DIR, "index.d.ts")}`;
         draft.exports = {
             ".": {
                 require: `./${path.join(CJS_OUTPUT_DIR, ENTRYPOINT)}`,

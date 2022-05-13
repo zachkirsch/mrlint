@@ -8,5 +8,5 @@
     "tsBuildInfoFile": "tsconfig.esm.tsbuildinfo"
   },
   "include": ["./src"],
-  "references": [{ "path": "../commons/tsconfig.esm.json" }, { "path": "../rules/tsconfig.esm.json" }]
+  "references": [{ "path": "../commons/tsconfig.json" }, { "path": "../rules/tsconfig.json" }]
 }
