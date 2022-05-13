@@ -4,12 +4,20 @@ import { IPackageJson } from "package-json-type";
 import path from "path";
 import { Executable, Executables } from "../utils/Executables";
 import { getDependencies } from "../utils/getDependencies";
+import {
+    CJS_OUTPUT_DIR,
+    ESM_OUTPUT_DIR,
+    getTsconfigFilenameForType,
+    MODULE_TYPES,
+    OUTPUT_DIR,
+} from "../utils/moduleUtils";
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
 import { writePackageFile } from "../utils/writePackageFile";
 
 const PRODUCTION_ENVIRONMENT_ENV_VAR = "REACT_APP_PRODUCTION_ENVIRONMENT";
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 const PATH_TO_CLI_SCRIPT = "./cli";
+const ENTRYPOINT = "index.js";
 
 interface RuleConfig {
     scripts?: Record<string, string>;
@@ -113,9 +121,15 @@ function generatePackageJson({
         if (packageToLint.config.private) {
             draft.private = true;
         }
-        draft.main = "lib/index.js";
-        draft.types = "lib/index.d.ts";
-        draft.files = ["lib"];
+        draft.files = [OUTPUT_DIR];
+        draft.main = `./${path.join(CJS_OUTPUT_DIR, ENTRYPOINT)}`;
+        draft.exports = {
+            ".": {
+                require: `./${path.join(CJS_OUTPUT_DIR, ENTRYPOINT)}`,
+                default: `./${path.join(ESM_OUTPUT_DIR, ENTRYPOINT)}`,
+            },
+        };
+        draft.sideEffects = false;
 
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
             draft.bin =
@@ -180,8 +194,12 @@ function addScripts({
     customScripts: Record<string, string>;
 }) {
     draft.scripts = {
-        clean: `${executables.get(Executable.TSC)} --build --clean`,
-        compile: `${executables.get(Executable.TSC)} --build`,
+        clean: MODULE_TYPES.map(
+            (moduleType) => `${executables.get(Executable.TSC)} --build clean ${getTsconfigFilenameForType(moduleType)}`
+        ).join(" && "),
+        compile: MODULE_TYPES.map(
+            (moduleType) => `${executables.get(Executable.TSC)} --build ${getTsconfigFilenameForType(moduleType)}`
+        ).join(" && "),
         test: `${executables.get(Executable.JEST)} --passWithNoTests`,
         "lint:eslint": `${executables.get(Executable.ESLINT)} --max-warnings 0 . --ignore-path=${pathToEslintIgnore}`,
         "lint:eslint:fix": `${executables.get(

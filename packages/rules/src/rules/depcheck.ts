@@ -1,4 +1,5 @@
 import { getRuleConfig, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { OUTPUT_DIR } from "../utils/moduleUtils";
 import { writePackageFile } from "../utils/writePackageFile";
 
 interface DepcheckConfig {
@@ -31,7 +32,7 @@ async function runRule({
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const depcheckRc: DepcheckConfig = {
         ignores: ["@types/jest", "@types/node"],
-        "ignore-patterns": ["lib"],
+        "ignore-patterns": [OUTPUT_DIR],
     };
 
     if (packageToLint.config.type === PackageType.REACT_APP) {
