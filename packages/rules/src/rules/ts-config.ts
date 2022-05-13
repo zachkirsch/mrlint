@@ -2,6 +2,13 @@ import { Logger, Package, PackageType, Result, Rule, RuleType } from "@fern-api/
 import path from "path";
 import { CompilerOptions, ProjectReference } from "typescript";
 import { keyPackagesByNpmName } from "../utils/keyPackagesByNpmName";
+import {
+    CJS_OUTPUT_DIR,
+    ESM_OUTPUT_DIR,
+    getTsconfigFilenameForType,
+    ModuleType,
+    MODULE_TYPES,
+} from "../utils/moduleUtils";
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
 import { writePackageFile } from "../utils/writePackageFile";
 
@@ -31,6 +38,39 @@ async function runRule({
     allPackages,
     logger,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
+    const result = Result.success();
+
+    for (const moduleType of MODULE_TYPES) {
+        result.accumulate(
+            await generateTsConfigForModuleType({
+                packageToLint,
+                allPackages,
+                relativePathToSharedConfigs,
+                logger,
+                fileSystems,
+                moduleType,
+            })
+        );
+    }
+
+    return result;
+}
+
+async function generateTsConfigForModuleType({
+    packageToLint,
+    allPackages,
+    relativePathToSharedConfigs,
+    logger,
+    fileSystems,
+    moduleType,
+}: {
+    packageToLint: Package;
+    allPackages: readonly Package[];
+    relativePathToSharedConfigs: string;
+    logger: Logger;
+    fileSystems: Rule.FileSystems;
+    moduleType: ModuleType;
+}): Promise<Result> {
     let tsConfig: TsConfig;
     try {
         tsConfig = await generateTsConfig({
@@ -38,6 +78,7 @@ async function runRule({
             allPackages,
             relativePathToSharedConfigs,
             logger,
+            moduleType,
         });
     } catch (error) {
         logger.error({
@@ -49,7 +90,7 @@ async function runRule({
 
     return writePackageFile({
         fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
-        filename: "tsconfig.json",
+        filename: getTsconfigFilenameForType(moduleType),
         contents: JSON.stringify(tsConfig),
         logger,
     });
@@ -60,11 +101,13 @@ async function generateTsConfig({
     allPackages,
     relativePathToSharedConfigs,
     logger,
+    moduleType,
 }: {
     packageToLint: Package;
     allPackages: readonly Package[];
     relativePathToSharedConfigs: string;
     logger: Logger;
+    moduleType: ModuleType;
 }): Promise<TsConfig> {
     const packageJson = tryGetPackageJson(packageToLint, logger);
     if (packageJson == null) {
@@ -76,10 +119,11 @@ async function generateTsConfig({
         extends: path.join(relativePathToSharedConfigs, "tsconfig.shared.json"),
         compilerOptions: {
             composite: true,
-            outDir: "./lib",
+            outDir: getOutputDirForType(moduleType),
             rootDir: "src",
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            module: "CommonJS" as any,
+            module: getModuleForType(moduleType) as any,
+            tsBuildInfoFile: `tsconfig.${moduleType}.tsbuildinfo`,
         },
         include: ["./src"],
         references: Object.entries({ ...packageJson.dependencies, ...packageJson.devDependencies })
@@ -94,6 +138,24 @@ async function generateTsConfig({
                 return acc;
             }, [])
             .sort()
-            .map((path) => ({ path })),
+            .map((pathToReference) => ({ path: path.join(pathToReference, getTsconfigFilenameForType(moduleType)) })),
     };
+}
+
+function getModuleForType(type: ModuleType): string {
+    switch (type) {
+        case "esm":
+            return "esnext";
+        case "cjs":
+            return "CommonJS";
+    }
+}
+
+function getOutputDirForType(type: ModuleType): string {
+    switch (type) {
+        case "esm":
+            return ESM_OUTPUT_DIR;
+        case "cjs":
+            return CJS_OUTPUT_DIR;
+    }
 }

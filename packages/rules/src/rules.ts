@@ -15,7 +15,7 @@ export interface Rules {
     rules: Rule[];
 }
 
-export const RULES: Rules = {
+export const rules: Rules = {
     rules: [
         PackageJsonRule,
         TsConfigRule,

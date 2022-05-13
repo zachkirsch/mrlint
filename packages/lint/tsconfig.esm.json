@@ -1,0 +1,6 @@
+{
+  "extends": "../../shared/tsconfig.shared.json",
+  "compilerOptions": { "composite": true, "outDir": "dist/esm", "rootDir": "src", "module": "esnext" },
+  "include": ["./src"],
+  "references": [{ "path": "../commons/tsconfig.esm.json" }, { "path": "../virtual-file-system/tsconfig.esm.json" }]
+}
