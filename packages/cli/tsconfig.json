@@ -9,9 +9,9 @@
   },
   "include": ["./src"],
   "references": [
-    { "path": "../commons/tsconfig.esm.json" },
-    { "path": "../lint/tsconfig.esm.json" },
-    { "path": "../parser/tsconfig.esm.json" },
-    { "path": "../rules/tsconfig.esm.json" }
+    { "path": "../commons/tsconfig.json" },
+    { "path": "../lint/tsconfig.json" },
+    { "path": "../parser/tsconfig.json" },
+    { "path": "../rules/tsconfig.json" }
   ]
 }

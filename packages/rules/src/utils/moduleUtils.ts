@@ -9,7 +9,12 @@ export const CJS_OUTPUT_DIR = path.join(OUTPUT_DIR, "cjs");
 export const ESM_OUTPUT_DIR = path.join(OUTPUT_DIR, "esm");
 
 export function getTsconfigFilenameForType(type: ModuleType): string {
-    return `tsconfig.${type}.json`;
+    switch (type) {
+        case "esm":
+            return "tsconfig.json";
+        default:
+            return `tsconfig.${type}.json`;
+    }
 }
 
 function keys<T>(obj: T): (keyof T)[] {
