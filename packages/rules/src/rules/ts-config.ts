@@ -117,14 +117,7 @@ async function generateTsConfig({
 
     return {
         extends: path.join(relativePathToSharedConfigs, "tsconfig.shared.json"),
-        compilerOptions: {
-            composite: true,
-            outDir: getOutputDirForType(moduleType),
-            rootDir: "src",
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            module: getModuleForType(moduleType) as any,
-            tsBuildInfoFile: `tsconfig.${moduleType}.tsbuildinfo`,
-        },
+        compilerOptions: generateCompilerOptions(moduleType),
         include: ["./src"],
         references: Object.entries({ ...packageJson.dependencies, ...packageJson.devDependencies })
             .reduce<string[]>((acc, [dependency, version]) => {
@@ -142,10 +135,31 @@ async function generateTsConfig({
     };
 }
 
-function getModuleForType(type: ModuleType): string {
+function generateCompilerOptions(moduleType: ModuleType): CompilerOptions {
+    const compilerOptions: CompilerOptions = {
+        composite: true,
+        outDir: getOutputDirForType(moduleType),
+        rootDir: "src",
+    };
+
+    const module = getModuleForType(moduleType);
+    if (module != null) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        compilerOptions.module = module as any;
+    }
+
+    const tsBuildInfoFile = getTsBuildInfoFilenameForType(moduleType);
+    if (tsBuildInfoFile != null) {
+        compilerOptions.tsBuildInfoFile = tsBuildInfoFile;
+    }
+
+    return compilerOptions;
+}
+
+function getModuleForType(type: ModuleType): string | undefined {
     switch (type) {
         case "esm":
-            return "esnext";
+            return undefined;
         case "cjs":
             return "CommonJS";
     }
@@ -157,5 +171,14 @@ function getOutputDirForType(type: ModuleType): string {
             return ESM_OUTPUT_DIR;
         case "cjs":
             return CJS_OUTPUT_DIR;
+    }
+}
+
+function getTsBuildInfoFilenameForType(type: ModuleType): string | undefined {
+    switch (type) {
+        case "esm":
+            return undefined;
+        default:
+            return `tsconfig.${type}.tsbuildinfo`;
     }
 }
