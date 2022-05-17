@@ -206,10 +206,20 @@ function addScripts({
         "lint:eslint:fix": `${executables.get(
             Executable.ESLINT
         )} --max-warnings 0 . --ignore-path=${pathToEslintIgnore} --fix`,
-        "lint:style": `${executables.get(Executable.STYLELINT)} '**/*.scss' --allow-empty-input --max-warnings 0`,
-        "lint:style:fix": `${executables.get(
-            Executable.STYLELINT
-        )} '**/*.scss' --allow-empty-input --max-warnings 0 --fix`,
+    };
+
+    if (canPackageContainCss(packageToLint)) {
+        draft.scripts = {
+            ...draft.scripts,
+            "lint:style": `${executables.get(Executable.STYLELINT)} '**/*.scss' --allow-empty-input --max-warnings 0`,
+            "lint:style:fix": `${executables.get(
+                Executable.STYLELINT
+            )} '**/*.scss' --allow-empty-input --max-warnings 0 --fix`,
+        };
+    }
+
+    draft.scripts = {
+        ...draft.scripts,
         format: `${executables.get(
             Executable.PRETTIER
         )} --write --ignore-unknown --ignore-path ${pathToPrettierIgnore} "**"`,
