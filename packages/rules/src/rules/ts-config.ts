@@ -148,11 +148,6 @@ function generateCompilerOptions(moduleType: ModuleType): CompilerOptions {
         compilerOptions.module = module as any;
     }
 
-    const tsBuildInfoFile = getTsBuildInfoFilenameForType(moduleType);
-    if (tsBuildInfoFile != null) {
-        compilerOptions.tsBuildInfoFile = tsBuildInfoFile;
-    }
-
     return compilerOptions;
 }
 
@@ -171,14 +166,5 @@ function getOutputDirForType(type: ModuleType): string {
             return ESM_OUTPUT_DIR;
         case "cjs":
             return CJS_OUTPUT_DIR;
-    }
-}
-
-function getTsBuildInfoFilenameForType(type: ModuleType): string | undefined {
-    switch (type) {
-        case "esm":
-            return undefined;
-        default:
-            return `tsconfig.${type}.tsbuildinfo`;
     }
 }
