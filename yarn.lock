@@ -1372,14 +1372,13 @@ __metadata:
     "@babel/preset-typescript": ^7.16.7
     "@fern-api/mrlint-commons": "workspace:*"
     "@fern-api/mrlint-rules": "workspace:*"
-    "@types/glob": ^7.2.0
     "@types/jest": ^27.4.1
     "@types/js-yaml": ^4.0.5
     "@types/node": ^17.0.25
     depcheck: ^1.4.3
     eslint: ^8.12.0
+    execa: ^5.1.1
     find-up: ^5.0.0
-    glob: ^7.2.0
     jest: ^27.5.1
     js-yaml: ^4.1.0
     package-json-type: ^1.0.3
@@ -1824,16 +1823,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/glob@npm:^7.2.0":
-  version: 7.2.0
-  resolution: "@types/glob@npm:7.2.0"
-  dependencies:
-    "@types/minimatch": "*"
-    "@types/node": "*"
-  checksum: 6ae717fedfdfdad25f3d5a568323926c64f52ef35897bcac8aca8e19bc50c0bd84630bbd063e5d52078b2137d8e7d3c26eabebd1a2f03ff350fff8a91e79fc19
-  languageName: node
-  linkType: hard
-
 "@types/graceful-fs@npm:^4.1.2":
   version: 4.1.5
   resolution: "@types/graceful-fs@npm:4.1.5"
@@ -1892,7 +1881,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/minimatch@npm:*, @types/minimatch@npm:^3.0.3":
+"@types/minimatch@npm:^3.0.3":
   version: 3.0.5
   resolution: "@types/minimatch@npm:3.0.5"
   checksum: c41d136f67231c3131cf1d4ca0b06687f4a322918a3a5adddc87ce90ed9dbd175a3610adee36b106ae68c0b92c637c35e02b58c8a56c424f71d30993ea220b92

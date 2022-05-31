@@ -14,7 +14,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "clean": "tsc --build clean tsconfig.json && tsc --build clean tsconfig.cjs.json",
+    "clean": "tsc --build --clean tsconfig.json && tsc --build --clean tsconfig.cjs.json",
     "compile": "tsc --build tsconfig.json && tsc --build tsconfig.cjs.json && echo '{ \"type\": \"commonjs\" }' > dist/cjs/package.json && echo '{ \"type\": \"module\" }' > dist/esm/package.json",
     "test": "jest --passWithNoTests",
     "lint:eslint": "eslint --max-warnings 0 . --ignore-path=../../.eslintignore",
@@ -26,8 +26,8 @@
   "dependencies": {
     "@fern-api/mrlint-commons": "workspace:*",
     "@fern-api/mrlint-rules": "workspace:*",
+    "execa": "^5.1.1",
     "find-up": "^5.0.0",
-    "glob": "^7.2.0",
     "js-yaml": "^4.1.0",
     "zod": "^3.14.3"
   },
@@ -35,7 +35,6 @@
     "@babel/core": "^7.17.9",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
-    "@types/glob": "^7.2.0",
     "@types/jest": "^27.4.1",
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^17.0.25",

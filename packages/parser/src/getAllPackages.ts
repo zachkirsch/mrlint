@@ -1,14 +1,11 @@
 import { BasePackageConfig, MonorepoRoot, Package, PackageConfig, PackageType } from "@fern-api/mrlint-commons";
+import execa from "execa";
 import { readFile } from "fs/promises";
-import glob from "glob";
 import { IPackageJson } from "package-json-type";
 import path from "path";
-import { promisify } from "util";
 import { z } from "zod";
 import { readConfig } from "./readConfig";
 import { PackageConfigSchema } from "./schemas/PackageConfigSchema";
-
-const promisifiedGlob = promisify(glob);
 
 type RawPackageConfig = z.infer<typeof PackageConfigSchema>;
 
@@ -23,14 +20,9 @@ export async function getAllPackages(monorepoRoot: MonorepoRoot): Promise<Packag
         throw new Error("No 'workspaces' found in root package.json");
     }
 
-    const packageJsons = await promisifiedGlob(
-        `${monorepoRoot.fullPath}/${rootPackageJson.workspaces.join("|")}/package.json`,
-        {
-            ignore: "**/node_modules/**",
-        }
-    );
-    for (const packageJson of packageJsons) {
-        const packageDirectory = path.dirname(packageJson);
+    const { stdout } = await execa("yarn", ["workspaces", "list", "--json"]);
+    const packageLocations = stdout.split("\n").map((p) => JSON.parse(p).location);
+    for (const packageDirectory of packageLocations) {
         const rawConfig = await readConfig(path.join(packageDirectory, ".mrlint.json"), (contents) =>
             PackageConfigSchema.parse(contents)
         );

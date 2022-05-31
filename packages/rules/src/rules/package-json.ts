@@ -196,7 +196,8 @@ function addScripts({
 }) {
     draft.scripts = {
         clean: MODULE_TYPES.map(
-            (moduleType) => `${executables.get(Executable.TSC)} --build clean ${getTsconfigFilenameForType(moduleType)}`
+            (moduleType) =>
+                `${executables.get(Executable.TSC)} --build --clean ${getTsconfigFilenameForType(moduleType)}`
         ).join(" && "),
         compile: [
             ...MODULE_TYPES.map(
