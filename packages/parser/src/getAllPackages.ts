@@ -21,7 +21,10 @@ export async function getAllPackages(monorepoRoot: MonorepoRoot): Promise<Packag
     }
 
     const { stdout } = await execa("yarn", ["workspaces", "list", "--json"]);
-    const packageLocations = stdout.split("\n").map((p) => JSON.parse(p).location);
+    const packageLocations = stdout
+        .split("\n")
+        .map((line) => path.join(monorepoRoot.fullPath, JSON.parse(line).location))
+        .filter((packageLocation) => path.normalize(packageLocation) !== path.normalize(monorepoRoot.fullPath));
     for (const packageDirectory of packageLocations) {
         const rawConfig = await readConfig(path.join(packageDirectory, ".mrlint.json"), (contents) =>
             PackageConfigSchema.parse(contents)
