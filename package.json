@@ -5,7 +5,8 @@
   "author": "Birch Solutions, Inc.",
   "private": true,
   "workspaces": [
-    "packages/**"
+    "packages/**",
+    "!packages/**/dist"
   ],
   "scripts": {
     "clean": "yarn workspaces foreach --verbose --parallel run clean",
