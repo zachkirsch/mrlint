@@ -199,9 +199,15 @@ function addScripts({
             (moduleType) =>
                 `${executables.get(Executable.TSC)} --build --clean ${getTsconfigFilenameForType(moduleType)}`
         ).join(" && "),
-        compile: MODULE_TYPES.map(
-            (moduleType) => `${executables.get(Executable.TSC)} --build ${getTsconfigFilenameForType(moduleType)}`
-        ).join(" && "),
+        compile: [
+            ...MODULE_TYPES.map(
+                (moduleType) => `${executables.get(Executable.TSC)} --build ${getTsconfigFilenameForType(moduleType)}`
+            ),
+            // writing package.json for each target,
+            // per https://www.sensedeep.com/blog/posts/2021/how-to-create-single-source-npm-module.html
+            `echo '{ "type": "commonjs" }' > ${path.join(CJS_OUTPUT_DIR, "package.json")}`,
+            `echo '{ "type": "module" }' > ${path.join(ESM_OUTPUT_DIR, "package.json")}`,
+        ].join(" && "),
         test: `${executables.get(Executable.JEST)} --passWithNoTests`,
         "lint:eslint": `${executables.get(Executable.ESLINT)} --max-warnings 0 . --ignore-path=${pathToEslintIgnore}`,
         "lint:eslint:fix": `${executables.get(
