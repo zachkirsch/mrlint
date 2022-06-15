@@ -20,6 +20,7 @@ const PRODUCTION_ENVIRONMENT_ENV_VAR = "REACT_APP_PRODUCTION_ENVIRONMENT";
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 const PATH_TO_CLI_SCRIPT = "./cli";
 const ENTRYPOINT = "index.js";
+const TYPES_ENTRYPOINT = "index.d.ts";
 
 interface RuleConfig {
     scripts?: Record<string, string>;
@@ -125,7 +126,7 @@ function generatePackageJson({
         }
         draft.files = [OUTPUT_DIR];
         draft.main = `./${path.join(CJS_OUTPUT_DIR, ENTRYPOINT)}`;
-        draft.types = `./${path.join(ESM_OUTPUT_DIR, "index.d.ts")}`;
+        draft.types = `./${path.join(CJS_OUTPUT_DIR, TYPES_ENTRYPOINT)}`;
         draft.exports = {
             ".": {
                 require: `./${path.join(CJS_OUTPUT_DIR, ENTRYPOINT)}`,

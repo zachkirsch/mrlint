@@ -1,6 +1,6 @@
 {
   "extends": "../../shared/tsconfig.shared.json",
-  "compilerOptions": { "composite": true, "outDir": "lib/esm", "rootDir": "src" },
+  "compilerOptions": { "composite": true, "outDir": "lib/cjs", "rootDir": "src", "module": "CommonJS" },
   "include": ["./src"],
   "references": [{ "path": "../virtual-file-system/tsconfig.json" }]
 }

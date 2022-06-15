@@ -1322,6 +1322,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fern-api/mrlint-commons@npm:0.0.28":
+  version: 0.0.28
+  resolution: "@fern-api/mrlint-commons@npm:0.0.28"
+  dependencies:
+    "@fern-api/mrlint-virtual-file-system": 0.0.28
+  checksum: ed1d1a98df49448e2207360b4dc3af0e918308f66575e4234ced1ee6600d5fa414f16906db9299faedad895ce983fb74d4cc7fa10e2db4e6972b012a216dae41
+  languageName: node
+  linkType: hard
+
 "@fern-api/mrlint-commons@workspace:*, @fern-api/mrlint-commons@workspace:packages/commons":
   version: 0.0.0-use.local
   resolution: "@fern-api/mrlint-commons@workspace:packages/commons"
@@ -1341,6 +1350,19 @@ __metadata:
     typescript: ^4.6.3
   languageName: unknown
   linkType: soft
+
+"@fern-api/mrlint-lint@npm:0.0.28":
+  version: 0.0.28
+  resolution: "@fern-api/mrlint-lint@npm:0.0.28"
+  dependencies:
+    "@fern-api/mrlint-commons": 0.0.28
+    "@fern-api/mrlint-virtual-file-system": 0.0.28
+    chalk: ^4.1.2
+    diff: ^5.0.0
+    prettier: ^2.6.2
+  checksum: 266c012d6f84a6e66e823b365c091b46ebc64d13556328353d7264d8bf4a90b484ee466289943ff4f3967d0ea56d3f3e6af4060f165e0200a1a284781c28c754
+  languageName: node
+  linkType: hard
 
 "@fern-api/mrlint-lint@workspace:*, @fern-api/mrlint-lint@workspace:packages/lint":
   version: 0.0.0-use.local
@@ -1364,6 +1386,20 @@ __metadata:
     typescript: ^4.6.3
   languageName: unknown
   linkType: soft
+
+"@fern-api/mrlint-parser@npm:0.0.28":
+  version: 0.0.28
+  resolution: "@fern-api/mrlint-parser@npm:0.0.28"
+  dependencies:
+    "@fern-api/mrlint-commons": 0.0.28
+    "@fern-api/mrlint-rules": 0.0.28
+    execa: ^5.1.1
+    find-up: ^5.0.0
+    js-yaml: ^4.1.0
+    zod: ^3.14.3
+  checksum: cb40c15a47752f85ef1f38d928d3a82a1fda0d78fd6b7a917289a668e4ba68a1ef0ea5e23fc8e5498d89e56daa6e4071a07f4aeceec189d13437ed5e085c0c62
+  languageName: node
+  linkType: hard
 
 "@fern-api/mrlint-parser@workspace:*, @fern-api/mrlint-parser@workspace:packages/parser":
   version: 0.0.0-use.local
@@ -1391,6 +1427,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@fern-api/mrlint-rules@npm:0.0.28":
+  version: 0.0.28
+  resolution: "@fern-api/mrlint-rules@npm:0.0.28"
+  dependencies:
+    "@fern-api/mrlint-commons": 0.0.28
+    "@fern-api/mrlint-virtual-file-system": 0.0.28
+    immer: ^9.0.12
+  checksum: c3a3bc843f96dc0bddf8575e8430ca32964f94d7aa06f4362ebaff5dfc848190f73859db220a69193ddcfa92bb550ec49f03fbe62978353c696d72fcdbe7a92b
+  languageName: node
+  linkType: hard
+
 "@fern-api/mrlint-rules@workspace:*, @fern-api/mrlint-rules@workspace:packages/rules":
   version: 0.0.0-use.local
   resolution: "@fern-api/mrlint-rules@workspace:packages/rules"
@@ -1412,6 +1459,13 @@ __metadata:
     typescript: ^4.6.3
   languageName: unknown
   linkType: soft
+
+"@fern-api/mrlint-virtual-file-system@npm:0.0.28":
+  version: 0.0.28
+  resolution: "@fern-api/mrlint-virtual-file-system@npm:0.0.28"
+  checksum: f3ef547b5272c5200c6f92995aed70dec1147ffb3b1ce39d5c75ef56d721e064b2ccfca85036b2e070488c0df14796fd49d07d0947e28c8a904e978ebc982bd5
+  languageName: node
+  linkType: hard
 
 "@fern-api/mrlint-virtual-file-system@workspace:*, @fern-api/mrlint-virtual-file-system@workspace:packages/virtual-file-system":
   version: 0.0.0-use.local
@@ -5319,12 +5373,28 @@ __metadata:
     eslint-plugin-react-hooks: ^4.4.0
     husky: ^7.0.4
     lint-staged: ^12.3.7
-    mrlint: "workspace:*"
+    mrlint: ^0.0.28
     prettier: ^2.6.2
   languageName: unknown
   linkType: soft
 
-"mrlint@workspace:*, mrlint@workspace:packages/cli":
+"mrlint@npm:^0.0.28":
+  version: 0.0.28
+  resolution: "mrlint@npm:0.0.28"
+  dependencies:
+    "@fern-api/mrlint-commons": 0.0.28
+    "@fern-api/mrlint-lint": 0.0.28
+    "@fern-api/mrlint-parser": 0.0.28
+    "@fern-api/mrlint-rules": 0.0.28
+    chalk: ^4.1.2
+    yargs: ^17.3.1
+  bin:
+    mrlint: ./cli
+  checksum: d517bc869fd193633cff57cfffb6a0d898ae6685e770da45731341989333da8f6d6d1fd00ac115b2433470a32e81676129ed28c41baa00c3e6fc6cc1536c33ee
+  languageName: node
+  linkType: hard
+
+"mrlint@workspace:packages/cli":
   version: 0.0.0-use.local
   resolution: "mrlint@workspace:packages/cli"
   dependencies:

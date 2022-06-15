@@ -148,7 +148,7 @@ function generateCompilerOptions(moduleType: ModuleType): CompilerOptions {
 function getModuleForType(type: ModuleType): string | undefined {
     switch (type) {
         case "esm":
-            return undefined;
+            return "esnext";
         case "cjs":
             return "CommonJS";
     }
