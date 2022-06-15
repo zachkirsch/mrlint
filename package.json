@@ -6,16 +6,18 @@
   "private": true,
   "workspaces": [
     "packages/**",
-    "!packages/**/dist"
+    "!packages/**/lib"
   ],
   "scripts": {
     "clean": "yarn workspaces foreach --verbose --parallel run clean",
     "compile": "yarn workspaces foreach --verbose --parallel --topological run compile",
+    "compile:all": "yarn workspaces foreach --verbose --parallel --topological run compile:all",
+    "build": "yarn workspaces foreach --verbose --parallel --topological run build",
     "test": "yarn workspaces foreach --verbose --parallel --topological run test",
     "lint:eslint": "eslint . --max-warnings 0",
     "lint:eslint:fix": "eslint . --fix --max-warnings 0",
-    "lint:monorepo": "yarn workspace mrlint run compile && mrlint lint",
-    "lint:monorepo:fix": "yarn workspace mrlint run compile && mrlint lint --fix",
+    "lint:monorepo": "yarn workspace mrlint run compile && node packages/cli/cli lint",
+    "lint:monorepo:fix": "yarn run lint:monorepo --fix",
     "format": "prettier --write --ignore-unknown --ignore-path ./shared/.prettierignore \"**\"",
     "format:check": "prettier --check --ignore-unknown --ignore-path ./shared/.prettierignore \"**\"",
     "depcheck": "yarn workspaces foreach --verbose --parallel run depcheck",
@@ -30,7 +32,7 @@
     "eslint-plugin-react-hooks": "^4.4.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.3.7",
-    "mrlint": "workspace:*",
+    "mrlint": "^0.0.28",
     "prettier": "^2.6.2"
   },
   "packageManager": "yarn@3.2.0"
