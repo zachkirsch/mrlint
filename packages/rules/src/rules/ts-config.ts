@@ -2,13 +2,7 @@ import { Logger, Package, PackageType, Result, Rule, RuleType } from "@fern-api/
 import path from "path";
 import { CompilerOptions, ProjectReference } from "typescript";
 import { keyPackagesByNpmName } from "../utils/keyPackagesByNpmName";
-import {
-    CJS_OUTPUT_DIR,
-    ESM_OUTPUT_DIR,
-    getTsconfigFilenameForType,
-    ModuleType,
-    MODULE_TYPES,
-} from "../utils/moduleUtils";
+import { getOutputDirForType, getTsconfigFilenameForType, ModuleType, MODULE_TYPES } from "../utils/moduleUtils";
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
 import { writePackageFile } from "../utils/writePackageFile";
 
@@ -157,14 +151,5 @@ function getModuleForType(type: ModuleType): string | undefined {
             return undefined;
         case "cjs":
             return "CommonJS";
-    }
-}
-
-function getOutputDirForType(type: ModuleType): string {
-    switch (type) {
-        case "esm":
-            return ESM_OUTPUT_DIR;
-        case "cjs":
-            return CJS_OUTPUT_DIR;
     }
 }

@@ -7,7 +7,9 @@ import { getDependencies } from "../utils/getDependencies";
 import {
     CJS_OUTPUT_DIR,
     ESM_OUTPUT_DIR,
+    getOutputDirForType,
     getTsconfigFilenameForType,
+    ModuleType,
     MODULE_TYPES,
     OUTPUT_DIR,
 } from "../utils/moduleUtils";
@@ -199,15 +201,21 @@ function addScripts({
             (moduleType) =>
                 `${executables.get(Executable.TSC)} --build --clean ${getTsconfigFilenameForType(moduleType)}`
         ).join(" && "),
-        compile: [
-            ...MODULE_TYPES.map(
-                (moduleType) => `${executables.get(Executable.TSC)} --build ${getTsconfigFilenameForType(moduleType)}`
-            ),
-            // writing package.json for each target,
-            // per https://www.sensedeep.com/blog/posts/2021/how-to-create-single-source-npm-module.html
-            `echo '{ "type": "commonjs" }' > ${path.join(CJS_OUTPUT_DIR, "package.json")}`,
-            `echo '{ "type": "module" }' > ${path.join(ESM_OUTPUT_DIR, "package.json")}`,
-        ].join(" && "),
+        compile: `yarn run ${getCompileScriptName("cjs")}`,
+        "compile:all": `${executables.get(Executable.RUN_P)} ${MODULE_TYPES.map(getCompileScriptName).join(" ")}`,
+        ...MODULE_TYPES.reduce(
+            (compileScripts, moduleType) => ({
+                ...compileScripts,
+                [getCompileScriptName(moduleType)]: [
+                    `${getCompileCommand(executables, moduleType)}`,
+                    `echo '{ "type": "${getPackageJsonTypeProperty(moduleType)}" }' > ${path.join(
+                        getOutputDirForType(moduleType),
+                        "package.json"
+                    )}`,
+                ].join(" && "),
+            }),
+            {}
+        ),
         test: `${executables.get(Executable.JEST)} --passWithNoTests`,
         "lint:eslint": `${executables.get(Executable.ESLINT)} --max-warnings 0 . --ignore-path=${pathToEslintIgnore}`,
         "lint:eslint:fix": `${executables.get(
@@ -303,4 +311,21 @@ function updateWorkspaceVersions(dependencies: Record<string, string> | undefine
             }
         }
     });
+}
+
+function getCompileScriptName(moduleType): string {
+    return `compile:${moduleType}`;
+}
+
+function getCompileCommand(executables: Executables, moduleType: ModuleType): string {
+    return `${executables.get(Executable.TSC)} --build ${getTsconfigFilenameForType(moduleType)}`;
+}
+
+function getPackageJsonTypeProperty(moduleType: ModuleType): string {
+    switch (moduleType) {
+        case "esm":
+            return "module";
+        case "cjs":
+            return "commonjs";
+    }
 }
