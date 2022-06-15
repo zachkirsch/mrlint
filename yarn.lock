@@ -2769,42 +2769,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cjs-1b18fb@workspace:packages/lint/dist/cjs":
-  version: 0.0.0-use.local
-  resolution: "cjs-1b18fb@workspace:packages/lint/dist/cjs"
-  languageName: unknown
-  linkType: soft
-
-"cjs-25b89e@workspace:packages/parser/dist/cjs":
-  version: 0.0.0-use.local
-  resolution: "cjs-25b89e@workspace:packages/parser/dist/cjs"
-  languageName: unknown
-  linkType: soft
-
-"cjs-445002@workspace:packages/virtual-file-system/dist/cjs":
-  version: 0.0.0-use.local
-  resolution: "cjs-445002@workspace:packages/virtual-file-system/dist/cjs"
-  languageName: unknown
-  linkType: soft
-
-"cjs-7ca931@workspace:packages/commons/dist/cjs":
-  version: 0.0.0-use.local
-  resolution: "cjs-7ca931@workspace:packages/commons/dist/cjs"
-  languageName: unknown
-  linkType: soft
-
-"cjs-807398@workspace:packages/rules/dist/cjs":
-  version: 0.0.0-use.local
-  resolution: "cjs-807398@workspace:packages/rules/dist/cjs"
-  languageName: unknown
-  linkType: soft
-
-"cjs-acc525@workspace:packages/cli/dist/cjs":
-  version: 0.0.0-use.local
-  resolution: "cjs-acc525@workspace:packages/cli/dist/cjs"
-  languageName: unknown
-  linkType: soft
-
 "cjs-module-lexer@npm:^1.0.0":
   version: 1.2.2
   resolution: "cjs-module-lexer@npm:1.2.2"
@@ -3483,42 +3447,6 @@ __metadata:
   checksum: bc7d2fc9a046d42cb2c8987573ecaf534c1fae14747c4695e32388e179c5f21b83eefdb3e4f35924bf76152e226d7cc9dfb21f12348baf12c803109005b17439
   languageName: node
   linkType: hard
-
-"esm-12022d@workspace:packages/lint/dist/esm":
-  version: 0.0.0-use.local
-  resolution: "esm-12022d@workspace:packages/lint/dist/esm"
-  languageName: unknown
-  linkType: soft
-
-"esm-34b83e@workspace:packages/virtual-file-system/dist/esm":
-  version: 0.0.0-use.local
-  resolution: "esm-34b83e@workspace:packages/virtual-file-system/dist/esm"
-  languageName: unknown
-  linkType: soft
-
-"esm-764853@workspace:packages/parser/dist/esm":
-  version: 0.0.0-use.local
-  resolution: "esm-764853@workspace:packages/parser/dist/esm"
-  languageName: unknown
-  linkType: soft
-
-"esm-d7edbb@workspace:packages/rules/dist/esm":
-  version: 0.0.0-use.local
-  resolution: "esm-d7edbb@workspace:packages/rules/dist/esm"
-  languageName: unknown
-  linkType: soft
-
-"esm-fa9ad1@workspace:packages/commons/dist/esm":
-  version: 0.0.0-use.local
-  resolution: "esm-fa9ad1@workspace:packages/commons/dist/esm"
-  languageName: unknown
-  linkType: soft
-
-"esm-ff2e7b@workspace:packages/cli/dist/esm":
-  version: 0.0.0-use.local
-  resolution: "esm-ff2e7b@workspace:packages/cli/dist/esm"
-  languageName: unknown
-  linkType: soft
 
 "espree@npm:^9.3.1":
   version: 9.3.1
