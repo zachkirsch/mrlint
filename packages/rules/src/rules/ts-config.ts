@@ -1,6 +1,7 @@
-import { Logger, Package, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { getRuleConfig, Logger, Package, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import path from "path";
 import { CompilerOptions, ProjectReference } from "typescript";
+import { getDependencies } from "../utils/getDependencies";
 import { keyPackagesByNpmName } from "../utils/keyPackagesByNpmName";
 import { getOutputDirForType, getTsconfigFilenameForType, ModuleType, MODULE_TYPES } from "../utils/moduleUtils";
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
@@ -18,11 +19,16 @@ export const TsConfigRule: Rule.PackageRule = {
     run: runRule,
 };
 
+interface RuleConfig {
+    exclude?: string[];
+}
+
 export type TsConfig = {
     extends?: string;
     compilerOptions?: CompilerOptions;
     include?: string[];
-    references: ProjectReference[];
+    exclude?: string[];
+    references?: ProjectReference[];
 };
 
 async function runRule({
@@ -31,8 +37,11 @@ async function runRule({
     packageToLint,
     allPackages,
     logger,
+    ruleConfig,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const result = Result.success();
+
+    const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);
 
     for (const moduleType of MODULE_TYPES) {
         result.accumulate(
@@ -43,6 +52,7 @@ async function runRule({
                 logger,
                 fileSystems,
                 moduleType,
+                exclude: castedRuleConfig?.exclude ?? [],
             })
         );
     }
@@ -57,6 +67,7 @@ async function generateTsConfigForModuleType({
     logger,
     fileSystems,
     moduleType,
+    exclude,
 }: {
     packageToLint: Package;
     allPackages: readonly Package[];
@@ -64,6 +75,7 @@ async function generateTsConfigForModuleType({
     logger: Logger;
     fileSystems: Rule.FileSystems;
     moduleType: ModuleType;
+    exclude: string[];
 }): Promise<Result> {
     let tsConfig: TsConfig;
     try {
@@ -73,6 +85,7 @@ async function generateTsConfigForModuleType({
             relativePathToSharedConfigs,
             logger,
             moduleType,
+            exclude,
         });
     } catch (error) {
         logger.error({
@@ -96,12 +109,14 @@ async function generateTsConfig({
     relativePathToSharedConfigs,
     logger,
     moduleType,
+    exclude,
 }: {
     packageToLint: Package;
     allPackages: readonly Package[];
     relativePathToSharedConfigs: string;
     logger: Logger;
     moduleType: ModuleType;
+    exclude: string[];
 }): Promise<TsConfig> {
     const packageJson = tryGetPackageJson(packageToLint, logger);
     if (packageJson == null) {
@@ -109,24 +124,34 @@ async function generateTsConfig({
     }
     const packagesByNpmName = keyPackagesByNpmName(allPackages);
 
-    return {
+    const tsConfig: TsConfig = {
         extends: path.join(relativePathToSharedConfigs, "tsconfig.shared.json"),
         compilerOptions: generateCompilerOptions(moduleType),
         include: ["./src"],
-        references: Object.entries({ ...packageJson.dependencies, ...packageJson.devDependencies })
-            .reduce<string[]>((acc, [dependency, version]) => {
-                if (version.startsWith("workspace:")) {
-                    const packageOfDependency = packagesByNpmName[dependency];
-                    if (packageOfDependency == null) {
-                        throw new Error("Workspace dependency not found: " + dependency);
-                    }
-                    acc.push(path.relative(packageToLint.relativePath, packageOfDependency.relativePath));
-                }
-                return acc;
-            }, [])
-            .sort()
-            .map((pathToReference) => ({ path: path.join(pathToReference, getTsconfigFilenameForType(moduleType)) })),
     };
+
+    if (exclude.length > 0) {
+        tsConfig.exclude = exclude;
+    }
+
+    const references = getDependencies(packageJson)
+        .reduce<string[]>((acc, { name, version }) => {
+            if (version.startsWith("workspace:")) {
+                const packageOfDependency = packagesByNpmName[name];
+                if (packageOfDependency == null) {
+                    throw new Error("Workspace dependency not found: " + name);
+                }
+                acc.push(path.relative(packageToLint.relativePath, packageOfDependency.relativePath));
+            }
+            return acc;
+        }, [])
+        .sort()
+        .map((pathToReference) => ({ path: path.join(pathToReference, getTsconfigFilenameForType(moduleType)) }));
+    if (references.length > 0) {
+        tsConfig.references = references;
+    }
+
+    return tsConfig;
 }
 
 function generateCompilerOptions(moduleType: ModuleType): CompilerOptions {
