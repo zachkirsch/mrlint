@@ -169,7 +169,7 @@ function generatePackageJson({
 
         if (
             canPackageContainCss(packageToLint) &&
-            getDependencies(packageJson.dependencies).some((d) => d.startsWith("@blueprintjs/"))
+            getDependencies(packageJson).some((d) => d.name.startsWith("@blueprintjs/"))
         ) {
             draft.postcss = {
                 "postcss-modules": {
