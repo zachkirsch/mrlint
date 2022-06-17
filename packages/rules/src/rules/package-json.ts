@@ -217,7 +217,7 @@ function addScripts({
             }),
             {}
         ),
-        test: `${executables.get(Executable.JEST)} --passWithNoTests`,
+        test: `yarn run compile && ${executables.get(Executable.JEST)} --passWithNoTests`,
         "lint:eslint": `${executables.get(Executable.ESLINT)} --max-warnings 0 . --ignore-path=${pathToEslintIgnore}`,
         "lint:eslint:fix": `${executables.get(
             Executable.ESLINT
