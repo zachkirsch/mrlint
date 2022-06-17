@@ -13,7 +13,7 @@
     "compile": "yarn workspaces foreach --verbose --parallel --topological run compile",
     "compile:all": "yarn workspaces foreach --verbose --parallel --topological run compile:all",
     "build": "yarn workspaces foreach --verbose --parallel --topological run build",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "lint:eslint": "eslint . --max-warnings 0",
     "lint:eslint:fix": "eslint . --fix --max-warnings 0",
     "lint:monorepo": "yarn workspace mrlint run compile && node packages/cli/cli lint",
