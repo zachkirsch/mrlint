@@ -35,10 +35,10 @@ async function runRule({
     result.accumulate(
         await writePackageFile({
             fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
-            filename: "jest.config.js",
-            contents: `module.exports = {
-    ...require("${path.join(relativePathToSharedConfigs, "jest.config.shared.json")}"),
-        };`,
+            filename: "jest.config.ts",
+            contents: `import packageConfig from "${path.join(relativePathToSharedConfigs, "jest.config.shared")}";
+            
+export default packageConfig;`,
             logger,
         })
     );
@@ -48,7 +48,7 @@ async function runRule({
             fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
             filename: "babel.config.js",
             contents: `module.exports = {
-    presets: [["@babel/preset-env", { targets: { node: "current" } }], "@babel/preset-typescript"],
+    ...require("${path.join(relativePathToSharedConfigs, "babel.config.shared.json")}"),
         };`,
             logger,
         })
