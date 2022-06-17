@@ -13,7 +13,7 @@
     "compile": "yarn workspaces foreach --verbose --parallel --topological run compile",
     "compile:all": "yarn workspaces foreach --verbose --parallel --topological run compile:all",
     "build": "yarn workspaces foreach --verbose --parallel --topological run build",
-    "test": "yarn workspaces foreach --verbose --parallel --topological run test",
+    "test": "jest",
     "lint:eslint": "eslint . --max-warnings 0",
     "lint:eslint:fix": "eslint . --fix --max-warnings 0",
     "lint:monorepo": "yarn workspace mrlint run compile && node packages/cli/cli lint",
@@ -25,15 +25,22 @@
     "publish": "yarn workspaces foreach --no-private --parallel --verbose npm publish --access public"
   },
   "devDependencies": {
+    "@babel/core": "^7.18.5",
+    "@babel/preset-env": "^7.18.2",
+    "@babel/preset-typescript": "^7.17.12",
+    "@types/jest": "^28.1.2",
+    "@types/node": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.17.0",
     "@typescript-eslint/parser": "^5.17.0",
     "eslint": "^8.12.0",
-    "eslint-plugin-react": "^7.29.4",
-    "eslint-plugin-react-hooks": "^4.4.0",
+    "eslint-plugin-jest": "^26.5.3",
     "husky": "^7.0.4",
+    "jest": "^28.1.1",
     "lint-staged": "^12.3.7",
     "mrlint": "^0.0.28",
-    "prettier": "^2.6.2"
+    "prettier": "^2.6.2",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.4"
   },
-  "packageManager": "yarn@3.2.0"
+  "packageManager": "yarn@3.2.1"
 }

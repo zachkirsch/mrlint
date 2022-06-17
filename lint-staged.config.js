@@ -1,5 +1,5 @@
 module.exports = {
-    "**/*.{ts,tsx}": "eslint --fix --max-warnings 0",
+    "**/*.{ts,tsx}": "eslint --fix --max-warnings 0 --no-eslintrc --config .eslintrc.lint-staged.js",
     "**/{*,_}": "prettier --write --ignore-unknown",
-    "**/{*,__}": () => "yarn install --immutable",
+    "**/{package.json, _}": () => "yarn install --immutable",
 };
