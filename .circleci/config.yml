@@ -43,7 +43,7 @@ jobs:
           command: yarn compile
       - run:
           name: Add version to package.json's
-          command: yarn mrlint version $(git tag --points-at HEAD)
+          command: yarn run mrlint version $(git tag --points-at HEAD)
       - run:
           name: Publish all packages
           command: yarn run publish
