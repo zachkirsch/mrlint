@@ -20,9 +20,7 @@ async function runRule({
     relativePathToRoot,
     logger,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
-    const contents = `module.exports = {
-...require("${path.join(relativePathToRoot, ".prettierrc.json")}"),
-};`;
+    const contents = `module.exports = require("${path.join(relativePathToRoot, ".prettierrc.json")}");`;
 
     return writePackageFile({
         fileSystem: fileSystems.getFileSystemForPackage(packageToLint),

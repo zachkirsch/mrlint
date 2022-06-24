@@ -47,9 +47,10 @@ export default packageConfig;`,
         await writePackageFile({
             fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
             filename: "babel.config.js",
-            contents: `module.exports = {
-    ...require("${path.join(relativePathToSharedConfigs, "babel.config.shared.json")}"),
-        };`,
+            contents: `module.exports = require("${path.join(
+                relativePathToSharedConfigs,
+                "babel.config.shared.json"
+            )}");`,
             logger,
         })
     );
