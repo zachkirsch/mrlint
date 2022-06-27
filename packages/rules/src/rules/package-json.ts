@@ -46,6 +46,7 @@ async function runRule({
     logger,
     addDevDependency,
     ruleConfig,
+    repository,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const result = Result.success();
 
@@ -60,6 +61,7 @@ async function runRule({
             logger,
             executables,
             ruleConfig: getRuleConfig(ruleConfig),
+            repository,
         });
     } catch (error) {
         logger.error({
@@ -102,6 +104,7 @@ function generatePackageJson({
     logger,
     executables,
     ruleConfig,
+    repository,
 }: {
     packageToLint: LintablePackage;
     relativePathToRoot: string;
@@ -109,6 +112,7 @@ function generatePackageJson({
     logger: Logger;
     executables: Executables;
     ruleConfig: RuleConfig | undefined;
+    repository: string;
 }): IPackageJson {
     const oldPackageJson = tryGetPackageJson(packageToLint, logger);
     if (oldPackageJson == null) {
@@ -121,6 +125,11 @@ function generatePackageJson({
     const packageJson = produce<IPackageJson>({}, (draft) => {
         draft.name = oldPackageJson.name;
         draft.version = "0.0.0";
+        draft.repository = {
+            type: "git",
+            url: repository,
+            directory: packageToLint.relativePath,
+        };
         if (packageToLint.config.private) {
             draft.private = true;
         }

@@ -35,6 +35,7 @@ export async function runRuleOnPackage({
             logger,
             addDevDependency,
             ruleConfig: packageToLint.config.rules[rule.ruleId],
+            repository: monorepo.root.config.repository,
         });
     } catch (error) {
         logger.error({

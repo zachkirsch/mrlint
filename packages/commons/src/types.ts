@@ -13,6 +13,7 @@ export interface MonorepoRoot {
 export interface RootConfig {
     packages: string;
     sharedConfigs: string;
+    repository: string;
 }
 
 export interface Package {
