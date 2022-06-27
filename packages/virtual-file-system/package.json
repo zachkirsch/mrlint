@@ -1,6 +1,11 @@
 {
   "name": "@fern-api/mrlint-virtual-file-system",
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:fern-api/mrlint.git",
+    "directory": "packages/virtual-file-system"
+  },
   "files": [
     "lib"
   ],
