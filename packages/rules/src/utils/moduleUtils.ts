@@ -1,7 +1,12 @@
 import path from "path";
 
-export type ModuleType = "esm" | "cjs";
-const MODULE_TYPES_MAP: Record<ModuleType, true> = { esm: true, cjs: true };
+export type ModuleType = "cjs" | "esm";
+const MODULE_TYPES_MAP: Record<ModuleType, true> = {
+    // this order is used to determined compilation order.
+    // we compile CJS first since that's where the declaration types live.
+    cjs: true,
+    esm: true,
+};
 export const MODULE_TYPES = keys(MODULE_TYPES_MAP);
 
 export const OUTPUT_DIR = "lib";

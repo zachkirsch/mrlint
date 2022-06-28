@@ -212,7 +212,7 @@ function addScripts({
                 `${executables.get(Executable.TSC)} --build --clean ${getTsconfigFilenameForType(moduleType)}`
         ).join(" && "),
         compile: `yarn run ${getCompileScriptName("cjs")}`,
-        "compile:all": `${executables.get(Executable.RUN_P)} ${MODULE_TYPES.map(getCompileScriptName).join(" ")}`,
+        "compile:all": `${executables.get(Executable.RUN_S)} ${MODULE_TYPES.map(getCompileScriptName).join(" ")}`,
         ...MODULE_TYPES.reduce(
             (compileScripts, moduleType) => ({
                 ...compileScripts,
