@@ -9,6 +9,7 @@ export enum Executable {
     AWS_CDK,
     REACT_SCRIPTS,
     RUN_P,
+    RUN_S,
 }
 
 export const EXECUTABLES: Record<Executable, string> = {
@@ -22,6 +23,7 @@ export const EXECUTABLES: Record<Executable, string> = {
     [Executable.AWS_CDK]: "cdk",
     [Executable.REACT_SCRIPTS]: "react-scripts",
     [Executable.RUN_P]: "run-p",
+    [Executable.RUN_S]: "run-s",
 };
 
 const DEPENDENCIES: Record<Executable, string> = {
@@ -35,6 +37,7 @@ const DEPENDENCIES: Record<Executable, string> = {
     [Executable.AWS_CDK]: "aws-cdk",
     [Executable.REACT_SCRIPTS]: "react-scripts",
     [Executable.RUN_P]: "npm-run-all",
+    [Executable.RUN_S]: "npm-run-all",
 };
 
 export interface RequiredDependency {
