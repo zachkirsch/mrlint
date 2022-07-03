@@ -2,6 +2,7 @@ import { getRuleConfig, LintablePackage, Logger, PackageType, Result, Rule, Rule
 import produce, { Draft } from "immer";
 import { IPackageJson } from "package-json-type";
 import path from "path";
+import { ENABLE_CDK } from "../constants";
 import { Executable, Executables } from "../utils/Executables";
 import { getDependencies } from "../utils/getDependencies";
 import {
@@ -266,14 +267,21 @@ function addScripts({
             "build:production": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=PRODUCTION ${executables.get(
                 Executable.ENV_CMD
             )} -e production craco --max_old_space_size=4096 build`,
-            "deploy:staging": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=STAGING ${executables.get(
-                Executable.AWS_CDK
-            )} deploy --output deploy/cdk.out --require-approval never --progress events`,
-            "deploy:production": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=PRODUCTION ${executables.get(
-                Executable.AWS_CDK
-            )} deploy --output deploy/cdk.out --require-approval never --progress events`,
-            eject: `${executables.get(Executable.REACT_SCRIPTS)} eject`,
         };
+
+        if (ENABLE_CDK) {
+            draft.scripts = {
+                ...draft.scripts,
+                "deploy:staging": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=STAGING ${executables.get(
+                    Executable.AWS_CDK
+                )} deploy --output deploy/cdk.out --require-approval never --progress events`,
+                "deploy:production": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=PRODUCTION ${executables.get(
+                    Executable.AWS_CDK
+                )} deploy --output deploy/cdk.out --require-approval never --progress events`,
+            };
+        }
+
+        draft.eject = `${executables.get(Executable.REACT_SCRIPTS)} eject`;
     }
 
     draft.scripts = {
