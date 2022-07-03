@@ -268,21 +268,21 @@ function addScripts({
                 Executable.ENV_CMD
             )} -e production craco --max_old_space_size=4096 build`,
         };
-    }
 
-    if (ENABLE_CDK) {
-        draft.scripts = {
-            ...draft.scripts,
-            "deploy:staging": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=STAGING ${executables.get(
-                Executable.AWS_CDK
-            )} deploy --output deploy/cdk.out --require-approval never --progress events`,
-            "deploy:production": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=PRODUCTION ${executables.get(
-                Executable.AWS_CDK
-            )} deploy --output deploy/cdk.out --require-approval never --progress events`,
-        };
-    }
+        if (ENABLE_CDK) {
+            draft.scripts = {
+                ...draft.scripts,
+                "deploy:staging": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=STAGING ${executables.get(
+                    Executable.AWS_CDK
+                )} deploy --output deploy/cdk.out --require-approval never --progress events`,
+                "deploy:production": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=PRODUCTION ${executables.get(
+                    Executable.AWS_CDK
+                )} deploy --output deploy/cdk.out --require-approval never --progress events`,
+            };
+        }
 
-    draft.eject = `${executables.get(Executable.REACT_SCRIPTS)} eject`;
+        draft.eject = `${executables.get(Executable.REACT_SCRIPTS)} eject`;
+    }
 
     draft.scripts = {
         ...draft.scripts,
