@@ -1,6 +1,7 @@
 import { Logger, Package, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
 import path from "path";
+import { ENABLE_CDK } from "../constants";
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
 import { writePackageFile } from "../utils/writePackageFile";
 import { TsConfig } from "./ts-config";
@@ -21,6 +22,10 @@ async function runRule({
     allPackages,
     logger,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
+    if (!ENABLE_CDK) {
+        return Result.success();
+    }
+
     const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
     const result = Result.success();
 
