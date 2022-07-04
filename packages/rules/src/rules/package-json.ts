@@ -3,6 +3,7 @@ import produce, { Draft } from "immer";
 import { IPackageJson } from "package-json-type";
 import path from "path";
 import { ENABLE_CDK } from "../constants";
+import { canPackageContainCss } from "../utils/canPackageContainCss";
 import { Executable, Executables } from "../utils/Executables";
 import { getDependencies } from "../utils/getDependencies";
 import {
@@ -300,21 +301,6 @@ function sortDependencies(dependencies: Record<string, string>): Record<string, 
             }),
             {}
         );
-}
-
-function canPackageContainCss(p: LintablePackage): boolean {
-    if (p.config.type == null) {
-        return false;
-    }
-    switch (p.config.type) {
-        case PackageType.REACT_APP:
-        case PackageType.REACT_LIBRARY:
-            return true;
-        case PackageType.TYPESCRIPT_CLI:
-        case PackageType.TYPESCRIPT_LIBRARY:
-        case PackageType.CUSTOM:
-            return false;
-    }
 }
 
 function updateWorkspaceVersions(dependencies: Record<string, string> | undefined): Record<string, string> | undefined {
