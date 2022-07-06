@@ -262,7 +262,7 @@ function addScripts({
             start: `${executables.get(Executable.ENV_CMD)} -e development ${executables.get(
                 Executable.ENV_CMD
             )} -f .env.local --silent craco start`,
-            build: "craco build",
+            build: "yarn run compile && craco build",
         };
 
         draft.scripts.eject = `${executables.get(Executable.REACT_SCRIPTS)} eject`;
