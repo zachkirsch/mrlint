@@ -29,12 +29,3 @@ lerna-debug.log*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-
-# cdk
-cdk.context.json
-.cdk.staging/
-cdk.out/
-*.tabl.json
-
-# generated code
-src/generated
