@@ -240,7 +240,9 @@ function addScripts({
     if (canPackageContainCss(packageToLint)) {
         draft.scripts = {
             ...draft.scripts,
-            "lint:style": `${executables.get(Executable.STYLELINT)} '**/*.scss' --allow-empty-input --max-warnings 0`,
+            "lint:style": `${executables.get(
+                Executable.STYLELINT
+            )} 'src/**/*.scss' --allow-empty-input --max-warnings 0`,
             "lint:style:fix": "yarn run lint:style --fix",
         };
     }
