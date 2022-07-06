@@ -136,6 +136,8 @@ function generatePackageJson({
             draft.private = true;
         }
         draft.files = [OUTPUT_DIR];
+        draft.source = `src/${ENTRYPOINT}.ts`;
+        draft.module = `src/${ENTRYPOINT}.ts`;
         draft.main = `./${path.join(CJS_OUTPUT_DIR, ENTRYPOINT)}`;
         draft.types = `./${path.join(CJS_OUTPUT_DIR, TYPES_ENTRYPOINT)}`;
         draft.exports = {
