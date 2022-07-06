@@ -282,7 +282,7 @@ function addScripts({
             };
         }
 
-        draft.eject = `${executables.get(Executable.REACT_SCRIPTS)} eject`;
+        draft.scripts.eject = `${executables.get(Executable.REACT_SCRIPTS)} eject`;
     }
 
     draft.scripts = {
