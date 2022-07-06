@@ -3,9 +3,9 @@ import path from "path";
 export type ModuleType = "cjs" | "esm";
 const MODULE_TYPES_MAP: Record<ModuleType, true> = {
     // this order is used to determined compilation order.
-    // we compile CJS first since that's where the declaration types live.
-    cjs: true,
+    // we compile ESM first since that's where the declaration types live.
     esm: true,
+    cjs: true,
 };
 export const MODULE_TYPES = keys(MODULE_TYPES_MAP);
 

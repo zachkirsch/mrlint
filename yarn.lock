@@ -6998,13 +6998,14 @@ __metadata:
     husky: ^7.0.4
     jest: ^28.1.1
     lint-staged: ^12.3.7
+    mrlint: "workspace:*"
     prettier: ^2.6.2
     ts-node: ^10.8.1
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
 
-"mrlint@workspace:packages/cli":
+"mrlint@workspace:*, mrlint@workspace:packages/cli":
   version: 0.0.0-use.local
   resolution: "mrlint@workspace:packages/cli"
   dependencies:
