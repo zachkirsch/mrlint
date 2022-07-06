@@ -1,5 +1,4 @@
 import { Rule } from "@fern-api/mrlint-commons";
-import { CdkRule } from "./rules/cdk";
 import { CliRule } from "./rules/cli";
 import { CracoRule } from "./rules/craco";
 import { DeclarationsRule } from "./rules/declarations";
@@ -19,7 +18,6 @@ export const rules: Rules = {
     rules: [
         PackageJsonRule,
         TsConfigRule,
-        CdkRule,
         DepcheckRule,
         DeclarationsRule,
         CracoRule,

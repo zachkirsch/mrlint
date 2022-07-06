@@ -2,7 +2,6 @@ import { getRuleConfig, LintablePackage, Logger, PackageType, Result, Rule, Rule
 import produce, { Draft } from "immer";
 import { IPackageJson } from "package-json-type";
 import path from "path";
-import { ENABLE_CDK } from "../constants";
 import { canPackageContainCss } from "../utils/canPackageContainCss";
 import { Executable, Executables } from "../utils/Executables";
 import { getDependencies } from "../utils/getDependencies";
@@ -18,7 +17,6 @@ import {
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
 import { writePackageFile } from "../utils/writePackageFile";
 
-const PRODUCTION_ENVIRONMENT_ENV_VAR = "REACT_APP_PRODUCTION_ENVIRONMENT";
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 const PATH_TO_CLI_SCRIPT = "./cli";
 const ENTRYPOINT = "index.js";
@@ -264,25 +262,8 @@ function addScripts({
             start: `${executables.get(Executable.ENV_CMD)} -e development ${executables.get(
                 Executable.ENV_CMD
             )} -f .env.local --silent craco start`,
-            "build:staging": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=STAGING ${executables.get(
-                Executable.ENV_CMD
-            )} -e development craco --max_old_space_size=4096 build`,
-            "build:production": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=PRODUCTION ${executables.get(
-                Executable.ENV_CMD
-            )} -e production craco --max_old_space_size=4096 build`,
+            build: "craco build",
         };
-
-        if (ENABLE_CDK) {
-            draft.scripts = {
-                ...draft.scripts,
-                "deploy:staging": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=STAGING ${executables.get(
-                    Executable.AWS_CDK
-                )} deploy --output deploy/cdk.out --require-approval never --progress events`,
-                "deploy:production": `${PRODUCTION_ENVIRONMENT_ENV_VAR}=PRODUCTION ${executables.get(
-                    Executable.AWS_CDK
-                )} deploy --output deploy/cdk.out --require-approval never --progress events`,
-            };
-        }
 
         draft.scripts.eject = `${executables.get(Executable.REACT_SCRIPTS)} eject`;
     }
