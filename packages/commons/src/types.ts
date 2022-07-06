@@ -12,7 +12,8 @@ export interface MonorepoRoot {
 
 export interface RootConfig {
     packages: string;
-    sharedConfigs: string;
+    absolutePathToSharedConfigs: string;
+    absolutePathToScripts: string;
     repository: string;
 }
 

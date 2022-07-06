@@ -9,7 +9,6 @@ const MONOREPO_ROOT_FILES = [".mrlint.root.json", ".mrlint.root.yml"];
 
 const RootConfigSchema = z.strictObject({
     packages: z.string(),
-    sharedConfigs: z.string(),
 });
 
 export async function getMonorepoRoot(): Promise<MonorepoRoot> {
@@ -29,11 +28,14 @@ export async function getMonorepoRoot(): Promise<MonorepoRoot> {
         throw new Error("Could not determine remote repository");
     }
 
+    const fullPath = path.dirname(configPath);
+
     return {
-        fullPath: path.dirname(configPath),
+        fullPath,
         config: {
             packages: config.packages,
-            sharedConfigs: config.sharedConfigs,
+            absolutePathToSharedConfigs: path.join(fullPath, "shared"),
+            absolutePathToScripts: path.join(fullPath, "scripts"),
             repository,
         },
     };
