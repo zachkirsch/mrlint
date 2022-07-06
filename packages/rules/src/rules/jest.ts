@@ -21,6 +21,7 @@ const EXPECTED_DEV_DEPENDENCIES = [
     "@babel/core",
     "@babel/preset-env",
     "@babel/preset-typescript",
+    "ts-jest",
 ];
 
 async function runRule({
