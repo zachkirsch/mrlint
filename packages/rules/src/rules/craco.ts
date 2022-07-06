@@ -1,4 +1,5 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import path from "path";
 import { writePackageFile } from "../utils/writePackageFile";
 
 export const CracoRule: Rule.PackageRule = {
@@ -8,12 +9,18 @@ export const CracoRule: Rule.PackageRule = {
     run: runRule,
 };
 
-const CONTENTS = `const { getLoader, loaderByName } = require("@craco/craco");
+async function runRule({
+    fileSystems,
+    packageToLint,
+    logger,
+    relativePathToScripts,
+}: Rule.PackageRuleRunnerArgs): Promise<Result> {
+    const CONTENTS = `const { getLoader, loaderByName } = require("@craco/craco");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
-const { getPackages } = require("@lerna/project");
+const { getAllPackages } = require("${path.join(relativePathToScripts, "getAllPackages")}");
 
 module.exports = async function () {
-    const packages = (await getPackages()).map((p) => \`\${p.location}/src\`);
+    const packages = (await getAllPackages()).map((p) => \`\${p.location}/src\`);
     return {
         webpack: {
             plugins: [new NodePolyfillPlugin()],
@@ -41,7 +48,6 @@ module.exports = async function () {
     };
 };`;
 
-async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     return writePackageFile({
         fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
         filename: "craco.config.js",

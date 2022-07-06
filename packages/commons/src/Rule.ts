@@ -41,6 +41,7 @@ export declare namespace Rule {
         allPackages: readonly Package[];
         relativePathToRoot: string;
         relativePathToSharedConfigs: string;
+        relativePathToScripts: string;
         repository: string;
         fileSystems: FileSystems;
         logger: Logger;

@@ -17,10 +17,7 @@ export async function runRuleOnPackage({
     logger,
     addDevDependency,
 }: runRuleOnPackage.Args): Promise<Result> {
-    const relativePathToRoot = path.relative(
-        path.join(monorepo.root.fullPath, packageToLint.relativePath),
-        monorepo.root.fullPath
-    );
+    const absolutePathToPackage = path.join(monorepo.root.fullPath, packageToLint.relativePath);
 
     logger.debug("Running rule...");
 
@@ -29,8 +26,12 @@ export async function runRuleOnPackage({
         result = await rule.run({
             packageToLint,
             allPackages: monorepo.packages,
-            relativePathToRoot,
-            relativePathToSharedConfigs: path.join(relativePathToRoot, monorepo.root.config.sharedConfigs),
+            relativePathToRoot: path.relative(absolutePathToPackage, monorepo.root.fullPath),
+            relativePathToSharedConfigs: path.relative(
+                absolutePathToPackage,
+                monorepo.root.config.absolutePathToSharedConfigs
+            ),
+            relativePathToScripts: path.relative(absolutePathToPackage, monorepo.root.config.absolutePathToScripts),
             fileSystems,
             logger,
             addDevDependency,
