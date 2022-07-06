@@ -16,9 +16,9 @@ export const ESM_OUTPUT_DIR = path.join(OUTPUT_DIR, "esm");
 export function getTsconfigFilenameForType(type: ModuleType): string {
     switch (type) {
         case "esm":
-            return "tsconfig.esm.json";
-        default:
             return "tsconfig.json";
+        default:
+            return "tsconfig.cjs.json";
     }
 }
 

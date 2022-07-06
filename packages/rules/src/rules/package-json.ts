@@ -136,8 +136,8 @@ function generatePackageJson({
         draft.files = [OUTPUT_DIR];
         draft.source = "src/index.ts";
         draft.module = "src/index.ts";
-        draft.main = `./${path.join(CJS_OUTPUT_DIR, ENTRYPOINT)}`;
-        draft.types = `./${path.join(CJS_OUTPUT_DIR, TYPES_ENTRYPOINT)}`;
+        draft.main = `./${path.join(ESM_OUTPUT_DIR, ENTRYPOINT)}`;
+        draft.types = `./${path.join(ESM_OUTPUT_DIR, TYPES_ENTRYPOINT)}`;
         draft.exports = {
             ".": {
                 require: `./${path.join(CJS_OUTPUT_DIR, ENTRYPOINT)}`,
@@ -213,7 +213,7 @@ function addScripts({
             (moduleType) =>
                 `${executables.get(Executable.TSC)} --build --clean ${getTsconfigFilenameForType(moduleType)}`
         ).join(" && "),
-        compile: `yarn run ${getCompileScriptName("cjs")}`,
+        compile: `yarn run ${getCompileScriptName("esm")}`,
         "compile:all": `${executables.get(Executable.RUN_S)} ${MODULE_TYPES.map(getCompileScriptName).join(" ")}`,
         ...MODULE_TYPES.reduce(
             (compileScripts, moduleType) => ({
