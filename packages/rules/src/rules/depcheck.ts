@@ -1,5 +1,4 @@
 import { getRuleConfig, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
-import { canPackageContainCss } from "../utils/canPackageContainCss";
 import { OUTPUT_DIR } from "../utils/moduleUtils";
 import { writePackageFile } from "../utils/writePackageFile";
 
@@ -40,11 +39,7 @@ async function runRule({
     if (packageToLint.config.type === PackageType.REACT_APP) {
         // TODO this should probably live in the craco rule
         addDevDependency("@craco/craco");
-        depcheckRc.ignores.push("react-scripts", "node-polyfill-webpack-plugin");
-    }
-
-    if (canPackageContainCss(packageToLint)) {
-        depcheckRc.ignores.push("sass");
+        depcheckRc.ignores.push("react-scripts", "sass");
     }
 
     const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);
