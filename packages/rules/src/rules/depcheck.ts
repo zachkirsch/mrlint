@@ -29,7 +29,6 @@ async function runRule({
     packageToLint,
     logger,
     ruleConfig,
-    addDevDependency,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const depcheckRc: DepcheckConfig = {
         ignores: ["@types/jest", "@types/node"],
@@ -37,8 +36,6 @@ async function runRule({
     };
 
     if (packageToLint.config.type === PackageType.REACT_APP) {
-        // TODO this should probably live in the craco rule
-        addDevDependency("@craco/craco");
         depcheckRc.ignores.push("react-scripts", "sass");
     }
 
