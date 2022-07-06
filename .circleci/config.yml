@@ -40,10 +40,10 @@ jobs:
           pkg-manager: yarn-berry
       - run:
           name: Compile
-          command: yarn compile
+          command: yarn compile:all
       - run:
           name: Add version to package.json's
-          command: yarn run mrlint version $(git tag --points-at HEAD)
+          command: yarn mrlint:local version $(git tag --points-at HEAD)
       - run:
           name: Publish all packages
           command: yarn run publish
