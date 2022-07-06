@@ -17,7 +17,7 @@
     "mrlint": "node packages/cli/cli",
     "lint:eslint": "eslint . --max-warnings 0",
     "lint:eslint:fix": "eslint . --fix --max-warnings 0",
-    "lint:monorepo": "yarn workspace mrlint run compile && yarn run mrlint lint",
+    "lint:monorepo": "yarn workspace mrlint run compile:cjs && yarn run mrlint lint",
     "lint:monorepo:fix": "yarn run lint:monorepo --fix",
     "format": "prettier --write --ignore-unknown --ignore-path ./shared/.prettierignore \"**\"",
     "format:check": "prettier --check --ignore-unknown --ignore-path ./shared/.prettierignore \"**\"",
