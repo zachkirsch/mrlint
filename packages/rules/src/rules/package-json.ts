@@ -241,9 +241,7 @@ function addScripts({
         draft.scripts = {
             ...draft.scripts,
             "lint:style": `${executables.get(Executable.STYLELINT)} '**/*.scss' --allow-empty-input --max-warnings 0`,
-            "lint:style:fix": `${executables.get(
-                Executable.STYLELINT
-            )} '**/*.scss' --allow-empty-input --max-warnings 0 --fix`,
+            "lint:style:fix": "yarn run lint:style --fix",
         };
     }
 
