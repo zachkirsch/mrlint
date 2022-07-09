@@ -1,6 +1,5 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import path from "path";
-import { getTsconfigFilenameForType } from "../utils/moduleUtils";
 import { writePackageFile } from "../utils/writePackageFile";
 
 export const CracoRule: Rule.PackageRule = {
@@ -54,8 +53,6 @@ async function runRule({
                         const options = (forkTsCheckerWebpackPlugin as any).options as ForkTsCheckerWebpackPluginConfig;
                         // add --build flag to tsc for building project references
                         options.typescript.build = true;
-                        // compile ESM, not CJS
-                        options.typescript.configFile = "${getTsconfigFilenameForType("esm")}";
                     } else {
                         throw new Error("Could not find ForkTsCheckerWebpackPlugin");
                     }

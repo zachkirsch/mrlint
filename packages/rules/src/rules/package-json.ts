@@ -8,8 +8,8 @@ import { getDependencies } from "../utils/getDependencies";
 import {
     CJS_OUTPUT_DIR,
     ESM_OUTPUT_DIR,
+    getModuleForType,
     getOutputDirForType,
-    getTsconfigFilenameForType,
     ModuleType,
     MODULE_TYPES,
     OUTPUT_DIR,
@@ -209,10 +209,7 @@ function addScripts({
     customScripts: Record<string, string>;
 }) {
     draft.scripts = {
-        clean: MODULE_TYPES.map(
-            (moduleType) =>
-                `${executables.get(Executable.TSC)} --build --clean ${getTsconfigFilenameForType(moduleType)}`
-        ).join(" && "),
+        clean: MODULE_TYPES.map(() => `${executables.get(Executable.TSC)} --build --clean `).join(" && "),
         compile: `yarn run ${getCompileScriptName("esm")}`,
         "compile:all": `${executables.get(Executable.RUN_S)} ${MODULE_TYPES.map(getCompileScriptName).join(" ")}`,
         ...MODULE_TYPES.reduce(
@@ -300,12 +297,18 @@ function updateWorkspaceVersions(dependencies: Record<string, string> | undefine
     });
 }
 
-function getCompileScriptName(moduleType): string {
+function getCompileScriptName(moduleType: ModuleType): string {
     return `compile:${moduleType}`;
 }
 
 function getCompileCommand(executables: Executables, moduleType: ModuleType): string {
-    return `${executables.get(Executable.TSC)} --build ${getTsconfigFilenameForType(moduleType)}`;
+    return [
+        executables.get(Executable.TSC),
+        "--build",
+        `--module ${getModuleForType(moduleType)}`,
+        `--outDir ${getOutputDirForType(moduleType)}`,
+        `--tsBuildInfoFile ${getTsBuildInfoFileName(moduleType)}`,
+    ].join(" ");
 }
 
 function getPackageJsonTypeProperty(moduleType: ModuleType): string {
@@ -315,4 +318,8 @@ function getPackageJsonTypeProperty(moduleType: ModuleType): string {
         case "cjs":
             return "commonjs";
     }
+}
+
+function getTsBuildInfoFileName(type: ModuleType): string {
+    return `.${type}.tsbuildinfo`;
 }

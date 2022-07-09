@@ -1,9 +1,9 @@
 import { getRuleConfig, Logger, Package, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import path from "path";
-import { CompilerOptions, ProjectReference } from "typescript";
+import ts, { CompilerOptions, ProjectReference } from "typescript";
 import { getDependencies } from "../utils/getDependencies";
 import { keyPackagesByNpmName } from "../utils/keyPackagesByNpmName";
-import { getOutputDirForType, getTsconfigFilenameForType, ModuleType, MODULE_TYPES } from "../utils/moduleUtils";
+import { DEFAULT_MODULE_TYPE, getModuleForType, getOutputDirForType } from "../utils/moduleUtils";
 import { tryGetPackageJson } from "../utils/tryGetPackageJson";
 import { writePackageFile } from "../utils/writePackageFile";
 
@@ -43,30 +43,26 @@ async function runRule({
 
     const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);
 
-    for (const moduleType of MODULE_TYPES) {
-        result.accumulate(
-            await generateTsConfigForModuleType({
-                packageToLint,
-                allPackages,
-                relativePathToSharedConfigs,
-                logger,
-                fileSystems,
-                moduleType,
-                exclude: castedRuleConfig?.exclude ?? [],
-            })
-        );
-    }
+    result.accumulate(
+        await generateTsConfig({
+            packageToLint,
+            allPackages,
+            relativePathToSharedConfigs,
+            logger,
+            fileSystems,
+            exclude: castedRuleConfig?.exclude ?? [],
+        })
+    );
 
     return result;
 }
 
-async function generateTsConfigForModuleType({
+async function generateTsConfig({
     packageToLint,
     allPackages,
     relativePathToSharedConfigs,
     logger,
     fileSystems,
-    moduleType,
     exclude,
 }: {
     packageToLint: Package;
@@ -74,17 +70,15 @@ async function generateTsConfigForModuleType({
     relativePathToSharedConfigs: string;
     logger: Logger;
     fileSystems: Rule.FileSystems;
-    moduleType: ModuleType;
     exclude: string[];
 }): Promise<Result> {
     let tsConfig: TsConfig;
     try {
-        tsConfig = await generateTsConfig({
+        tsConfig = await generateTsConfigOrThrow({
             packageToLint,
             allPackages,
             relativePathToSharedConfigs,
             logger,
-            moduleType,
             exclude,
         });
     } catch (error) {
@@ -97,25 +91,23 @@ async function generateTsConfigForModuleType({
 
     return writePackageFile({
         fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
-        filename: getTsconfigFilenameForType(moduleType),
+        filename: "tsconfig.json",
         contents: JSON.stringify(tsConfig),
         logger,
     });
 }
 
-async function generateTsConfig({
+async function generateTsConfigOrThrow({
     packageToLint,
     allPackages,
     relativePathToSharedConfigs,
     logger,
-    moduleType,
     exclude,
 }: {
     packageToLint: Package;
     allPackages: readonly Package[];
     relativePathToSharedConfigs: string;
     logger: Logger;
-    moduleType: ModuleType;
     exclude: string[];
 }): Promise<TsConfig> {
     const packageJson = tryGetPackageJson(packageToLint, logger);
@@ -126,7 +118,12 @@ async function generateTsConfig({
 
     const tsConfig: TsConfig = {
         extends: path.join(relativePathToSharedConfigs, "tsconfig.shared.json"),
-        compilerOptions: generateCompilerOptions(moduleType),
+        compilerOptions: {
+            composite: true,
+            outDir: getOutputDirForType(DEFAULT_MODULE_TYPE),
+            rootDir: "src",
+            module: getModuleForType(DEFAULT_MODULE_TYPE) as unknown as ts.ModuleKind,
+        },
         include: ["./src"],
     };
 
@@ -146,35 +143,11 @@ async function generateTsConfig({
             return acc;
         }, [])
         .sort()
-        .map((pathToReference) => ({ path: path.join(pathToReference, getTsconfigFilenameForType(moduleType)) }));
+        .map((pathToReference) => ({ path: path.join(pathToReference, "tsconfig.json") }));
+
     if (references.length > 0) {
         tsConfig.references = references;
     }
 
     return tsConfig;
-}
-
-function generateCompilerOptions(moduleType: ModuleType): CompilerOptions {
-    const compilerOptions: CompilerOptions = {
-        composite: true,
-        outDir: getOutputDirForType(moduleType),
-        rootDir: "src",
-    };
-
-    const module = getModuleForType(moduleType);
-    if (module != null) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        compilerOptions.module = module as any;
-    }
-
-    return compilerOptions;
-}
-
-function getModuleForType(type: ModuleType): string | undefined {
-    switch (type) {
-        case "esm":
-            return "esnext";
-        case "cjs":
-            return "CommonJS";
-    }
 }
