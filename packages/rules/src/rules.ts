@@ -10,21 +10,17 @@ import { PrettierRule } from "./rules/prettier";
 import { StyleLintRule } from "./rules/stylelint";
 import { TsConfigRule } from "./rules/ts-config";
 
-export interface Rules {
-    rules: Rule[];
-}
+export type Rules = Rule[];
 
-export const rules: Rules = {
-    rules: [
-        PackageJsonRule,
-        TsConfigRule,
-        DepcheckRule,
-        DeclarationsRule,
-        CracoRule,
-        JestRule,
-        PrettierRule,
-        StyleLintRule,
-        CliRule,
-        DuplicateDependenciesRule,
-    ],
-};
+export const rules: Rules = [
+    PackageJsonRule,
+    TsConfigRule,
+    DepcheckRule,
+    DeclarationsRule,
+    CracoRule,
+    JestRule,
+    PrettierRule,
+    StyleLintRule,
+    CliRule,
+    DuplicateDependenciesRule,
+];

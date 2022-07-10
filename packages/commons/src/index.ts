@@ -1,4 +1,4 @@
-export { formatFile, formatFileContents, formatFiles } from "./formatFiles";
+export { formatFileContents } from "./formatFiles";
 export { getRuleConfig } from "./getRuleConfig";
 export { LogLevel } from "./logger/Logger";
 export type { Logger } from "./logger/Logger";

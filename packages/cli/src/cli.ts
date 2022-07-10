@@ -1,5 +1,6 @@
 import { LogLevel } from "@fern-api/mrlint-commons";
 import yargs from "yargs";
+import { createPackageCommand } from "./commands/createPackageCommand";
 import { lintCommand } from "./commands/lintCommand";
 import { listCommand } from "./commands/listCommand";
 import { versionCommand } from "./commands/versionCommand";
@@ -52,6 +53,16 @@ yargs
         }
     )
     .command("list", "List the packages in the monorepo", listCommand)
+    .command(
+        "create-package",
+        "Create a new package",
+        () => {
+            /* no-op */
+        },
+        async (argv) => {
+            await createPackageCommand({ loggers: new ConsoleMonorepoLogger(convertLogLevel(argv.logLevel)) });
+        }
+    )
     .demandCommand()
     .showHelpOnFail(true)
     .parse();

@@ -35,25 +35,25 @@ export type PackageConfig =
     | CustomPackageConfig;
 
 export interface ReactAppPackageConfig extends BasePackageConfig {
-    type: PackageType.REACT_APP;
+    type: typeof PackageType.REACT_APP;
 }
 
 export interface ReactLibraryPackageConfig extends BasePackageConfig {
-    type: PackageType.REACT_LIBRARY;
+    type: typeof PackageType.REACT_LIBRARY;
 }
 
 export interface TypescriptLibraryPackageConfig extends BasePackageConfig {
-    type: PackageType.TYPESCRIPT_LIBRARY;
+    type: typeof PackageType.TYPESCRIPT_LIBRARY;
 }
 
 export interface TypescriptCliPackageConfig extends BasePackageConfig {
-    type: PackageType.TYPESCRIPT_CLI;
+    type: typeof PackageType.TYPESCRIPT_CLI;
     cliName: string | undefined;
     pathToCli: string;
 }
 
 export interface CustomPackageConfig extends BasePackageConfig {
-    type: PackageType.CUSTOM;
+    type: typeof PackageType.CUSTOM;
 }
 
 export interface BasePackageConfig {
@@ -61,10 +61,11 @@ export interface BasePackageConfig {
     rules: Record<string, unknown>;
 }
 
-export enum PackageType {
-    REACT_APP = "REACT_APP",
-    REACT_LIBRARY = "REACT_LIBRARY",
-    TYPESCRIPT_LIBRARY = "TYPESCRIPT_LIBRARY",
-    TYPESCRIPT_CLI = "TYPESCRIPT_CLI",
-    CUSTOM = "CUSTOM",
-}
+export const PackageType = {
+    REACT_APP: "React app",
+    REACT_LIBRARY: "React library",
+    TYPESCRIPT_LIBRARY: "TypeScript library",
+    TYPESCRIPT_CLI: "TypeScript CLI",
+    CUSTOM: "Custom",
+} as const;
+export type PackageType = typeof PackageType[keyof typeof PackageType];
