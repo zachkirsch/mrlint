@@ -1,10 +1,10 @@
+import { addPackage } from "@fern-api/mrlint-add-package";
 import { MonorepoLoggers } from "@fern-api/mrlint-commons";
-import { createPackage } from "@fern-api/mrlint-create-package";
 import { parseMonorepo } from "@fern-api/mrlint-parser";
 
-export async function createPackageCommand({ loggers }: { loggers: MonorepoLoggers }): Promise<void> {
+export async function addPackageCommand({ loggers }: { loggers: MonorepoLoggers }): Promise<void> {
     const monorepo = await parseMonorepo();
-    await createPackage({
+    await addPackage({
         monorepo,
         loggers,
     });

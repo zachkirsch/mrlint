@@ -1,5 +1,3 @@
-import { IPackageJson } from "package-json-type";
-
 export interface Monorepo {
     root: MonorepoRoot;
     packages: Package[];
@@ -20,7 +18,6 @@ export interface RootConfig {
 export interface Package {
     relativePath: string;
     config: PackageConfig | undefined;
-    packageJson: IPackageJson | undefined;
 }
 
 export interface LintablePackage extends Package {

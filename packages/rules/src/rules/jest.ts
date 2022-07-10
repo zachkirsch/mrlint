@@ -1,6 +1,5 @@
-import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { getPackageJson, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import path from "path";
-import { tryGetPackageJson } from "../utils/tryGetPackageJson";
 import { writePackageFile } from "../utils/writePackageFile";
 
 export const JestRule: Rule.PackageRule = {
@@ -33,9 +32,11 @@ async function runRule({
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const result = Result.success();
 
+    const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
+
     result.accumulate(
         await writePackageFile({
-            fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+            fileSystem: fileSystemForPackage,
             filename: "jest.config.ts",
             contents: `import packageConfig from "${path.join(relativePathToSharedConfigs, "jest.config.shared")}";
             
@@ -46,7 +47,7 @@ export default packageConfig;`,
 
     result.accumulate(
         await writePackageFile({
-            fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+            fileSystem: fileSystemForPackage,
             filename: "babel.config.js",
             contents: `module.exports = require("${path.join(
                 relativePathToSharedConfigs,
@@ -56,7 +57,7 @@ export default packageConfig;`,
         })
     );
 
-    const packageJson = tryGetPackageJson(packageToLint, logger);
+    const packageJson = getPackageJson(fileSystemForPackage, logger);
     if (packageJson == null) {
         result.fail();
     } else {

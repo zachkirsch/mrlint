@@ -1,4 +1,5 @@
 export { formatFileContents } from "./formatFiles";
+export { getPackageJson } from "./getPackageJson";
 export { getRuleConfig } from "./getRuleConfig";
 export { LogLevel } from "./logger/Logger";
 export type { Logger } from "./logger/Logger";
