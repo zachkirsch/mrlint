@@ -1,7 +1,6 @@
 import { MonorepoLoggers } from "@fern-api/mrlint-commons";
 import { lintMonorepo } from "@fern-api/mrlint-lint";
 import { parseMonorepo } from "@fern-api/mrlint-parser";
-import { rules } from "@fern-api/mrlint-rules";
 
 export async function lintCommand({
     loggers,
@@ -14,7 +13,6 @@ export async function lintCommand({
 
     const result = await lintMonorepo({
         monorepo,
-        rules: rules.rules,
         shouldFix,
         loggers,
     });

@@ -4,7 +4,7 @@
   "include": ["./src"],
   "references": [
     { "path": "../commons/tsconfig.cjs.json" },
-    { "path": "../rules/tsconfig.cjs.json" },
-    { "path": "../virtual-file-system/tsconfig.cjs.json" }
+    { "path": "../lint/tsconfig.cjs.json" },
+    { "path": "../parser/tsconfig.cjs.json" }
   ]
 }

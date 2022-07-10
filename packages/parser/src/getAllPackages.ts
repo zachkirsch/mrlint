@@ -1,4 +1,5 @@
 import { BasePackageConfig, MonorepoRoot, Package, PackageConfig, PackageType } from "@fern-api/mrlint-commons";
+import { CJS_OUTPUT_DIR } from "@fern-api/mrlint-rules";
 import execa from "execa";
 import { readFile } from "fs/promises";
 import { IPackageJson } from "package-json-type";
@@ -8,6 +9,8 @@ import { readConfig } from "./readConfig";
 import { PackageConfigSchema } from "./schemas/PackageConfigSchema";
 
 type RawPackageConfig = z.infer<typeof PackageConfigSchema>;
+
+export const MRLINT_PACKAGE_CONFIG_FILENAME = ".mrlint.json";
 
 export async function getAllPackages(monorepoRoot: MonorepoRoot): Promise<Package[]> {
     const packages: Package[] = [];
@@ -26,12 +29,12 @@ export async function getAllPackages(monorepoRoot: MonorepoRoot): Promise<Packag
         .map((line) => path.join(monorepoRoot.fullPath, JSON.parse(line).location))
         .filter((packageLocation) => path.normalize(packageLocation) !== path.normalize(monorepoRoot.fullPath));
     for (const packageDirectory of packageLocations) {
-        const rawConfig = await readConfig(path.join(packageDirectory, ".mrlint.json"), (contents) =>
+        const rawConfig = await readConfig(path.join(packageDirectory, MRLINT_PACKAGE_CONFIG_FILENAME), (contents) =>
             PackageConfigSchema.parse(contents)
         );
         packages.push({
             relativePath: path.relative(monorepoRoot.fullPath, packageDirectory),
-            config: rawConfig != null ? convertConfig(rawConfig) : undefined,
+            config: rawConfig != null ? convertPackageConfig(rawConfig) : undefined,
             packageJson: await getPackageJson(packageDirectory),
         });
     }
@@ -48,7 +51,7 @@ async function getPackageJson(packageDirectory: string): Promise<IPackageJson | 
     }
 }
 
-function convertConfig(rawConfig: RawPackageConfig): PackageConfig {
+export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig {
     const baseConfig: BasePackageConfig = {
         private: rawConfig.private,
         rules: rawConfig.rules ?? {},
@@ -59,7 +62,7 @@ function convertConfig(rawConfig: RawPackageConfig): PackageConfig {
                 ...baseConfig,
                 type: PackageType.TYPESCRIPT_CLI,
                 cliName: rawConfig.cliName,
-                pathToCli: rawConfig.pathToCli,
+                pathToCli: rawConfig.pathToCli ?? `./${path.join(CJS_OUTPUT_DIR, "cli.js")}`,
             };
         case "library":
             return {

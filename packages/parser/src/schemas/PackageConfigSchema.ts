@@ -13,3 +13,5 @@ export const PackageConfigSchema = z.union([
     BasePackageConfigSchema.merge(TypescriptLibraryPackageConfigSchema),
     BasePackageConfigSchema.merge(TypescriptCliPackageConfigSchema),
 ]);
+
+export type PackageConfigSchema = z.infer<typeof PackageConfigSchema>;
