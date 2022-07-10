@@ -2077,30 +2077,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fern-api/mrlint-commons@workspace:*, @fern-api/mrlint-commons@workspace:packages/commons":
+"@fern-api/mrlint-add-package@workspace:*, @fern-api/mrlint-add-package@workspace:packages/add-package":
   version: 0.0.0-use.local
-  resolution: "@fern-api/mrlint-commons@workspace:packages/commons"
-  dependencies:
-    "@babel/core": ^7.17.9
-    "@babel/preset-env": ^7.16.11
-    "@babel/preset-typescript": ^7.16.7
-    "@fern-api/mrlint-virtual-file-system": "workspace:*"
-    "@types/jest": ^27.4.1
-    "@types/node": ^17.0.25
-    depcheck: ^1.4.3
-    eslint: ^8.12.0
-    jest: ^27.5.1
-    npm-run-all: ^4.1.5
-    package-json-type: ^1.0.3
-    prettier: ^2.6.2
-    ts-jest: ^28.0.5
-    typescript: ^4.6.3
-  languageName: unknown
-  linkType: soft
-
-"@fern-api/mrlint-create-package@workspace:*, @fern-api/mrlint-create-package@workspace:packages/create-package":
-  version: 0.0.0-use.local
-  resolution: "@fern-api/mrlint-create-package@workspace:packages/create-package"
+  resolution: "@fern-api/mrlint-add-package@workspace:packages/add-package"
   dependencies:
     "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
@@ -2116,6 +2095,26 @@ __metadata:
     execa: ^5.1.1
     inquirer: ^8.0.0
     inquirer-file-tree-selection-prompt: ^1.0.19
+    jest: ^27.5.1
+    npm-run-all: ^4.1.5
+    prettier: ^2.6.2
+    ts-jest: ^28.0.5
+    typescript: ^4.6.3
+  languageName: unknown
+  linkType: soft
+
+"@fern-api/mrlint-commons@workspace:*, @fern-api/mrlint-commons@workspace:packages/commons":
+  version: 0.0.0-use.local
+  resolution: "@fern-api/mrlint-commons@workspace:packages/commons"
+  dependencies:
+    "@babel/core": ^7.17.9
+    "@babel/preset-env": ^7.16.11
+    "@babel/preset-typescript": ^7.16.7
+    "@fern-api/mrlint-virtual-file-system": "workspace:*"
+    "@types/jest": ^27.4.1
+    "@types/node": ^17.0.25
+    depcheck: ^1.4.3
+    eslint: ^8.12.0
     jest: ^27.5.1
     npm-run-all: ^4.1.5
     package-json-type: ^1.0.3
@@ -7241,8 +7240,8 @@ __metadata:
     "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
     "@babel/preset-typescript": ^7.16.7
+    "@fern-api/mrlint-add-package": "workspace:*"
     "@fern-api/mrlint-commons": "workspace:*"
-    "@fern-api/mrlint-create-package": "workspace:*"
     "@fern-api/mrlint-lint": "workspace:*"
     "@fern-api/mrlint-parser": "workspace:*"
     "@types/jest": ^27.4.1
@@ -7253,6 +7252,7 @@ __metadata:
     eslint: ^8.12.0
     jest: ^27.5.1
     npm-run-all: ^4.1.5
+    package-json-type: ^1.0.3
     prettier: ^2.6.2
     ts-jest: ^28.0.5
     typescript: ^4.6.3

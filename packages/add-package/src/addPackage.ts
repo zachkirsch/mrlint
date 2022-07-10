@@ -3,11 +3,10 @@ import { lintMonorepo } from "@fern-api/mrlint-lint";
 import { convertPackageConfig, MRLINT_PACKAGE_CONFIG_FILENAME, PackageConfigSchema } from "@fern-api/mrlint-parser";
 import execa from "execa";
 import { mkdir, rm, writeFile } from "fs/promises";
-import { IPackageJson } from "package-json-type";
 import path from "path";
 import { promptForPackageMetadata } from "./promptForPackageMetadata";
 
-export async function createPackage({
+export async function addPackage({
     monorepo,
     loggers,
 }: {
@@ -18,7 +17,7 @@ export async function createPackage({
     const absolutePackagePath = path.join(location, name);
 
     try {
-        const result = await tryCreatePackage({
+        const result = await tryaddPackage({
             monorepo,
             loggers,
             absolutePackagePath,
@@ -39,7 +38,7 @@ export async function createPackage({
     return Result.failure();
 }
 
-async function tryCreatePackage({
+async function tryaddPackage({
     monorepo,
     loggers,
     absolutePackagePath,
@@ -54,31 +53,31 @@ async function tryCreatePackage({
     packageType: PackageType;
     isPackagePrivate: boolean;
 }) {
-    const packageJson: IPackageJson = { name: packageName };
-
-    await writeSkeletonPackageToDiskAndYarnInstall({ absolutePackagePath, packageJson, monorepo });
+    await writeSkeletonPackageToDiskAndYarnInstall({ absolutePackagePath, packageName, monorepo });
     const rawMrlintConfig: PackageConfigSchema = await writeMrlintConfigToDisk({
         packageType,
         isPackagePrivate,
         absolutePackagePath,
     });
     await writeSrc(absolutePackagePath);
-    const result = await lintPackage({ monorepo, absolutePackagePath, rawMrlintConfig, packageJson, loggers });
-
+    const result = await lintPackage({ monorepo, absolutePackagePath, rawMrlintConfig, loggers });
     return result;
 }
 
 async function writeSkeletonPackageToDiskAndYarnInstall({
+    packageName,
     absolutePackagePath,
-    packageJson,
     monorepo,
 }: {
+    packageName: string;
     absolutePackagePath: string;
-    packageJson: IPackageJson;
     monorepo: Monorepo;
 }) {
     await mkdir(absolutePackagePath);
-    await writeFile(path.join(absolutePackagePath, "package.json"), JSON.stringify(packageJson, undefined, 2));
+    await writeFile(
+        path.join(absolutePackagePath, "package.json"),
+        JSON.stringify({ name: packageName }, undefined, 2)
+    );
     await execa("yarn", {
         cwd: monorepo.root.fullPath,
     });
@@ -129,13 +128,11 @@ async function lintPackage({
     monorepo,
     absolutePackagePath,
     rawMrlintConfig,
-    packageJson,
     loggers,
 }: {
     monorepo: Monorepo;
     absolutePackagePath: string;
     rawMrlintConfig: PackageConfigSchema;
-    packageJson: IPackageJson;
     loggers: MonorepoLoggers;
 }) {
     return await lintMonorepo({
@@ -145,7 +142,6 @@ async function lintPackage({
                 {
                     relativePath: path.relative(monorepo.root.fullPath, absolutePackagePath),
                     config: convertPackageConfig(rawMrlintConfig),
-                    packageJson,
                 },
             ],
         },

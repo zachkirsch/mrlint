@@ -1,10 +1,10 @@
 {
-  "name": "@fern-api/mrlint-create-package",
+  "name": "@fern-api/mrlint-add-package",
   "version": "0.0.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:fern-api/mrlint.git",
-    "directory": "packages/create-package"
+    "directory": "packages/add-package"
   },
   "files": [
     "lib"
@@ -52,7 +52,6 @@
     "eslint": "^8.12.0",
     "jest": "^27.5.1",
     "npm-run-all": "^4.1.5",
-    "package-json-type": "^1.0.3",
     "prettier": "^2.6.2",
     "ts-jest": "^28.0.5",
     "typescript": "^4.6.3"

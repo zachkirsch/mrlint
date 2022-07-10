@@ -1,4 +1,5 @@
-import { Logger, MonorepoLoggers, Package, Result } from "@fern-api/mrlint-commons";
+import { getPackageJson, Logger, MonorepoLoggers, Package, Result } from "@fern-api/mrlint-commons";
+import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
 import chalk from "chalk";
 import { exec } from "child_process";
 
@@ -14,24 +15,28 @@ export async function addDevDependencies({
     devDependencies,
     shouldFix,
     loggers,
+    getFileSystemForPackage,
 }: {
     devDependencies: Record<PackageName, PackageWithRequiredDevDependencies>;
     shouldFix: boolean;
     loggers: MonorepoLoggers;
+    getFileSystemForPackage: (p: Package) => FileSystem;
 }): Promise<Result> {
     const result = Result.success();
 
     for (const [packageName, { package: p, devDependenciesToAdd }] of Object.entries(devDependencies)) {
+        const loggerForPackage = loggers.getLoggerForPackage(p);
+        const packageJson = await getPackageJson(getFileSystemForPackage(p), loggerForPackage);
         result.accumulate(
             await addDevDependenciesForPackage({
                 packageName,
                 devDependenciesToAdd: [...devDependenciesToAdd],
                 existingDevDependencies: Object.keys({
-                    ...p.packageJson?.dependencies,
-                    ...p.packageJson?.devDependencies,
+                    ...packageJson?.dependencies,
+                    ...packageJson?.devDependencies,
                 }),
                 shouldFix,
-                logger: loggers.getLoggerForPackage(p),
+                logger: loggerForPackage,
             })
         );
     }

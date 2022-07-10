@@ -1,4 +1,14 @@
-import { getRuleConfig, LintablePackage, Logger, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import {
+    getPackageJson,
+    getRuleConfig,
+    LintablePackage,
+    Logger,
+    PackageType,
+    Result,
+    Rule,
+    RuleType,
+} from "@fern-api/mrlint-commons";
+import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
 import produce, { Draft } from "immer";
 import { IPackageJson } from "package-json-type";
 import path from "path";
@@ -14,7 +24,6 @@ import {
     MODULE_TYPES,
     OUTPUT_DIR,
 } from "../utils/moduleUtils";
-import { tryGetPackageJson } from "../utils/tryGetPackageJson";
 import { writePackageFile } from "../utils/writePackageFile";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
@@ -54,7 +63,7 @@ async function runRule({
 
     let packageJson: IPackageJson;
     try {
-        packageJson = generatePackageJson({
+        packageJson = await generatePackageJson({
             packageToLint,
             relativePathToRoot,
             relativePathToSharedConfigs,
@@ -62,6 +71,7 @@ async function runRule({
             executables,
             ruleConfig: getRuleConfig(ruleConfig),
             repository,
+            fileSystemForPackage: fileSystems.getFileSystemForPackage(packageToLint),
         });
     } catch (error) {
         logger.error({
@@ -97,7 +107,7 @@ async function runRule({
     return result;
 }
 
-function generatePackageJson({
+async function generatePackageJson({
     packageToLint,
     relativePathToRoot,
     relativePathToSharedConfigs,
@@ -105,6 +115,7 @@ function generatePackageJson({
     executables,
     ruleConfig,
     repository,
+    fileSystemForPackage,
 }: {
     packageToLint: LintablePackage;
     relativePathToRoot: string;
@@ -113,8 +124,9 @@ function generatePackageJson({
     executables: Executables;
     ruleConfig: RuleConfig | undefined;
     repository: string;
-}): IPackageJson {
-    const oldPackageJson = tryGetPackageJson(packageToLint, logger);
+    fileSystemForPackage: FileSystem;
+}): Promise<IPackageJson> {
+    const oldPackageJson = await getPackageJson(fileSystemForPackage, logger);
     if (oldPackageJson == null) {
         throw new Error("Missing package.json");
     }

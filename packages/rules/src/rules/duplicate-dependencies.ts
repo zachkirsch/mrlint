@@ -1,6 +1,5 @@
-import { Package, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { getPackageJson, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import produce from "immer";
-import { IPackageJson } from "package-json-type";
 import semver from "semver";
 
 type DependencyName = string;
@@ -17,20 +16,10 @@ async function runRule({ monorepo, getLoggerForPackage, fileSystems }: Rule.Mono
 
     const latestVersions: Record<DependencyName, DependencyVersion> = {};
 
-    async function getPackageJson(p: Package): Promise<IPackageJson | undefined> {
-        const fileSystemForPackage = fileSystems.getFileSystemForPackage(p);
-        const packageJsonStr = await fileSystemForPackage.readFile("package.json");
-        if (packageJsonStr == null) {
-            return undefined;
-        }
-        return JSON.parse(packageJsonStr) as IPackageJson;
-    }
-
     // find latest version of each package
     for (const p of monorepo.packages) {
-        const packageJson = await getPackageJson(p);
+        const packageJson = await getPackageJson(fileSystems.getFileSystemForPackage(p), getLoggerForPackage(p));
         if (packageJson == null) {
-            getLoggerForPackage(p).error("Could not read package.json");
             result.fail();
             continue;
         }
@@ -47,8 +36,10 @@ async function runRule({ monorepo, getLoggerForPackage, fileSystems }: Rule.Mono
 
     // upgrade all dependencies to use latest version
     for (const p of monorepo.packages) {
-        const packageJson = await getPackageJson(p);
+        const fileSystemForPackage = fileSystems.getFileSystemForPackage(p);
+        const packageJson = await getPackageJson(fileSystemForPackage, getLoggerForPackage(p));
         if (packageJson == null) {
+            result.fail();
             continue;
         }
 
@@ -63,7 +54,7 @@ async function runRule({ monorepo, getLoggerForPackage, fileSystems }: Rule.Mono
             });
         });
 
-        fileSystems.getFileSystemForPackage(p).writeFile("package.json", JSON.stringify(newPackageJson));
+        fileSystemForPackage.writeFile("package.json", JSON.stringify(newPackageJson));
     }
 
     return result;

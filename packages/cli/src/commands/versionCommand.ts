@@ -1,6 +1,7 @@
 import { formatFileContents, Monorepo, Package } from "@fern-api/mrlint-commons";
 import { parseMonorepo } from "@fern-api/mrlint-parser";
-import { writeFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
+import { IPackageJson } from "package-json-type";
 import path from "path";
 
 export async function versionCommand({ newVersion }: { newVersion: string }): Promise<void> {
@@ -17,8 +18,11 @@ async function addVersionToPackage({
     p: Package;
     newVersion: string;
 }): Promise<void> {
-    const { packageJson } = p;
-    if (packageJson == null || packageJson.private === true) {
+    const packageJsonPath = path.join(monorepo.root.fullPath, p.relativePath, "package.json");
+    const packageJsonStr = (await readFile(packageJsonPath)).toString();
+    const packageJson = JSON.parse(packageJsonStr) as IPackageJson;
+
+    if (packageJson.private === true) {
         return;
     }
 

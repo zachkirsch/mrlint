@@ -1,10 +1,19 @@
-import { getRuleConfig, Logger, Package, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import {
+    getPackageJson,
+    getRuleConfig,
+    Logger,
+    Package,
+    PackageType,
+    Result,
+    Rule,
+    RuleType,
+} from "@fern-api/mrlint-commons";
+import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
 import path from "path";
 import { CompilerOptions, ProjectReference } from "typescript";
 import { getDependencies } from "../utils/getDependencies";
 import { keyPackagesByNpmName } from "../utils/keyPackagesByNpmName";
 import { getOutputDirForType, getTsconfigFilenameForType, ModuleType, MODULE_TYPES } from "../utils/moduleUtils";
-import { tryGetPackageJson } from "../utils/tryGetPackageJson";
 import { writePackageFile } from "../utils/writePackageFile";
 
 export const TsConfigRule: Rule.PackageRule = {
@@ -77,15 +86,21 @@ async function generateTsConfigForModuleType({
     moduleType: ModuleType;
     exclude: string[];
 }): Promise<Result> {
+    const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
+
     let tsConfig: TsConfig;
     try {
         tsConfig = await generateTsConfig({
             packageToLint,
-            allPackages,
+            packagesByNpmName: await keyPackagesByNpmName({
+                allPackages,
+                getFileSystemForPackage: fileSystems.getFileSystemForPackage,
+            }),
             relativePathToSharedConfigs,
             logger,
             moduleType,
             exclude,
+            fileSystemForPackage,
         });
     } catch (error) {
         logger.error({
@@ -96,7 +111,7 @@ async function generateTsConfigForModuleType({
     }
 
     return writePackageFile({
-        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+        fileSystem: fileSystemForPackage,
         filename: getTsconfigFilenameForType(moduleType),
         contents: JSON.stringify(tsConfig),
         logger,
@@ -105,24 +120,25 @@ async function generateTsConfigForModuleType({
 
 async function generateTsConfig({
     packageToLint,
-    allPackages,
+    packagesByNpmName,
     relativePathToSharedConfigs,
     logger,
     moduleType,
     exclude,
+    fileSystemForPackage,
 }: {
     packageToLint: Package;
-    allPackages: readonly Package[];
+    packagesByNpmName: Record<string, Package>;
     relativePathToSharedConfigs: string;
     logger: Logger;
     moduleType: ModuleType;
     exclude: string[];
+    fileSystemForPackage: FileSystem;
 }): Promise<TsConfig> {
-    const packageJson = tryGetPackageJson(packageToLint, logger);
+    const packageJson = await getPackageJson(fileSystemForPackage, logger);
     if (packageJson == null) {
         throw new Error("package.json does not exist");
     }
-    const packagesByNpmName = keyPackagesByNpmName(allPackages);
 
     const tsConfig: TsConfig = {
         extends: path.join(relativePathToSharedConfigs, "tsconfig.shared.json"),

@@ -1,4 +1,13 @@
-import { LintablePackage, Monorepo, MonorepoLoggers, Package, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import {
+    getPackageJson,
+    LintablePackage,
+    Monorepo,
+    MonorepoLoggers,
+    Package,
+    Result,
+    Rule,
+    RuleType,
+} from "@fern-api/mrlint-commons";
 import { rules } from "@fern-api/mrlint-rules";
 import { LazyVirtualFileSystem } from "@fern-api/mrlint-virtual-file-system";
 import {
@@ -50,12 +59,12 @@ export async function lintMonorepo({ monorepo, loggers, shouldFix }: lintMonorep
         );
 
         if (devDependenciesForPackage.size > 0) {
-            if (packageToLint.packageJson == null) {
-                loggerForPackage.error("Cannot add dependencies because package.json does not exist");
-            } else if (packageToLint.packageJson.name == null) {
-                loggerForPackage.error('Cannot add dependencies because package.json does not have a "name"');
-            } else {
-                devDependenciesToAdd[packageToLint.packageJson.name] = {
+            const packageJson = await getPackageJson(
+                fileSystems.getFileSystemForPackage(packageToLint),
+                loggerForPackage
+            );
+            if (packageJson != null) {
+                devDependenciesToAdd[packageJson.name] = {
                     package: packageToLint,
                     devDependenciesToAdd: devDependenciesForPackage,
                 };
@@ -89,6 +98,7 @@ export async function lintMonorepo({ monorepo, loggers, shouldFix }: lintMonorep
 
     result.accumulate(
         await addDevDependencies({
+            getFileSystemForPackage: fileSystems.getFileSystemForPackage,
             devDependencies: devDependenciesToAdd,
             shouldFix,
             loggers,
