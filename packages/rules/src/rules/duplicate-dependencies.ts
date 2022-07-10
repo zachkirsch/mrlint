@@ -83,16 +83,20 @@ function addDependencies({
     for (const [dependency, version] of Object.entries(dependencies)) {
         const existing = latestVersions[dependency];
 
-        if (existing == null || isVersionGreater(version, existing)) {
+        if (existing == null) {
             latestVersions[dependency] = version;
+        } else {
+            const validRangeOfVersion = semver.validRange(version);
+            const validRangeOfExisting = semver.validRange(existing);
+            if (validRangeOfVersion != null && validRangeOfExisting != null) {
+                const minOfVersion = semver.minVersion(validRangeOfVersion);
+                const minOfExisting = semver.minVersion(validRangeOfExisting);
+                if (minOfVersion != null && minOfExisting != null) {
+                    latestVersions[dependency] = version;
+                }
+            }
         }
     }
-}
-
-function isVersionGreater(a: string, b: string) {
-    const cleanedA = semver.clean(a);
-    const cleanedB = semver.clean(b);
-    return cleanedA != null && cleanedB != null && semver.gt(cleanedA, cleanedB);
 }
 
 function upgradeDependencies({
