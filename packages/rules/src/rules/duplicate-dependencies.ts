@@ -91,7 +91,7 @@ function addDependencies({
             if (validRangeOfVersion != null && validRangeOfExisting != null) {
                 const minOfVersion = semver.minVersion(validRangeOfVersion);
                 const minOfExisting = semver.minVersion(validRangeOfExisting);
-                if (minOfVersion != null && minOfExisting != null) {
+                if (minOfVersion != null && minOfExisting != null && minOfVersion.compare(minOfExisting) === 1) {
                     latestVersions[dependency] = version;
                 }
             }
