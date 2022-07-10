@@ -54,7 +54,7 @@ async function runRule({ monorepo, getLoggerForPackage, fileSystems }: Rule.Mono
             });
         });
 
-        fileSystemForPackage.writeFile("package.json", JSON.stringify(newPackageJson));
+        await fileSystemForPackage.writeFile("package.json", JSON.stringify(newPackageJson));
     }
 
     return result;
