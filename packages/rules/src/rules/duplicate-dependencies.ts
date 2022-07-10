@@ -1,8 +1,10 @@
-import { Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { Package, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import produce from "immer";
+import { IPackageJson } from "package-json-type";
+import semver from "semver";
 
 type DependencyName = string;
 type DependencyVersion = string;
-type PackagePath = string;
 
 export const DuplicateDependenciesRule: Rule.MonorepoRule = {
     ruleId: "duplicate-dependencies",
@@ -10,61 +12,101 @@ export const DuplicateDependenciesRule: Rule.MonorepoRule = {
     run: runRule,
 };
 
-function runRule({ monorepo, logger }: Rule.MonorepoRuleRunnerArgs): Result {
+async function runRule({ monorepo, getLoggerForPackage, fileSystems }: Rule.MonorepoRuleRunnerArgs): Promise<Result> {
     const result = Result.success();
 
-    const dependenciesByName: Record<DependencyName, Record<DependencyVersion, PackagePath[]>> = {};
+    const latestVersions: Record<DependencyName, DependencyVersion> = {};
+
+    async function getPackageJson(p: Package): Promise<IPackageJson | undefined> {
+        const fileSystemForPackage = fileSystems.getFileSystemForPackage(p);
+        const packageJsonStr = await fileSystemForPackage.readFile("package.json");
+        if (packageJsonStr == null) {
+            return undefined;
+        }
+        return JSON.parse(packageJsonStr) as IPackageJson;
+    }
+
+    // find latest version of each package
     for (const p of monorepo.packages) {
+        const packageJson = await getPackageJson(p);
+        if (packageJson == null) {
+            getLoggerForPackage(p).error("Could not read package.json");
+            result.fail();
+            continue;
+        }
+
         addDependencies({
-            packagePath: p.relativePath,
-            dependencies: p.packageJson?.dependencies,
-            dependenciesByName,
+            dependencies: packageJson.dependencies,
+            latestVersions,
         });
         addDependencies({
-            packagePath: p.relativePath,
-            dependencies: p.packageJson?.devDependencies,
-            dependenciesByName,
+            dependencies: packageJson.devDependencies,
+            latestVersions,
         });
     }
 
-    for (const [dependency, versionToPackageNames] of Object.entries(dependenciesByName)) {
-        const entries = Object.entries(versionToPackageNames);
-        if (entries.length > 1) {
-            result.fail();
-            logger.error({
-                message: `Found multiple versions of ${dependency}`,
-                additionalContent: entries.map(([version, packageNames]) => `${version} (${packageNames.join(", ")})`),
-            });
+    // upgrade all dependencies to use latest version
+    for (const p of monorepo.packages) {
+        const packageJson = await getPackageJson(p);
+        if (packageJson == null) {
+            continue;
         }
+
+        const newPackageJson = produce(packageJson, (draft) => {
+            upgradeDependencies({
+                dependencies: draft.dependencies,
+                latestVersions,
+            });
+            upgradeDependencies({
+                dependencies: draft.devDependencies,
+                latestVersions,
+            });
+        });
+
+        fileSystems.getFileSystemForPackage(p).writeFile("package.json", JSON.stringify(newPackageJson));
     }
 
     return result;
 }
 
 function addDependencies({
-    packagePath,
     dependencies,
-    dependenciesByName,
+    latestVersions,
 }: {
-    packagePath: PackagePath;
     dependencies: Record<string, string> | undefined;
-    dependenciesByName: Record<DependencyName, Record<DependencyVersion, PackagePath[]>>;
+    latestVersions: Record<DependencyName, DependencyVersion>;
 }) {
     if (dependencies == null) {
         return;
     }
 
     for (const [dependency, version] of Object.entries(dependencies)) {
-        let depsForPackage = dependenciesByName[dependency];
-        if (depsForPackage == null) {
-            depsForPackage = {};
-            dependenciesByName[dependency] = depsForPackage;
+        const existing = latestVersions[dependency];
+
+        if (existing == null || isVersionGreater(version, existing)) {
+            latestVersions[dependency] = version;
         }
-        let packagesForVersion = depsForPackage[version];
-        if (packagesForVersion == null) {
-            packagesForVersion = [];
-            depsForPackage[version] = packagesForVersion;
-        }
-        packagesForVersion.push(packagePath);
+    }
+}
+
+function isVersionGreater(a: string, b: string) {
+    const cleanedA = semver.clean(a);
+    const cleanedB = semver.clean(b);
+    return cleanedA != null && cleanedB != null && semver.gt(cleanedA, cleanedB);
+}
+
+function upgradeDependencies({
+    dependencies,
+    latestVersions,
+}: {
+    dependencies: Record<string, string> | undefined;
+    latestVersions: Record<DependencyName, DependencyVersion>;
+}) {
+    if (dependencies == null) {
+        return;
+    }
+
+    for (const [dependency, version] of Object.entries(dependencies)) {
+        dependencies[dependency] = latestVersions[dependency] ?? version;
     }
 }
