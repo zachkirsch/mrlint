@@ -73,6 +73,7 @@ export async function lintMonorepo({ monorepo, loggers, shouldFix }: lintMonorep
                     monorepo,
                     fileSystems,
                     logger: loggers.getLoggerForRule({ rule, package: undefined }),
+                    getLoggerForPackage: (p) => loggers.getLoggerForRule({ rule, package: p }),
                 })
             );
         }

@@ -24,6 +24,7 @@ export declare namespace Rule {
         monorepo: Monorepo;
         fileSystems: FileSystems;
         logger: Logger;
+        getLoggerForPackage: (p: Package) => Logger;
     }
 
     /**
