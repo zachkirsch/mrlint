@@ -6,7 +6,6 @@
     { "path": "../commons/tsconfig.json" },
     { "path": "../create-package/tsconfig.json" },
     { "path": "../lint/tsconfig.json" },
-    { "path": "../parser/tsconfig.json" },
-    { "path": "../rules/tsconfig.json" }
+    { "path": "../parser/tsconfig.json" }
   ]
 }

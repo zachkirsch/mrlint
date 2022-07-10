@@ -6,7 +6,6 @@
     { "path": "../commons/tsconfig.cjs.json" },
     { "path": "../create-package/tsconfig.cjs.json" },
     { "path": "../lint/tsconfig.cjs.json" },
-    { "path": "../parser/tsconfig.cjs.json" },
-    { "path": "../rules/tsconfig.cjs.json" }
+    { "path": "../parser/tsconfig.cjs.json" }
   ]
 }

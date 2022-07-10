@@ -69,7 +69,9 @@ async function writeFiles({
             await mkdir(fileDirectory, { recursive: true });
             await writeFile(touchedFile.fullPath, touchedFile.newContents);
             logger.info({
-                message: chalk.green(`Fixed ${touchedFile.relativePath}`),
+                message: chalk.green(
+                    `${touchedFile.originalContents != null ? "Fixed" : "Wrote"} ${touchedFile.relativePath}`
+                ),
             });
         } catch (error) {
             logger.error({

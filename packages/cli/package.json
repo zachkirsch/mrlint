@@ -39,7 +39,6 @@
     "@fern-api/mrlint-create-package": "workspace:*",
     "@fern-api/mrlint-lint": "workspace:*",
     "@fern-api/mrlint-parser": "workspace:*",
-    "@fern-api/mrlint-rules": "workspace:*",
     "chalk": "^4.1.2",
     "yargs": "^17.3.1"
   },
