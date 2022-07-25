@@ -46,7 +46,6 @@ export interface TypescriptLibraryPackageConfig extends BasePackageConfig {
 export interface TypescriptCliPackageConfig extends BasePackageConfig {
     type: typeof PackageType.TYPESCRIPT_CLI;
     cliName: string | undefined;
-    pathToCli: string;
 }
 
 export interface CustomPackageConfig extends BasePackageConfig {

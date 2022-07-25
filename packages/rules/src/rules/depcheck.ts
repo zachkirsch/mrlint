@@ -1,5 +1,5 @@
 import { getRuleConfig, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
-import { OUTPUT_DIR } from "../utils/moduleUtils";
+import { OUTPUT_DIR } from "../utils/constants";
 import { writePackageFile } from "../utils/writePackageFile";
 
 interface DepcheckConfig {
@@ -37,6 +37,10 @@ async function runRule({
 
     if (packageToLint.config.type === PackageType.REACT_APP) {
         depcheckRc.ignores.push("react-scripts", "sass");
+    }
+
+    if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
+        depcheckRc.ignores.push("webpack", "webpack-cli", "ts-loader", "node-loader");
     }
 
     const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);

@@ -11,22 +11,13 @@
   ],
   "source": "src/index.ts",
   "module": "src/index.ts",
-  "main": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./lib/cjs/index.js",
-      "default": "./lib/esm/index.js"
-    }
-  },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "sideEffects": false,
   "scripts": {
-    "clean": "tsc --build --clean tsconfig.json && tsc --build --clean tsconfig.cjs.json",
-    "compile": "yarn run compile:esm",
-    "compile:all": "run-s compile:esm compile:cjs",
-    "compile:esm": "tsc --build tsconfig.json && echo '{ \"type\": \"module\" }' > lib/esm/package.json",
-    "compile:cjs": "tsc --build tsconfig.cjs.json && echo '{ \"type\": \"commonjs\" }' > lib/cjs/package.json",
-    "test": "yarn run compile:all && jest --passWithNoTests",
+    "clean": "rm -r ./lib",
+    "compile": "tsc --build",
+    "test": "yarn run compile && jest --passWithNoTests",
     "lint:eslint": "eslint --max-warnings 0 . --ignore-path=../../.eslintignore",
     "lint:eslint:fix": "eslint --max-warnings 0 . --ignore-path=../../.eslintignore --fix",
     "format": "prettier --write --ignore-unknown --ignore-path ../../shared/.prettierignore \"**\"",
@@ -34,18 +25,20 @@
     "depcheck": "depcheck"
   },
   "dependencies": {
-    "@fern-api/mrlint-virtual-file-system": "workspace:*"
+    "@fern-api/mrlint-virtual-file-system": "workspace:*",
+    "find-up": "^5.0.0",
+    "micromatch": "^4.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
     "@types/jest": "^27.4.1",
+    "@types/micromatch": "^4.0.2",
     "@types/node": "^17.0.25",
     "depcheck": "^1.4.3",
     "eslint": "^8.12.0",
     "jest": "^27.5.1",
-    "npm-run-all": "^4.1.5",
     "package-json-type": "^1.0.3",
     "prettier": "^2.6.2",
     "ts-jest": "^28.0.5",

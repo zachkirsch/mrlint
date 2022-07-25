@@ -1,4 +1,4 @@
-import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { PackageType, PRETTIER_RC_FILENAME, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import path from "path";
 import { writePackageFile } from "../utils/writePackageFile";
 
@@ -24,7 +24,7 @@ async function runRule({
 
     return writePackageFile({
         fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
-        filename: ".prettierrc.js",
+        filename: PRETTIER_RC_FILENAME,
         contents,
         logger,
     });

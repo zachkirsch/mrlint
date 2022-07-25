@@ -13,23 +13,13 @@ import produce, { Draft } from "immer";
 import { IPackageJson } from "package-json-type";
 import path from "path";
 import { canPackageContainCss } from "../utils/canPackageContainCss";
+import { OUTPUT_DIR } from "../utils/constants";
 import { Executable, Executables } from "../utils/Executables";
 import { getDependencies } from "../utils/getDependencies";
-import {
-    CJS_OUTPUT_DIR,
-    ESM_OUTPUT_DIR,
-    getOutputDirForType,
-    getTsconfigFilenameForType,
-    ModuleType,
-    MODULE_TYPES,
-    OUTPUT_DIR,
-} from "../utils/moduleUtils";
 import { writePackageFile } from "../utils/writePackageFile";
+import { CLI_WEBPACK_CONFIG_TS_FILENAME, WEBPACK_BUNDLE_FILENAME, WEBPACK_OUTPUT_DIR } from "./cli";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
-const PATH_TO_CLI_SCRIPT = "./cli";
-const ENTRYPOINT = "index.js";
-const TYPES_ENTRYPOINT = "index.d.ts";
 
 interface RuleConfig {
     scripts?: Record<string, string>;
@@ -145,25 +135,26 @@ async function generatePackageJson({
         if (packageToLint.config.private) {
             draft.private = true;
         }
+
         draft.files = [OUTPUT_DIR];
+        if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
+            draft.files.push(WEBPACK_OUTPUT_DIR);
+        }
+
         draft.source = "src/index.ts";
         draft.module = "src/index.ts";
-        draft.main = `./${path.join(ESM_OUTPUT_DIR, ENTRYPOINT)}`;
-        draft.types = `./${path.join(ESM_OUTPUT_DIR, TYPES_ENTRYPOINT)}`;
-        draft.exports = {
-            ".": {
-                require: `./${path.join(CJS_OUTPUT_DIR, ENTRYPOINT)}`,
-                default: `./${path.join(ESM_OUTPUT_DIR, ENTRYPOINT)}`,
-            },
-        };
+        draft.main = `./${OUTPUT_DIR}/index.js`;
+        draft.types = `./${OUTPUT_DIR}/index.d.ts`;
+
         draft.sideEffects = false;
 
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
+            const pathToCli = path.join(WEBPACK_OUTPUT_DIR, WEBPACK_BUNDLE_FILENAME);
             draft.bin =
                 packageToLint.config.cliName == null
-                    ? PATH_TO_CLI_SCRIPT
+                    ? pathToCli
                     : {
-                          [packageToLint.config.cliName]: PATH_TO_CLI_SCRIPT,
+                          [packageToLint.config.cliName]: pathToCli,
                       };
         }
 
@@ -221,26 +212,9 @@ function addScripts({
     customScripts: Record<string, string>;
 }) {
     draft.scripts = {
-        clean: MODULE_TYPES.map(
-            (moduleType) =>
-                `${executables.get(Executable.TSC)} --build --clean ${getTsconfigFilenameForType(moduleType)}`
-        ).join(" && "),
-        compile: `yarn run ${getCompileScriptName("esm")}`,
-        "compile:all": `${executables.get(Executable.RUN_S)} ${MODULE_TYPES.map(getCompileScriptName).join(" ")}`,
-        ...MODULE_TYPES.reduce(
-            (compileScripts, moduleType) => ({
-                ...compileScripts,
-                [getCompileScriptName(moduleType)]: [
-                    `${getCompileCommand(executables, moduleType)}`,
-                    `echo '{ "type": "${getPackageJsonTypeProperty(moduleType)}" }' > ${path.join(
-                        getOutputDirForType(moduleType),
-                        "package.json"
-                    )}`,
-                ].join(" && "),
-            }),
-            {}
-        ),
-        test: `yarn run compile:all && ${executables.get(Executable.JEST)} --passWithNoTests`,
+        clean: `rm -r ./${OUTPUT_DIR}`,
+        compile: `${executables.get(Executable.TSC)} --build`,
+        test: `yarn run compile && ${executables.get(Executable.JEST)} --passWithNoTests`,
         "lint:eslint": `${executables.get(Executable.ESLINT)} --max-warnings 0 . --ignore-path=${pathToEslintIgnore}`,
         "lint:eslint:fix": `${executables.get(
             Executable.ESLINT
@@ -280,6 +254,13 @@ function addScripts({
         draft.scripts.eject = `${executables.get(Executable.REACT_SCRIPTS)} eject`;
     }
 
+    if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
+        draft.scripts = {
+            ...draft.scripts,
+            dist: `TS_NODE_PROJECT=${CLI_WEBPACK_CONFIG_TS_FILENAME} yarn webpack --progress`,
+        };
+    }
+
     draft.scripts = {
         ...draft.scripts,
         ...customScripts,
@@ -310,21 +291,4 @@ function updateWorkspaceVersions(dependencies: Record<string, string> | undefine
             }
         }
     });
-}
-
-function getCompileScriptName(moduleType): string {
-    return `compile:${moduleType}`;
-}
-
-function getCompileCommand(executables: Executables, moduleType: ModuleType): string {
-    return `${executables.get(Executable.TSC)} --build ${getTsconfigFilenameForType(moduleType)}`;
-}
-
-function getPackageJsonTypeProperty(moduleType: ModuleType): string {
-    switch (moduleType) {
-        case "esm":
-            return "module";
-        case "cjs":
-            return "commonjs";
-    }
 }

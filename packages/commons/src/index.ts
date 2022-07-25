@@ -1,4 +1,5 @@
-export { formatFileContents } from "./formatFiles";
+export { PRETTIER_RC_FILENAME } from "./constants";
+export { formatFileContents } from "./format-files/formatFiles";
 export { getPackageJson } from "./getPackageJson";
 export { getRuleConfig } from "./getRuleConfig";
 export { LogLevel } from "./logger/Logger";

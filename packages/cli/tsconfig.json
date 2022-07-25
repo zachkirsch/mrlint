@@ -1,11 +1,6 @@
 {
   "extends": "../../shared/tsconfig.shared.json",
-  "compilerOptions": { "composite": true, "outDir": "lib/esm", "rootDir": "src", "module": "esnext" },
+  "compilerOptions": { "composite": true, "outDir": "lib", "rootDir": "src" },
   "include": ["./src"],
-  "references": [
-    { "path": "../add-package/tsconfig.json" },
-    { "path": "../commons/tsconfig.json" },
-    { "path": "../lint/tsconfig.json" },
-    { "path": "../parser/tsconfig.json" }
-  ]
+  "references": [{ "path": "../add-package" }, { "path": "../commons" }, { "path": "../lint" }, { "path": "../parser" }]
 }
