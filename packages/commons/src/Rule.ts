@@ -46,7 +46,7 @@ export declare namespace Rule {
         repository: string;
         fileSystems: FileSystems;
         logger: Logger;
-        addDevDependency: (dependency: string) => void;
+        addDevDependency: (dependency: string, version?: string) => void;
         ruleConfig: unknown | undefined;
     }
 

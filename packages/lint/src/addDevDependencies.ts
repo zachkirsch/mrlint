@@ -5,10 +5,15 @@ import { exec } from "child_process";
 
 export type PackageName = string;
 export type DependencyName = string;
+export type DependencyVersion = string;
+
+export interface DependencyVersions {
+    requestedVersions: Set<DependencyVersion>;
+}
 
 export interface PackageWithRequiredDevDependencies {
     package: Package;
-    devDependenciesToAdd: Set<DependencyName>;
+    devDependenciesToAdd: Record<DependencyName, DependencyVersions>;
 }
 
 export async function addDevDependencies({
@@ -30,11 +35,11 @@ export async function addDevDependencies({
         result.accumulate(
             await addDevDependenciesForPackage({
                 packageName,
-                devDependenciesToAdd: [...devDependenciesToAdd],
-                existingDevDependencies: Object.keys({
+                devDependenciesToAdd,
+                existingDevDependencies: {
                     ...packageJson?.dependencies,
                     ...packageJson?.devDependencies,
-                }),
+                },
                 shouldFix,
                 logger: loggerForPackage,
             })
@@ -52,52 +57,78 @@ export async function addDevDependenciesForPackage({
     logger,
 }: {
     packageName: string;
-    existingDevDependencies: readonly DependencyName[];
-    devDependenciesToAdd: readonly DependencyName[];
+    existingDevDependencies: Record<DependencyName, DependencyVersion>;
+    devDependenciesToAdd: Record<DependencyName, DependencyVersions>;
     shouldFix: boolean;
     logger: Logger;
 }): Promise<Result> {
-    const existingDevDependenciesSet = new Set(existingDevDependencies);
-    const filteredDependencies: DependencyName[] = [];
-    for (const devDependencyToAdd of devDependenciesToAdd) {
-        if (!existingDevDependenciesSet.has(devDependencyToAdd)) {
-            filteredDependencies.push(devDependencyToAdd);
+    const filteredDependencies: Record<DependencyName, DependencyVersion | undefined> = {};
+    let someDependencyHasMultipleVersionsRequested = false;
+
+    for (const [dependencyName, versionInfo] of Object.entries(devDependenciesToAdd)) {
+        const [firstRequestedVersion, ...otherRequestedVersions] = [...versionInfo.requestedVersions];
+
+        if (otherRequestedVersions.length > 0) {
+            logger.error(
+                `Multiple versions requested for ${dependencyName}: ${[...versionInfo.requestedVersions].join(", ")}`
+            );
+            someDependencyHasMultipleVersionsRequested = true;
+            continue;
+        }
+
+        const existingVersionForDependency = existingDevDependencies[dependencyName];
+        if (
+            existingVersionForDependency == null ||
+            (firstRequestedVersion != null && firstRequestedVersion !== existingVersionForDependency)
+        ) {
+            filteredDependencies[dependencyName] = firstRequestedVersion;
         }
     }
 
-    if (filteredDependencies.length === 0) {
+    if (someDependencyHasMultipleVersionsRequested) {
+        return Result.failure();
+    }
+
+    if (Object.keys(filteredDependencies).length === 0) {
         return Result.success();
     }
+
+    const dependenciesWithVersions = Object.entries(filteredDependencies).map(([dependencyName, dependencyVersion]) =>
+        dependencyVersion == null ? dependencyName : `${dependencyName}@${dependencyVersion}`
+    );
 
     if (!shouldFix) {
         logger.error({
             message: "Some devDependencies are missing",
-            additionalContent: filteredDependencies,
+            additionalContent: dependenciesWithVersions,
         });
         return Result.failure();
     }
 
     logger.debug({
         message: "Adding devDependencies",
-        additionalContent: filteredDependencies,
+        additionalContent: dependenciesWithVersions,
     });
 
     return new Promise((resolve) => {
-        exec(`yarn workspace ${packageName} add --prefer-dev ${filteredDependencies.join(" ")}`, (error, stdout) => {
-            if (error == null) {
-                logger.info({
-                    message: chalk.green("Installed missing devDependencies"),
-                    additionalContent: filteredDependencies,
-                });
-                resolve(Result.success());
-            } else {
-                logger.error({
-                    message: "Failed to install devDependencies",
-                    additionalContent: filteredDependencies,
-                    error: stdout.length > 0 ? stdout : undefined,
-                });
-                resolve(Result.failure());
+        exec(
+            `yarn workspace ${packageName} add --prefer-dev ${dependenciesWithVersions.join(" ")}`,
+            (error, stdout) => {
+                if (error == null) {
+                    logger.info({
+                        message: chalk.green("Installed missing devDependencies"),
+                        additionalContent: dependenciesWithVersions,
+                    });
+                    resolve(Result.success());
+                } else {
+                    logger.error({
+                        message: "Failed to install devDependencies",
+                        additionalContent: dependenciesWithVersions,
+                        error: stdout.length > 0 ? stdout : undefined,
+                    });
+                    resolve(Result.failure());
+                }
             }
-        });
+        );
     });
 }

@@ -13,6 +13,7 @@ import { LazyVirtualFileSystem } from "@fern-api/mrlint-virtual-file-system";
 import {
     addDevDependencies,
     DependencyName,
+    DependencyVersions,
     PackageName,
     PackageWithRequiredDevDependencies,
 } from "./addDevDependencies";
@@ -43,7 +44,7 @@ export async function lintMonorepo({ monorepo, loggers, shouldFix }: lintMonorep
         const loggerForPackage = loggers.getLoggerForPackage(packageToLint);
         loggerForPackage.debug("Linting...");
 
-        const devDependenciesForPackage = new Set<DependencyName>();
+        const devDependenciesForPackage: Record<DependencyName, DependencyVersions> = {};
 
         result.accumulate(
             await lintPackage({
@@ -52,13 +53,16 @@ export async function lintMonorepo({ monorepo, loggers, shouldFix }: lintMonorep
                 rules: getRulesForPackage(packageToLint),
                 fileSystems,
                 getLoggerForRule: loggers.getLoggerForRule,
-                addDevDependency: (dependency) => {
-                    devDependenciesForPackage.add(dependency);
+                addDevDependency: (dependency, version) => {
+                    const versions = (devDependenciesForPackage[dependency] ??= { requestedVersions: new Set() });
+                    if (version != null) {
+                        versions.requestedVersions.add(version);
+                    }
                 },
             })
         );
 
-        if (devDependenciesForPackage.size > 0) {
+        if (Object.keys(devDependenciesForPackage).length > 0) {
             const packageJson = await getPackageJson(
                 fileSystems.getFileSystemForPackage(packageToLint),
                 loggerForPackage
