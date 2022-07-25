@@ -1,4 +1,5 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { TypescriptCliPackageConfig } from "@fern-api/mrlint-commons/src/types";
 import { ModuleKind, ModuleResolutionKind, ScriptTarget } from "typescript";
 import { writePackageFile } from "../utils/writePackageFile";
 import { TsConfig } from "./ts-config";
@@ -21,6 +22,12 @@ async function runRule({
     logger,
     addDevDependency,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
+    if (packageToLint.config.type !== PackageType.TYPESCRIPT_CLI) {
+        logger.error("Package is not a CLI.");
+        return Result.failure();
+    }
+    packageToLint.config;
+
     addDevDependency("webpack");
     addDevDependency("webpack-cli");
     addDevDependency("ts-loader");
@@ -79,7 +86,7 @@ export default (): webpack.Configuration => {
                 ".ts",
             ],
         },
-        plugins: [new webpack.BannerPlugin({ banner: "#!/usr/bin/env node", raw: true })],
+        plugins: ${constructPlugins(packageToLint.config)},
         output: {
             path: path.join(__dirname, "${WEBPACK_OUTPUT_DIR}"),
             filename: "${WEBPACK_BUNDLE_FILENAME}",
@@ -115,4 +122,14 @@ export default (): webpack.Configuration => {
     );
 
     return result;
+}
+
+function constructPlugins(config: TypescriptCliPackageConfig): string {
+    const plugins = ['new webpack.BannerPlugin({ banner: "#!/usr/bin/env node", raw: true })'];
+    if (config.environmentVariables.length > 0) {
+        plugins.push(
+            `new webpack.EnvironmentPlugin(${config.environmentVariables.map((envVar) => `"${envVar}"`).join(", ")})`
+        );
+    }
+    return `[${plugins.join(", ")}]`;
 }
