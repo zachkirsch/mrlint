@@ -47,7 +47,7 @@ async function runRule({
     }
 
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-        depcheckRc.ignores.push("webpack", "webpack-cli", "ts-loader", "node-loader");
+        depcheckRc.ignores.push("webpack", "webpack-cli", "ts-loader", "node-loader", "ts-node");
     }
 
     const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);

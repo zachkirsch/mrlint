@@ -9,7 +9,8 @@
     "webpack",
     "webpack-cli",
     "ts-loader",
-    "node-loader"
+    "node-loader",
+    "ts-node"
   ],
   "ignore-patterns": ["lib"]
 }
