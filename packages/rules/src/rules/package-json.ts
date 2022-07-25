@@ -143,8 +143,7 @@ async function generatePackageJson({
 
         draft.source = "src/index.ts";
         draft.module = "src/index.ts";
-        draft.main = `./${OUTPUT_DIR}/index.js`;
-        draft.types = `./${OUTPUT_DIR}/index.d.ts`;
+        draft.main = "src/index.ts";
 
         draft.sideEffects = false;
 
@@ -212,7 +211,7 @@ function addScripts({
     customScripts: Record<string, string>;
 }) {
     draft.scripts = {
-        clean: `rm -r ./${OUTPUT_DIR}`,
+        clean: `rm -rf ./${OUTPUT_DIR} && ${executables.get(Executable.TSC)} --build --clean`,
         compile: `${executables.get(Executable.TSC)} --build`,
         test: `yarn run compile && ${executables.get(Executable.JEST)} --passWithNoTests`,
         "lint:eslint": `${executables.get(Executable.ESLINT)} --max-warnings 0 . --ignore-path=${pathToEslintIgnore}`,
