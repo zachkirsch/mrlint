@@ -1,5 +1,6 @@
 import { LogLevel } from "@fern-api/mrlint-commons";
-import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+import yargs from "yargs/yargs";
 import { addPackageCommand } from "./commands/addPackageCommand";
 import { lintCommand } from "./commands/lintCommand";
 import { listCommand } from "./commands/listCommand";
@@ -16,7 +17,7 @@ const LOG_LEVELS: Record<CommandLineLogLevel, true> = {
     error: true,
 };
 
-yargs
+yargs(hideBin(process.argv))
     .scriptName("mrlint")
     .strict()
     .option("log-level", {

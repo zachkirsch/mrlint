@@ -1,5 +1,5 @@
 import { BasePackageConfig, MonorepoRoot, Package, PackageConfig, PackageType } from "@fern-api/mrlint-commons";
-import { CJS_OUTPUT_DIR } from "@fern-api/mrlint-rules";
+import { OUTPUT_DIR } from "@fern-api/mrlint-rules";
 import execa from "execa";
 import { readFile } from "fs/promises";
 import { IPackageJson } from "package-json-type";
@@ -62,7 +62,7 @@ export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig
                 ...baseConfig,
                 type: PackageType.TYPESCRIPT_CLI,
                 cliName: rawConfig.cliName,
-                pathToCli: rawConfig.pathToCli ?? `./${path.join(CJS_OUTPUT_DIR, "cli.js")}`,
+                pathToCli: rawConfig.pathToCli ?? `./${path.join(OUTPUT_DIR, "cli.js")}`,
             };
         case "library":
             return {

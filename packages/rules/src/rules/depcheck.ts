@@ -1,5 +1,5 @@
 import { getRuleConfig, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
-import { OUTPUT_DIR } from "../utils/moduleUtils";
+import { OUTPUT_DIR } from "../utils/constants";
 import { writePackageFile } from "../utils/writePackageFile";
 
 interface DepcheckConfig {

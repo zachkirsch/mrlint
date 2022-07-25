@@ -1,6 +1,5 @@
 import { Rule } from "@fern-api/mrlint-commons";
 import { CliRule } from "./rules/cli";
-import { CracoRule } from "./rules/craco";
 import { DeclarationsRule } from "./rules/declarations";
 import { DepcheckRule } from "./rules/depcheck";
 import { DuplicateDependenciesRule } from "./rules/duplicate-dependencies";
@@ -17,7 +16,6 @@ export const rules: Rules = [
     TsConfigRule,
     DepcheckRule,
     DeclarationsRule,
-    CracoRule,
     JestRule,
     PrettierRule,
     StyleLintRule,

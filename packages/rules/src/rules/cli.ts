@@ -1,5 +1,12 @@
 import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { ModuleKind, ModuleResolutionKind, ScriptTarget } from "typescript";
 import { writePackageFile } from "../utils/writePackageFile";
+import { TsConfig } from "./ts-config";
+
+export const CLI_WEBPACK_CONFIG_TS_FILENAME = "tsconfig.webpack.json";
+
+export const WEBPACK_OUTPUT_DIR = "dist";
+export const WEBPACK_BUNDLE_FILENAME = "bundle.js";
 
 export const CliRule: Rule.PackageRule = {
     ruleId: "cli",
@@ -8,17 +15,95 @@ export const CliRule: Rule.PackageRule = {
     run: runRule,
 };
 
-async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
-    if (packageToLint.config.type !== PackageType.TYPESCRIPT_CLI) {
-        logger.error("This package is not a CLI. This is a bug in mrlint.");
-        return Result.failure();
-    }
-    return writePackageFile({
-        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
-        filename: "cli",
-        contents: `#!/usr/bin/env node
+async function runRule({
+    fileSystems,
+    packageToLint,
+    logger,
+    addDevDependency,
+}: Rule.PackageRuleRunnerArgs): Promise<Result> {
+    addDevDependency("webpack");
+    addDevDependency("webpack-cli");
+    addDevDependency("ts-loader");
+    addDevDependency("node-loader");
 
-require("${packageToLint.config.pathToCli}");`,
-        logger,
-    });
+    const result = Result.success();
+
+    result.accumulate(
+        await writePackageFile({
+            fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+            filename: "webpack.config.ts",
+            contents: `import path from "path";
+import * as webpack from "webpack";
+
+export default (): webpack.Configuration => {
+    return {
+        mode: "production",
+        target: "node",
+        entry: path.join(__dirname, "./src/cli.ts"),
+        module: {
+            rules: [
+                {
+                    test: /\\.js$/,
+                    resolve: {
+                        fullySpecified: false,
+                    },
+                },
+                {
+                    test: /\\.ts$/,
+                    loader: "ts-loader",
+                    options: {
+                        projectReferences: true,
+                    },
+                    exclude: /node_modules/,
+                },
+                {
+                    test: /\\.node$/,
+                    loader: "node-loader",
+                },
+            ],
+        },
+        resolve: {
+            extensions: [
+                // js is first so that if we encounter equivalent TS and JS source files side-by-side
+                // (e.g. in node_modules), prefer the js
+                ".js",
+                ".ts",
+            ],
+        },
+        plugins: [new webpack.BannerPlugin({ banner: "#!/usr/bin/env node", raw: true })],
+        output: {
+            path: path.join(__dirname, "${WEBPACK_OUTPUT_DIR}"),
+            filename: "${WEBPACK_BUNDLE_FILENAME}",
+        },
+        optimization: {
+            minimize: false,
+        },
+    };
+};`,
+            logger,
+        })
+    );
+
+    const webpackTsConfig: TsConfig = {
+        compilerOptions: {
+            module: "CommonJS" as unknown as ModuleKind,
+            moduleResolution: "node" as unknown as ModuleResolutionKind,
+            target: "esnext" as unknown as ScriptTarget,
+            esModuleInterop: true,
+            downlevelIteration: true,
+            noUncheckedIndexedAccess: true,
+        },
+        include: ["webpack.config.ts"],
+    };
+
+    result.accumulate(
+        await writePackageFile({
+            fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+            filename: CLI_WEBPACK_CONFIG_TS_FILENAME,
+            contents: JSON.stringify(webpackTsConfig, undefined, 2),
+            logger,
+        })
+    );
+
+    return result;
 }

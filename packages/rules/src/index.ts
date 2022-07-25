@@ -1,2 +1,2 @@
 export { rules } from "./rules";
-export { CJS_OUTPUT_DIR } from "./utils/moduleUtils";
+export { OUTPUT_DIR } from "./utils/constants";
