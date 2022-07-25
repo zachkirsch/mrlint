@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@fern-api/mrlint-commons": "workspace:*",
-    "@fern-api/mrlint-rules": "workspace:*",
     "execa": "^5.1.1",
     "find-up": "^5.0.0",
     "js-yaml": "^4.1.0",
