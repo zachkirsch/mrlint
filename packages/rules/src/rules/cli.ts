@@ -53,6 +53,7 @@ export default (): webpack.Configuration => {
                     loader: "ts-loader",
                     options: {
                         projectReferences: true,
+                        transpileOnly: true,
                     },
                     exclude: /node_modules/,
                 },
