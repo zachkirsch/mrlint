@@ -1,3 +1,4 @@
+export { PRETTIER_RC_FILENAME } from "./constants";
 export { formatFileContents } from "./formatFiles";
 export { getPackageJson } from "./getPackageJson";
 export { getRuleConfig } from "./getRuleConfig";

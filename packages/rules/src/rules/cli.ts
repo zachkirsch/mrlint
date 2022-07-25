@@ -61,6 +61,11 @@ export default (): webpack.Configuration => {
                     loader: "node-loader",
                 },
             ],
+            parser: {
+                javascript: {
+                  commonjsMagicComments: true,
+                },
+            },
         },
         resolve: {
             extensions: [
