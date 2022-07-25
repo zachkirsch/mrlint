@@ -1,1 +1,1 @@
-export const PRETTIER_RC_FILENAME = ".prettierrc.js";
+export const PRETTIER_RC_FILENAME = ".prettierrc.cjs";
