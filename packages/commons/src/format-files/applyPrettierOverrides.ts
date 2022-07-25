@@ -1,4 +1,5 @@
 // copied from https://github.com/prettier/prettier/blob/main/src/config/resolve-config.js
+// tracking in: https://github.com/prettier/prettier/issues/13134
 
 import micromatch from "micromatch";
 import path from "path";

@@ -1,8 +1,8 @@
 import findUp from "find-up";
 import path from "path";
 import prettier, { BuiltInParserName, Config } from "prettier";
+import { PRETTIER_RC_FILENAME } from "../constants";
 import { applyPrettierOverrides } from "./applyPrettierOverrides";
-import { PRETTIER_RC_FILENAME } from "./constants";
 
 export async function formatFileContents({
     fileContents,
