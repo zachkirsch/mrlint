@@ -4521,6 +4521,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:^5.0.0":
+  version: 5.1.0
+  resolution: "commander@npm:5.1.0"
+  checksum: 0b7fec1712fbcc6230fcb161d8d73b4730fa91a21dc089515489402ad78810547683f058e2a9835929c212fead1d6a6ade70db28bbb03edbc2829a9ab7d69447
+  languageName: node
+  linkType: hard
+
 "commander@npm:^7.0.0":
   version: 7.2.0
   resolution: "commander@npm:7.2.0"
@@ -4598,7 +4605,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3":
+"cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3":
   version: 7.0.3
   resolution: "cross-spawn@npm:7.0.3"
   dependencies:
@@ -4903,6 +4910,18 @@ __metadata:
     graceful-fs: ^4.2.4
     tapable: ^2.2.0
   checksum: 0bb9830704db271610f900e8d79d70a740ea16f251263362b0c91af545576d09fe50103496606c1300a05e588372d6f9780a9bc2e30ce8ef9b827ec8f44687ff
+  languageName: node
+  linkType: hard
+
+env-cmd@toddbluhm/env-cmd:
+  version: 10.1.0
+  resolution: "env-cmd@https://github.com/toddbluhm/env-cmd.git#commit=8f35b71651f6a78710308ff38ab30896ea72ee8b"
+  dependencies:
+    commander: ^5.0.0
+    cross-spawn: ^7.0.0
+  bin:
+    env-cmd: bin/env-cmd.js
+  checksum: cce663205b2755daec68852fdfa3f1ede3c7147e524efd50f64dc04ac8a48f2713a2e768e35e30fcc6e0487b84f56084ac671f92a2a86e2c9a401f41dc8ac624
   languageName: node
   linkType: hard
 
@@ -7503,6 +7522,7 @@ __metadata:
     "@types/yargs": ^17.0.10
     chalk: ^4.1.2
     depcheck: ^1.4.3
+    env-cmd: toddbluhm/env-cmd
     eslint: ^8.12.0
     jest: ^27.5.1
     node-loader: ^2.0.0

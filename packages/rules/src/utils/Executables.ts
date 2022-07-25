@@ -37,9 +37,16 @@ const DEPENDENCIES: Record<Executable, string> = {
     [Executable.RUN_S]: "npm-run-all",
 };
 
+const PINNED_VERSIONS: Partial<Record<Executable, string>> = {
+    // need to depend on master to allow parsing CJS .env files
+    // https://github.com/toddbluhm/env-cmd/issues/268
+    [Executable.ENV_CMD]: "toddbluhm/env-cmd",
+};
+
 export interface RequiredDependency {
     executable: Executable;
     dependency: string;
+    version?: string;
 }
 
 export class Executables {
@@ -54,6 +61,7 @@ export class Executables {
         return [...this.accessed].map((executable) => ({
             dependency: DEPENDENCIES[executable],
             executable,
+            version: PINNED_VERSIONS[executable],
         }));
     }
 }

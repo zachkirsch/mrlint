@@ -17,7 +17,7 @@ import { OUTPUT_DIR } from "../utils/constants";
 import { Executable, Executables } from "../utils/Executables";
 import { getDependencies } from "../utils/getDependencies";
 import { writePackageFile } from "../utils/writePackageFile";
-import { WEBPACK_BUNDLE_FILENAME, WEBPACK_OUTPUT_DIR } from "./cli";
+import { ENV_FILE_NAME, WEBPACK_BUNDLE_FILENAME, WEBPACK_OUTPUT_DIR } from "./cli";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 
@@ -89,7 +89,7 @@ async function runRule({
 
     // warn about missing deps
     for (const requiredDependency of executables.getRequiredDependencies()) {
-        addDevDependency(requiredDependency.dependency);
+        addDevDependency(requiredDependency.dependency, requiredDependency.version);
     }
     for (const dependency of EXPECTED_DEV_DEPENDENCIES) {
         addDevDependency(dependency);
@@ -264,7 +264,9 @@ function addScripts({
         addDevDependency("ts-node");
         draft.scripts = {
             ...draft.scripts,
-            dist: "yarn node --loader ts-node/esm $(yarn bin webpack)",
+            dist: `${executables.get(
+                Executable.ENV_CMD
+            )} -f ${ENV_FILE_NAME} node --loader ts-node/esm $(yarn bin webpack)`,
         };
     }
 
