@@ -39,6 +39,10 @@ async function runRule({
         depcheckRc.ignores.push("react-scripts", "sass");
     }
 
+    if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
+        depcheckRc.ignores.push("webpack", "webpack-cli", "ts-loader", "node-loader");
+    }
+
     const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);
     if (castedRuleConfig != null) {
         if (castedRuleConfig["ignore-patterns"] != null) {
