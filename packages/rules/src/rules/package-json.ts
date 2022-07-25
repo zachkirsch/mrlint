@@ -17,7 +17,7 @@ import { OUTPUT_DIR } from "../utils/constants";
 import { Executable, Executables } from "../utils/Executables";
 import { getDependencies } from "../utils/getDependencies";
 import { writePackageFile } from "../utils/writePackageFile";
-import { CLI_WEBPACK_CONFIG_TS_FILENAME, WEBPACK_BUNDLE_FILENAME, WEBPACK_OUTPUT_DIR } from "./cli";
+import { WEBPACK_BUNDLE_FILENAME, WEBPACK_OUTPUT_DIR } from "./cli";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 
@@ -62,6 +62,7 @@ async function runRule({
             ruleConfig: getRuleConfig(ruleConfig),
             repository,
             fileSystemForPackage: fileSystems.getFileSystemForPackage(packageToLint),
+            addDevDependency,
         });
     } catch (error) {
         logger.error({
@@ -106,6 +107,7 @@ async function generatePackageJson({
     ruleConfig,
     repository,
     fileSystemForPackage,
+    addDevDependency,
 }: {
     packageToLint: LintablePackage;
     relativePathToRoot: string;
@@ -115,6 +117,7 @@ async function generatePackageJson({
     ruleConfig: RuleConfig | undefined;
     repository: string;
     fileSystemForPackage: FileSystem;
+    addDevDependency: (devDependency: string) => void;
 }): Promise<IPackageJson> {
     const oldPackageJson = await getPackageJson(fileSystemForPackage, logger);
     if (oldPackageJson == null) {
@@ -141,10 +144,10 @@ async function generatePackageJson({
             draft.files.push(WEBPACK_OUTPUT_DIR);
         }
 
+        draft.type = "module";
         draft.source = "src/index.ts";
         draft.module = "src/index.ts";
-        draft.main = `./${OUTPUT_DIR}/index.js`;
-        draft.types = `./${OUTPUT_DIR}/index.d.ts`;
+        draft.main = "src/index.ts";
 
         draft.sideEffects = false;
 
@@ -165,6 +168,7 @@ async function generatePackageJson({
             pathToPrettierIgnore,
             packageToLint,
             customScripts: ruleConfig?.scripts ?? {},
+            addDevDependency,
         });
 
         if (packageToLint.config.type === PackageType.REACT_APP) {
@@ -203,6 +207,7 @@ function addScripts({
     pathToPrettierIgnore,
     packageToLint,
     customScripts,
+    addDevDependency,
 }: {
     draft: Draft<IPackageJson>;
     executables: Executables;
@@ -210,9 +215,10 @@ function addScripts({
     pathToPrettierIgnore: string;
     packageToLint: LintablePackage;
     customScripts: Record<string, string>;
+    addDevDependency: (devDependency: string) => void;
 }) {
     draft.scripts = {
-        clean: `rm -r ./${OUTPUT_DIR}`,
+        clean: `rm -rf ./${OUTPUT_DIR} && ${executables.get(Executable.TSC)} --build --clean`,
         compile: `${executables.get(Executable.TSC)} --build`,
         test: `yarn run compile && ${executables.get(Executable.JEST)} --passWithNoTests`,
         "lint:eslint": `${executables.get(Executable.ESLINT)} --max-warnings 0 . --ignore-path=${pathToEslintIgnore}`,
@@ -255,9 +261,10 @@ function addScripts({
     }
 
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
+        addDevDependency("ts-node");
         draft.scripts = {
             ...draft.scripts,
-            dist: `TS_NODE_PROJECT=${CLI_WEBPACK_CONFIG_TS_FILENAME} yarn webpack --progress`,
+            dist: "yarn node --loader ts-node/esm $(yarn bin webpack)",
         };
     }
 

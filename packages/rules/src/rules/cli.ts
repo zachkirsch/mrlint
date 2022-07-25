@@ -6,7 +6,7 @@ import { TsConfig } from "./ts-config";
 export const CLI_WEBPACK_CONFIG_TS_FILENAME = "tsconfig.webpack.json";
 
 export const WEBPACK_OUTPUT_DIR = "dist";
-export const WEBPACK_BUNDLE_FILENAME = "bundle.js";
+export const WEBPACK_BUNDLE_FILENAME = "bundle.cjs";
 
 export const CliRule: Rule.PackageRule = {
     ruleId: "cli",
@@ -32,8 +32,11 @@ async function runRule({
         await writePackageFile({
             fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
             filename: "webpack.config.ts",
-            contents: `import path from "path";
-import * as webpack from "webpack";
+            contents: `import path, { dirname } from "path";
+import { fileURLToPath } from "url";
+import webpack from "webpack";
+            
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default (): webpack.Configuration => {
     return {

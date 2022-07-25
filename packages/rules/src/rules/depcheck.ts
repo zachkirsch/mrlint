@@ -31,7 +31,14 @@ async function runRule({
     ruleConfig,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const depcheckRc: DepcheckConfig = {
-        ignores: ["@types/jest", "@types/node", "ts-jest"],
+        ignores: [
+            "@types/jest",
+            "@types/node",
+            "ts-jest",
+            "@babel/core",
+            "@babel/preset-env",
+            "@babel/preset-typescript",
+        ],
         "ignore-patterns": [OUTPUT_DIR],
     };
 
@@ -40,7 +47,7 @@ async function runRule({
     }
 
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-        depcheckRc.ignores.push("webpack", "webpack-cli", "ts-loader", "node-loader");
+        depcheckRc.ignores.push("webpack", "webpack-cli", "ts-loader", "node-loader", "ts-node");
     }
 
     const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);
