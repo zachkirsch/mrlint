@@ -40,7 +40,7 @@ jobs:
           pkg-manager: yarn-berry
       - run:
           name: Compile
-          command: yarn compile:all
+          command: yarn compile
       - run:
           name: Add version to package.json's
           command: yarn mrlint:local version $(git tag --points-at HEAD)
