@@ -8,9 +8,16 @@ export const ViteRule: Rule.PackageRule = {
     run: runRule,
 };
 
-async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleRunnerArgs): Promise<Result> {
+async function runRule({
+    fileSystems,
+    packageToLint,
+    logger,
+    addDevDependency,
+}: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const result = Result.success();
     const fileSystem = fileSystems.getFileSystemForPackage(packageToLint);
+
+    addDevDependency("sass");
 
     result.accumulate(
         await writePackageFile({
