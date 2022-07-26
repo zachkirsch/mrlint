@@ -1,5 +1,5 @@
-import { Logger, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
-import { LintablePackage } from "@fern-api/mrlint-commons/src/types";
+import { PackageType, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { TypescriptCliPackageConfig } from "@fern-api/mrlint-commons/src/types";
 import path from "path";
 import { writePackageFile } from "../utils/writePackageFile";
 
@@ -8,48 +8,24 @@ export const ESBUILD_BUILD_SCRIPT_FILE_NAME = "build.cjs";
 export const CLI_FILENAME = "cli.cjs";
 const ESBUILD_BUNDLE_FILENAME = "bundle.cjs";
 
-export const ENV_FILE_NAME = ".env.cjs";
-
-export const CliRule: Rule.PackageRule = {
+export const CliRule: Rule.PackageRule<typeof PackageType.TYPESCRIPT_CLI> = {
     ruleId: "cli",
     type: RuleType.PACKAGE,
     targetedPackages: [PackageType.TYPESCRIPT_CLI],
-    run: runRule,
+    run: ({ fileSystems, packageToLint, logger, addDevDependency }) => {
+        addDevDependency("esbuild");
+        addDevDependency("@yarnpkg/esbuild-plugin-pnp");
+
+        return writePackageFile({
+            fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+            filename: ESBUILD_BUILD_SCRIPT_FILE_NAME,
+            contents: generateScriptContents(packageToLint.config),
+            logger,
+        });
+    },
 };
 
-async function runRule({
-    fileSystems,
-    packageToLint,
-    logger,
-    addDevDependency,
-}: Rule.PackageRuleRunnerArgs): Promise<Result> {
-    packageToLint.config;
-
-    const result = Result.success();
-    result.accumulate(await writeEsbuildScript({ fileSystems, packageToLint, logger, addDevDependency }));
-    result.accumulate(await maybeWriteEnvFile({ fileSystems, packageToLint, logger }));
-    return result;
-}
-
-async function writeEsbuildScript({
-    fileSystems,
-    packageToLint,
-    logger,
-    addDevDependency,
-}: {
-    fileSystems: Rule.FileSystems;
-    packageToLint: LintablePackage;
-    logger: Logger;
-    addDevDependency: (dependency: string) => void;
-}): Promise<Result> {
-    if (packageToLint.config.type !== PackageType.TYPESCRIPT_CLI) {
-        logger.error("Package is not a CLI.");
-        return Result.failure();
-    }
-
-    addDevDependency("esbuild");
-    addDevDependency("@yarnpkg/esbuild-plugin-pnp");
-
+function generateScriptContents(config: TypescriptCliPackageConfig) {
     let script = `const { pnpPlugin } = require("@yarnpkg/esbuild-plugin-pnp");
 const { build } = require("esbuild");
 const path = require("path");
@@ -64,12 +40,12 @@ async function main() {
         entryPoints: ["./src/cli.ts"],
         outfile: "./${path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME)}",
         bundle: true,
-        external: ["cpu-features"],
+        external: ["cpu-features", "ssh2"],
         plugins: [pnpPlugin()],`;
 
-    if (packageToLint.config.environmentVariables.length > 0) {
+    if (config.environment.variables.length > 0) {
         script += `    define: {
-            ${packageToLint.config.environmentVariables
+            ${config.environment.variables
                 .map((envVar) => `        "process.env.${envVar}": getEnvironmentVariable("${envVar}"),`)
                 .join("\n")}
         },
@@ -101,7 +77,7 @@ require("./${ESBUILD_BUNDLE_FILENAME}");\`
     await chmod("${CLI_FILENAME}", "755");
 `;
 
-    if (packageToLint.config.cliPackageName != null) {
+    if (config.cliPackageName != null) {
         script += `
         
     // write cli's package.json
@@ -110,11 +86,11 @@ require("./${ESBUILD_BUNDLE_FILENAME}");\`
         "package.json",
         JSON.stringify(
             {
-                name: "${packageToLint.config.cliPackageName}",
+                name: "${config.cliPackageName}",
                 version: packageJson.version,
                 repository: packageJson.repository,
                 files: ["${ESBUILD_BUNDLE_FILENAME}", "${CLI_FILENAME}"],
-                bin: ${`{ ${packageToLint.config.cliName}: "${CLI_FILENAME}" }`},
+                bin: ${`{ ${config.cliName}: "${CLI_FILENAME}" }`},
             },
             undefined,
             2
@@ -137,35 +113,5 @@ require("./${ESBUILD_BUNDLE_FILENAME}");\`
     }
 
     script += "\n}";
-
-    return writePackageFile({
-        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
-        filename: ESBUILD_BUILD_SCRIPT_FILE_NAME,
-        contents: script,
-        logger,
-    });
-}
-
-async function maybeWriteEnvFile({
-    fileSystems,
-    packageToLint,
-    logger,
-}: {
-    fileSystems: Rule.FileSystems;
-    packageToLint: LintablePackage;
-    logger: Logger;
-}): Promise<Result> {
-    const fileSystem = fileSystems.getFileSystemForPackage(packageToLint);
-
-    // don't overwrite existing .env file
-    if ((await fileSystem.readFile(ENV_FILE_NAME)) != null) {
-        return Result.success();
-    }
-
-    return writePackageFile({
-        fileSystem,
-        filename: ENV_FILE_NAME,
-        contents: "module.exports = {};",
-        logger,
-    });
+    return script;
 }

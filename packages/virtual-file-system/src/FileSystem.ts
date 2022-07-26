@@ -1,6 +1,8 @@
 export interface FileSystem {
     readFile: (relativePath: string) => Promise<string | undefined>;
     writeFile: (relativePath: string, contents: string) => Promise<void>;
+    doesFileExist: (relativePath: string) => Promise<boolean>;
+    getAbsolutePathToFile: (relativePath: string) => string;
     readdir: (relativePath: string) => Promise<Record<FileSystem.FileName, FileSystem.File>>;
     mkdir: (relativePath: string) => Promise<void>;
     getFileSystemForPrefix: (prefix: string) => FileSystem;

@@ -57,10 +57,20 @@ export class LazyVirtualFileSystem implements FileSystemWithUtilities {
         await this.traverseToFile(relativePath, { replaceWith: contents });
     }
 
+    public async doesFileExist(relativePath: string): Promise<boolean> {
+        return (await this.readFile(relativePath)) != null;
+    }
+
+    public getAbsolutePathToFile(relativePath: string): string {
+        return path.join(this.rootDir, relativePath);
+    }
+
     public getFileSystemForPrefix(prefix: string): FileSystem {
         return {
             readFile: (relativePath) => this.readFile(path.join(prefix, relativePath)),
             writeFile: (relativePath, contents) => this.writeFile(path.join(prefix, relativePath), contents),
+            doesFileExist: (relativePath) => this.doesFileExist(path.join(prefix, relativePath)),
+            getAbsolutePathToFile: (relativePath) => this.getAbsolutePathToFile(path.join(prefix, relativePath)),
             readdir: (relativePath) => this.readdir(path.join(prefix, relativePath)),
             mkdir: (relativePath) => this.mkdir(path.join(prefix, relativePath)),
             getFileSystemForPrefix: (nextPrefix) => this.getFileSystemForPrefix(path.join(prefix, nextPrefix)),
@@ -123,7 +133,7 @@ export class LazyVirtualFileSystem implements FileSystemWithUtilities {
     }
 
     private async loadChildren(relativePath: string): Promise<Record<string, Node>> {
-        const newChildren = await readdir(this.getAbsolutePath(relativePath), {
+        const newChildren = await readdir(this.getAbsolutePathToFile(relativePath), {
             withFileTypes: true,
         });
 
@@ -219,7 +229,7 @@ export class LazyVirtualFileSystem implements FileSystemWithUtilities {
         if (fileNode.contents.isLoaded) {
             fileContents = fileNode.contents.value;
         } else {
-            const fileContentsBuffer = await readFile(this.getAbsolutePath(relativePath));
+            const fileContentsBuffer = await readFile(this.getAbsolutePathToFile(relativePath));
             fileContents = { originalContents: fileContentsBuffer.toString() };
         }
 
@@ -253,7 +263,7 @@ export class LazyVirtualFileSystem implements FileSystemWithUtilities {
                     }
                     const relativePath = path.join(currentPath, child.name);
                     return {
-                        fullPath: this.getAbsolutePath(relativePath),
+                        fullPath: this.getAbsolutePathToFile(relativePath),
                         relativePath,
                         originalContents: child.contents.value.originalContents,
                         newContents: child.contents.value.newContents,
@@ -261,10 +271,6 @@ export class LazyVirtualFileSystem implements FileSystemWithUtilities {
                 }
             }
         });
-    }
-
-    private getAbsolutePath(relativePath: string) {
-        return path.join(this.rootDir, relativePath);
     }
 }
 

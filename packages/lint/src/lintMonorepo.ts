@@ -128,8 +128,9 @@ function getLintablePackage(p: Package): LintablePackage | undefined {
 
 function getRulesForPackage(mrlintPackage: LintablePackage): Rule.PackageRule[] {
     return rules.reduce<Rule.PackageRule[]>((filtered, rule) => {
-        if (rule.type === RuleType.PACKAGE && ruleAppliesToPackage(rule, mrlintPackage)) {
-            filtered.push(rule);
+        const castedRule = rule as Rule.PackageRule;
+        if (rule.type === RuleType.PACKAGE && ruleAppliesToPackage(castedRule, mrlintPackage)) {
+            filtered.push(castedRule);
         }
         return filtered;
     }, []);

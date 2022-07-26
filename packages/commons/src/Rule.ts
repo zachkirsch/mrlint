@@ -31,14 +31,14 @@ export declare namespace Rule {
      * a rule that applies to a package.
      * it is run once per package.
      */
-    export interface PackageRule extends BaseRule {
+    export interface PackageRule<T extends PackageType = PackageType> extends BaseRule {
         type: RuleType.PACKAGE;
-        targetedPackages: PackageType[];
-        run: Runner<PackageRuleRunnerArgs>;
+        targetedPackages: T[];
+        run: Runner<PackageRuleRunnerArgs<T>>;
     }
 
-    export interface PackageRuleRunnerArgs {
-        packageToLint: LintablePackage;
+    export interface PackageRuleRunnerArgs<PackageTypes extends PackageType = PackageType> {
+        packageToLint: LintablePackage<PackageTypes>;
         allPackages: readonly Package[];
         relativePathToRoot: string;
         relativePathToSharedConfigs: string;
