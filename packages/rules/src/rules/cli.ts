@@ -48,22 +48,35 @@ async function writeEsbuildScript({
 
     addDevDependency("esbuild");
 
-    const script = `import { build, BuildOptions } from "esbuild";
+    let script = `import { build, BuildOptions } from "esbuild";
 
 const options: BuildOptions = {
     platform: "node",
     entryPoints: ["./src/cli.ts"],
     outfile: "./${path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME)}",
-    bundle: true,
-    define: {
-        ${packageToLint.config.environmentVariables.map(
-            (envVar) =>
-                `        "process.env.${envVar}": process.env.${envVar} ?? throw new Error("Environment variable ${envVar} is not defined"),`
-        )}
+    bundle: true,`;
+
+    if (packageToLint.config.environmentVariables.length > 0) {
+        script += `    define: {
+        ${packageToLint.config.environmentVariables
+            .map((envVar) => `        "process.env.${envVar}": getEnvironmentVariable("${envVar}"),`)
+            .join("\n")}
     },
 };
-    
-build(options).catch(() => process.exit(1));`;
+
+function getEnvironmentVariable(environmentVariable: string): string {
+    const value = process.env[environmentVariable];
+    if (value != null) {
+        return value;
+    }
+    throw new Error(\`Environment variable $\{environmentVariable} is not defined.\`);
+}`;
+    } else {
+        script += `
+};`;
+    }
+
+    script += "\n\nbuild(options).catch(() => process.exit(1));";
 
     return writePackageFile({
         fileSystem: fileSystems.getFileSystemForPackage(packageToLint),

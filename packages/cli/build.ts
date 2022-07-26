@@ -5,7 +5,6 @@ const options: BuildOptions = {
     entryPoints: ["./src/cli.ts"],
     outfile: "./dist/bundle.cjs",
     bundle: true,
-    define: {},
 };
 
 build(options).catch(() => process.exit(1));
