@@ -47,7 +47,7 @@ async function runRule({
     }
 
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-        depcheckRc.ignores.push("ts-node");
+        depcheckRc.ignores.push("esbuild", "@yarnpkg/esbuild-plugin-pnp");
     }
 
     const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);
