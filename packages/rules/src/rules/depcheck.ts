@@ -40,6 +40,13 @@ async function runRule({
         depcheckRc.ignores.push("sass");
     }
 
+    if (
+        packageToLint.config.type === PackageType.REACT_APP ||
+        packageToLint.config.type === PackageType.REACT_LIBRARY
+    ) {
+        depcheckRc.ignores.push("vite");
+    }
+
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
         depcheckRc.ignores.push("esbuild", "@yarnpkg/esbuild-plugin-pnp");
         depcheckRc["ignore-patterns"].push(ESBUILD_OUTPUT_DIR);
