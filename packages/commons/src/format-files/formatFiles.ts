@@ -21,7 +21,7 @@ export async function formatFileContents({
     }
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const prettierConfig: Config = require(/* webpackIgnore: true */ prettierConfigFilePath);
+    const prettierConfig: Config = require(prettierConfigFilePath);
 
     const prettierOptions = applyPrettierOverrides({
         config: prettierConfig,

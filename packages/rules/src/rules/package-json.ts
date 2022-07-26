@@ -17,7 +17,7 @@ import { OUTPUT_DIR } from "../utils/constants";
 import { Executable, Executables } from "../utils/Executables";
 import { getDependencies } from "../utils/getDependencies";
 import { writePackageFile } from "../utils/writePackageFile";
-import { ENV_FILE_NAME, WEBPACK_BUNDLE_FILENAME, WEBPACK_OUTPUT_DIR } from "./cli";
+import { ENV_FILE_NAME, ESBUILD_BUILD_SCRIPT_FILE_NAME, ESBUILD_BUNDLE_FILENAME, ESBUILD_OUTPUT_DIR } from "./cli";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 
@@ -141,7 +141,7 @@ async function generatePackageJson({
 
         draft.files = [OUTPUT_DIR];
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-            draft.files.push(WEBPACK_OUTPUT_DIR);
+            draft.files.push(ESBUILD_OUTPUT_DIR);
         }
 
         draft.type = "module";
@@ -153,7 +153,7 @@ async function generatePackageJson({
         draft.sideEffects = false;
 
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-            const pathToCli = path.join(WEBPACK_OUTPUT_DIR, WEBPACK_BUNDLE_FILENAME);
+            const pathToCli = path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME);
             draft.bin =
                 packageToLint.config.cliName == null
                     ? pathToCli
@@ -265,9 +265,12 @@ function addScripts({
         addDevDependency("ts-node");
         draft.scripts = {
             ...draft.scripts,
-            dist: `${executables.get(
-                Executable.ENV_CMD
-            )} -f ${ENV_FILE_NAME} node --loader ts-node/esm $(yarn bin webpack)`,
+            dist: [
+                "yarn run compile",
+                `${executables.get(
+                    Executable.ENV_CMD
+                )} -f ${ENV_FILE_NAME} node --no-warnings --loader ts-node/esm ${ESBUILD_BUILD_SCRIPT_FILE_NAME}`,
+            ].join(" && "),
         };
     }
 
