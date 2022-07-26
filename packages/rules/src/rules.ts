@@ -1,4 +1,5 @@
 import { CliRule } from "./rules/cli";
+import { DeclarationsRule } from "./rules/declarations";
 import { DepcheckRule } from "./rules/depcheck";
 import { DuplicateDependenciesRule } from "./rules/duplicate-dependencies";
 import { EnvCmdRule } from "./rules/env-cmd";
@@ -13,6 +14,7 @@ export const rules = [
     PackageJsonRule,
     TsConfigRule,
     DepcheckRule,
+    DeclarationsRule,
     JestRule,
     PrettierRule,
     StyleLintRule,
