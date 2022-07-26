@@ -32,4 +32,24 @@ async function main() {
             2
         )
     );
+
+    // write empty yarn.lock so yarn doesn't try to associate this package with the monorepo
+    await writeFile("dist/yarn.lock", "");
+
+    // install package into new yarn.lock
+    const { exec } = require("child_process");
+    exec(
+        "yarn install",
+        {
+            env: {
+                // so we can modify yarn.lock even when in CI
+                YARN_ENABLE_IMMUTABLE_INSTALLS: "false",
+            },
+        },
+        (error) => {
+            if (error != null) {
+                process.exit(1);
+            }
+        }
+    );
 }
