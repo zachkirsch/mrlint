@@ -1,5 +1,5 @@
 {
-  "name": "mrlint",
+  "name": "@fern-api/mrlint-cli",
   "version": "0.0.0",
   "repository": {
     "type": "git",
@@ -16,7 +16,9 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "sideEffects": false,
-  "bin": "dist/bundle.cjs",
+  "bin": {
+    "mrlint": "dist/bundle.cjs"
+  },
   "scripts": {
     "clean": "rm -rf ./lib && tsc --build --clean",
     "compile": "tsc --build",

@@ -151,12 +151,9 @@ async function generatePackageJson({
 
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
             const pathToCli = path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME);
-            draft.bin =
-                packageToLint.config.cliName == null
-                    ? pathToCli
-                    : {
-                          [packageToLint.config.cliName]: pathToCli,
-                      };
+            draft.bin = {
+                [packageToLint.config.cliName]: pathToCli,
+            };
         }
 
         addScripts({

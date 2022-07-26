@@ -92,10 +92,7 @@ async function writeMrlintConfigToDisk({
     isPackagePrivate: boolean;
     absolutePackagePath: string;
 }) {
-    const rawMrlintConfig: PackageConfigSchema = {
-        type: getRawPackageType(packageType),
-        private: isPackagePrivate,
-    };
+    const rawMrlintConfig = getRawConfig({ packageType, isPackagePrivate });
     await writeFile(
         path.join(absolutePackagePath, MRLINT_PACKAGE_CONFIG_FILENAME),
         JSON.stringify(rawMrlintConfig, undefined, 2)
@@ -103,18 +100,24 @@ async function writeMrlintConfigToDisk({
     return rawMrlintConfig;
 }
 
-function getRawPackageType(packageType: PackageType): PackageConfigSchema["type"] {
+function getRawConfig({
+    packageType,
+    isPackagePrivate,
+}: {
+    packageType: PackageType;
+    isPackagePrivate: boolean;
+}): PackageConfigSchema {
     switch (packageType) {
         case PackageType.REACT_APP:
-            return "react-app";
+            return { type: "react-app", private: isPackagePrivate };
         case PackageType.REACT_LIBRARY:
-            return "react-library";
+            return { type: "react-library", private: isPackagePrivate };
         case PackageType.TYPESCRIPT_LIBRARY:
-            return "library";
+            return { type: "library", private: isPackagePrivate };
         case PackageType.TYPESCRIPT_CLI:
-            return "cli";
+            return { type: "cli", cliName: "", private: isPackagePrivate };
         case PackageType.CUSTOM:
-            return "custom";
+            return { type: "custom", private: isPackagePrivate };
     }
 }
 

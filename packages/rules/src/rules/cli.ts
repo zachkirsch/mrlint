@@ -82,6 +82,28 @@ function getEnvironmentVariable(environmentVariable) {
 
     script += "\n\nbuild(options).catch(() => process.exit(1));";
 
+    if (packageToLint.config.cliPackageName != null) {
+        script += `
+
+// write cli's package.json
+const packageJson = require("./package.json");
+const { writeFile } = require("fs/promises");
+writeFile(
+    "${ESBUILD_OUTPUT_DIR}/package.json",
+    JSON.stringify(
+        {
+            name: "${packageToLint.config.cliPackageName}",
+            version: packageJson.version,
+            repository: packageJson.repository,
+            files: ["${ESBUILD_BUNDLE_FILENAME}"],
+            bin: ${`{ ${packageToLint.config.cliName}: "${ESBUILD_BUNDLE_FILENAME}" }`},
+        },
+        undefined,
+        2
+    )
+);`;
+    }
+
     return writePackageFile({
         fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
         filename: ESBUILD_BUILD_SCRIPT_FILE_NAME,

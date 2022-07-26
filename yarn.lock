@@ -2102,6 +2102,37 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@fern-api/mrlint-cli@workspace:*, @fern-api/mrlint-cli@workspace:packages/cli":
+  version: 0.0.0-use.local
+  resolution: "@fern-api/mrlint-cli@workspace:packages/cli"
+  dependencies:
+    "@babel/core": ^7.17.9
+    "@babel/preset-env": ^7.16.11
+    "@babel/preset-typescript": ^7.16.7
+    "@fern-api/mrlint-add-package": "workspace:*"
+    "@fern-api/mrlint-commons": "workspace:*"
+    "@fern-api/mrlint-lint": "workspace:*"
+    "@fern-api/mrlint-parser": "workspace:*"
+    "@types/jest": ^27.4.1
+    "@types/node": ^17.0.25
+    "@types/yargs": ^17.0.10
+    "@yarnpkg/esbuild-plugin-pnp": ^3.0.0-rc.14
+    chalk: ^4.1.2
+    depcheck: ^1.4.3
+    env-cmd: toddbluhm/env-cmd
+    esbuild: ^0.14.50
+    eslint: ^8.12.0
+    jest: ^27.5.1
+    package-json-type: ^1.0.3
+    prettier: ^2.6.2
+    ts-jest: ^28.0.5
+    typescript: ^4.6.3
+    yargs: ^17.5.1
+  bin:
+    mrlint: dist/bundle.cjs
+  languageName: unknown
+  linkType: soft
+
 "@fern-api/mrlint-commons@workspace:*, @fern-api/mrlint-commons@workspace:packages/commons":
   version: 0.0.0-use.local
   resolution: "@fern-api/mrlint-commons@workspace:packages/commons"
@@ -7251,6 +7282,7 @@ env-cmd@toddbluhm/env-cmd:
     "@babel/core": ^7.18.5
     "@babel/preset-env": ^7.18.2
     "@babel/preset-typescript": ^7.17.12
+    "@fern-api/mrlint-cli": "workspace:*"
     "@types/jest": ^28.1.2
     "@types/node": ^18.0.0
     "@typescript-eslint/eslint-plugin": ^5.17.0
@@ -7260,41 +7292,9 @@ env-cmd@toddbluhm/env-cmd:
     husky: ^7.0.4
     jest: ^28.1.1
     lint-staged: ^12.3.7
-    mrlint: "workspace:*"
     prettier: ^2.6.2
     ts-node: ^10.8.1
     typescript: ^4.7.4
-  languageName: unknown
-  linkType: soft
-
-"mrlint@workspace:*, mrlint@workspace:packages/cli":
-  version: 0.0.0-use.local
-  resolution: "mrlint@workspace:packages/cli"
-  dependencies:
-    "@babel/core": ^7.17.9
-    "@babel/preset-env": ^7.16.11
-    "@babel/preset-typescript": ^7.16.7
-    "@fern-api/mrlint-add-package": "workspace:*"
-    "@fern-api/mrlint-commons": "workspace:*"
-    "@fern-api/mrlint-lint": "workspace:*"
-    "@fern-api/mrlint-parser": "workspace:*"
-    "@types/jest": ^27.4.1
-    "@types/node": ^17.0.25
-    "@types/yargs": ^17.0.10
-    "@yarnpkg/esbuild-plugin-pnp": ^3.0.0-rc.14
-    chalk: ^4.1.2
-    depcheck: ^1.4.3
-    env-cmd: toddbluhm/env-cmd
-    esbuild: ^0.14.50
-    eslint: ^8.12.0
-    jest: ^27.5.1
-    package-json-type: ^1.0.3
-    prettier: ^2.6.2
-    ts-jest: ^28.0.5
-    typescript: ^4.6.3
-    yargs: ^17.5.1
-  bin:
-    mrlint: dist/bundle.cjs
   languageName: unknown
   linkType: soft
 
