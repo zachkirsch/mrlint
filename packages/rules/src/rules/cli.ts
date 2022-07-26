@@ -60,6 +60,7 @@ main();
 async function main() {
     const options = {
         platform: "node",
+        target: "node14",
         entryPoints: ["./src/cli.ts"],
         outfile: "./${path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME)}",
         bundle: true,
