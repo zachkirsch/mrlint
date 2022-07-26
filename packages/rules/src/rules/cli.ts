@@ -4,8 +4,9 @@ import path from "path";
 import { writePackageFile } from "../utils/writePackageFile";
 
 export const ESBUILD_OUTPUT_DIR = "dist";
-export const ESBUILD_BUNDLE_FILENAME = "bundle.cjs";
 export const ESBUILD_BUILD_SCRIPT_FILE_NAME = "build.cjs";
+export const CLI_FILENAME = "cli";
+const ESBUILD_BUNDLE_FILENAME = "bundle.cjs";
 
 export const ENV_FILE_NAME = ".env.cjs";
 
@@ -51,6 +52,8 @@ async function writeEsbuildScript({
 
     let script = `const { pnpPlugin } = require("@yarnpkg/esbuild-plugin-pnp");
 const { build } = require("esbuild");
+const path = require("path");
+const { chmod, writeFile } = require("fs/promises");
 
 main();
 
@@ -83,17 +86,25 @@ async function main() {
     };`;
     }
 
-    script += "\n\nawait build(options).catch(() => process.exit(1));";
+    script += `    \n\nawait build(options).catch(() => process.exit(1));
+ 
+    process.chdir(path.join(__dirname, "${ESBUILD_OUTPUT_DIR}"));
+
+    // write cli executable
+    await writeFile(
+        "${CLI_FILENAME}",
+        \`#!/usr/bin/env node
+
+require("./${ESBUILD_BUNDLE_FILENAME}");\`
+    );
+    await chmod("${CLI_FILENAME}", "755");
+`;
 
     if (packageToLint.config.cliPackageName != null) {
         script += `
-
-    const path = require("path");
-    process.chdir(path.join(__dirname, "${ESBUILD_OUTPUT_DIR}"));
         
     // write cli's package.json
     const packageJson = require("./package.json");
-    const { writeFile } = require("fs/promises");
     await writeFile(
         "package.json",
         JSON.stringify(
@@ -101,8 +112,8 @@ async function main() {
                 name: "${packageToLint.config.cliPackageName}",
                 version: packageJson.version,
                 repository: packageJson.repository,
-                files: ["${ESBUILD_BUNDLE_FILENAME}"],
-                bin: ${`{ ${packageToLint.config.cliName}: "${ESBUILD_BUNDLE_FILENAME}" }`},
+                files: ["${ESBUILD_BUNDLE_FILENAME}", "${CLI_FILENAME}"],
+                bin: ${`{ ${packageToLint.config.cliName}: "${CLI_FILENAME}" }`},
             },
             undefined,
             2
