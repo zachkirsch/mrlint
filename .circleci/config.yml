@@ -49,10 +49,7 @@ jobs:
           command: yarn run publish
       - run:
           name: Publish CLI
-          command: |
-            yarn workspace @fern-api/mrlint-cli dist
-            cd $(yarn workspace @fern-api/mrlint-cli exec pwd)/dist
-            yarn npm publish
+          command: yarn workspace @fern-api/mrlint-cli publish:cli
 
 workflows:
   version: 2
