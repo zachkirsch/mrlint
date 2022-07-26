@@ -48,7 +48,7 @@ export default packageConfig;`,
     result.accumulate(
         await writePackageFile({
             fileSystem: fileSystemForPackage,
-            filename: "babel.config.js",
+            filename: "babel.config.cjs",
             contents: `module.exports = require("${path.join(
                 relativePathToSharedConfigs,
                 "babel.config.shared.json"
