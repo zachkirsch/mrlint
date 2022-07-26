@@ -31,14 +31,7 @@ async function runRule({
     ruleConfig,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const depcheckRc: DepcheckConfig = {
-        ignores: [
-            "@types/jest",
-            "@types/node",
-            "ts-jest",
-            "@babel/core",
-            "@babel/preset-env",
-            "@babel/preset-typescript",
-        ],
+        ignores: ["@types/jest", "@types/node", "@babel/core", "@babel/preset-env", "@babel/preset-typescript"],
         "ignore-patterns": [OUTPUT_DIR],
     };
 
