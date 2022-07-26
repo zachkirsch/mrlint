@@ -21,12 +21,12 @@ async function main() {
 
     // write cli executable
     await writeFile(
-        "cli",
+        "cli.cjs",
         `#!/usr/bin/env node
 
 require("./bundle.cjs");`
     );
-    await chmod("cli", "755");
+    await chmod("cli.cjs", "755");
 
     // write cli's package.json
     const packageJson = require("./package.json");
@@ -37,8 +37,8 @@ require("./bundle.cjs");`
                 name: "mrlint",
                 version: packageJson.version,
                 repository: packageJson.repository,
-                files: ["bundle.cjs", "cli"],
-                bin: { mrlint: "cli" },
+                files: ["bundle.cjs", "cli.cjs"],
+                bin: { mrlint: "cli.cjs" },
             },
             undefined,
             2

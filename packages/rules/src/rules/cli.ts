@@ -5,7 +5,7 @@ import { writePackageFile } from "../utils/writePackageFile";
 
 export const ESBUILD_OUTPUT_DIR = "dist";
 export const ESBUILD_BUILD_SCRIPT_FILE_NAME = "build.cjs";
-export const CLI_FILENAME = "cli";
+export const CLI_FILENAME = "cli.cjs";
 const ESBUILD_BUNDLE_FILENAME = "bundle.cjs";
 
 export const ENV_FILE_NAME = ".env.cjs";

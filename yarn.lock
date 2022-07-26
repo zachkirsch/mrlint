@@ -2127,7 +2127,7 @@ __metadata:
     typescript: ^4.6.3
     yargs: ^17.5.1
   bin:
-    mrlint: dist/cli
+    mrlint: dist/cli.cjs
   languageName: unknown
   linkType: soft
 
