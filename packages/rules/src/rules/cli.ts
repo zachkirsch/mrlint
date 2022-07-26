@@ -87,7 +87,7 @@ require("./${ESBUILD_BUNDLE_FILENAME}");\`
         "package.json",
         JSON.stringify(
             {
-                name: process.env.${snakeCase(config.cliPackageName).toUpperCase()}_CLI_PACKAGE_NAME ?? "${
+                name: process.env.${snakeCase(config.cliName).toUpperCase()}_CLI_PACKAGE_NAME ?? "${
             config.cliPackageName
         }",
                 version: packageJson.version,
