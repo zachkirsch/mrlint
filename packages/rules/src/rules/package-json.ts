@@ -273,6 +273,7 @@ function addScripts({
                 script: `node ${ESBUILD_BUILD_SCRIPT_FILE_NAME}`,
                 prefix: "yarn compile &&",
             }),
+            "publish:cli": "yarn dist && cd dist && npm publish",
         };
     }
 

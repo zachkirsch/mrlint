@@ -1,5 +1,6 @@
 import { PackageType, Rule, RuleType } from "@fern-api/mrlint-commons";
 import { TypescriptCliPackageConfig } from "@fern-api/mrlint-commons/src/types";
+import { snakeCase } from "lodash";
 import path from "path";
 import { writePackageFile } from "../utils/writePackageFile";
 
@@ -86,7 +87,9 @@ require("./${ESBUILD_BUNDLE_FILENAME}");\`
         "package.json",
         JSON.stringify(
             {
-                name: "${config.cliPackageName}",
+                name: process.env.${snakeCase(config.cliPackageName).toUpperCase()}_CLI_NAME ?? "${
+            config.cliPackageName
+        }",
                 version: packageJson.version,
                 repository: packageJson.repository,
                 files: ["${ESBUILD_BUNDLE_FILENAME}", "${CLI_FILENAME}"],
