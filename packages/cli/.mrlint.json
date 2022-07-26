@@ -1,4 +1,6 @@
 {
   "type": "cli",
-  "private": false
+  "private": false,
+  "cliName": "mrlint",
+  "cliPackageName": "mrlint"
 }

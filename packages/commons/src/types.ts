@@ -45,7 +45,8 @@ export interface TypescriptLibraryPackageConfig extends BasePackageConfig {
 
 export interface TypescriptCliPackageConfig extends BasePackageConfig {
     type: typeof PackageType.TYPESCRIPT_CLI;
-    cliName: string | undefined;
+    cliName: string;
+    cliPackageName: string | undefined;
     environmentVariables: string[];
 }
 

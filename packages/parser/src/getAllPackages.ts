@@ -61,6 +61,7 @@ export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig
                 ...baseConfig,
                 type: PackageType.TYPESCRIPT_CLI,
                 cliName: rawConfig.cliName,
+                cliPackageName: rawConfig.cliPackageName,
                 environmentVariables: rawConfig.environmentVariables ?? [],
             };
         case "library":

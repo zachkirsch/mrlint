@@ -6,14 +6,15 @@
   "private": true,
   "workspaces": [
     "packages/**",
-    "!packages/**/lib"
+    "!packages/**/lib",
+    "!packages/**/dist"
   ],
   "scripts": {
     "clean": "yarn workspaces foreach --verbose --parallel run clean",
     "compile": "yarn workspaces foreach --verbose --parallel --topological run compile",
     "build": "yarn workspaces foreach --verbose --parallel --topological run build",
     "test": "jest --passWithNoTests",
-    "mrlint:local": "yarn workspace mrlint dist && mrlint",
+    "mrlint:local": "yarn workspace @fern-api/mrlint-cli dist && mrlint",
     "lint:eslint": "eslint . --max-warnings 0",
     "lint:eslint:fix": "eslint . --fix --max-warnings 0",
     "lint:monorepo": "yarn run mrlint:local lint",
@@ -28,6 +29,7 @@
     "@babel/core": "^7.18.5",
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-typescript": "^7.17.12",
+    "@fern-api/mrlint-cli": "workspace:*",
     "@types/jest": "^28.1.2",
     "@types/node": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.17.0",
@@ -37,7 +39,6 @@
     "husky": "^7.0.4",
     "jest": "^28.1.1",
     "lint-staged": "^12.3.7",
-    "mrlint": "workspace:*",
     "prettier": "^2.6.2",
     "ts-node": "^10.8.1",
     "typescript": "^4.7.4"
