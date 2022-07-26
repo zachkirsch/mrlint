@@ -40,7 +40,7 @@ async function main() {
         entryPoints: ["./src/cli.ts"],
         outfile: "./${path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME)}",
         bundle: true,
-        external: ["cpu-features"],
+        external: ["cpu-features", "ssh2"],
         plugins: [pnpPlugin()],`;
 
     if (config.environment.variables.length > 0) {
