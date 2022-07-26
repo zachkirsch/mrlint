@@ -52,57 +52,62 @@ async function writeEsbuildScript({
     let script = `const { pnpPlugin } = require("@yarnpkg/esbuild-plugin-pnp");
 const { build } = require("esbuild");
 
-const options = {
-    platform: "node",
-    entryPoints: ["./src/cli.ts"],
-    outfile: "./${path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME)}",
-    bundle: true,
-    external: ["cpu-features"],
-    plugins: [pnpPlugin()],`;
+main();
+
+async function main() {
+    const options = {
+        platform: "node",
+        entryPoints: ["./src/cli.ts"],
+        outfile: "./${path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME)}",
+        bundle: true,
+        external: ["cpu-features"],
+        plugins: [pnpPlugin()],`;
 
     if (packageToLint.config.environmentVariables.length > 0) {
         script += `    define: {
-        ${packageToLint.config.environmentVariables
-            .map((envVar) => `        "process.env.${envVar}": getEnvironmentVariable("${envVar}"),`)
-            .join("\n")}
-    },
-};
-
-function getEnvironmentVariable(environmentVariable) {
-    const value = process.env[environmentVariable];
-    if (value != null) {
-        return \`"\${value}"\`;
-    }
-    throw new Error(\`Environment variable \${environmentVariable} is not defined.\`);
-}`;
+            ${packageToLint.config.environmentVariables
+                .map((envVar) => `        "process.env.${envVar}": getEnvironmentVariable("${envVar}"),`)
+                .join("\n")}
+        },
+    };
+    
+    function getEnvironmentVariable(environmentVariable) {
+        const value = process.env[environmentVariable];
+        if (value != null) {
+            return \`"\${value}"\`;
+        }
+        throw new Error(\`Environment variable \${environmentVariable} is not defined.\`);
+    }`;
     } else {
         script += `
-};`;
+    };`;
     }
 
-    script += "\n\nbuild(options).catch(() => process.exit(1));";
+    script += "\n\nawait build(options).catch(() => process.exit(1));";
 
     if (packageToLint.config.cliPackageName != null) {
         script += `
-
-// write cli's package.json
-const packageJson = require("./package.json");
-const { writeFile } = require("fs/promises");
-writeFile(
-    "${ESBUILD_OUTPUT_DIR}/package.json",
-    JSON.stringify(
-        {
-            name: "${packageToLint.config.cliPackageName}",
-            version: packageJson.version,
-            repository: packageJson.repository,
-            files: ["${ESBUILD_BUNDLE_FILENAME}"],
-            bin: ${`{ ${packageToLint.config.cliName}: "${ESBUILD_BUNDLE_FILENAME}" }`},
-        },
-        undefined,
-        2
-    )
-);`;
+        
+    // write cli's package.json
+    const packageJson = require("./package.json");
+    const { writeFile } = require("fs/promises");
+    await writeFile(
+        "${ESBUILD_OUTPUT_DIR}/package.json",
+        JSON.stringify(
+            {
+                name: "${packageToLint.config.cliPackageName}",
+                version: packageJson.version,
+                repository: packageJson.repository,
+                files: ["${ESBUILD_BUNDLE_FILENAME}"],
+                bin: ${`{ ${packageToLint.config.cliName}: "${ESBUILD_BUNDLE_FILENAME}" }`},
+            },
+            undefined,
+            2
+        )
+    );`;
     }
+
+    script += "\n}";
 
     return writePackageFile({
         fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
