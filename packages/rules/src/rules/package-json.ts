@@ -16,7 +16,6 @@ import path from "path";
 import { canPackageContainCss } from "../utils/canPackageContainCss";
 import { OUTPUT_DIR } from "../utils/constants";
 import { Executable, Executables } from "../utils/Executables";
-import { getDependencies } from "../utils/getDependencies";
 import { writePackageFile } from "../utils/writePackageFile";
 import { CLI_FILENAME, ESBUILD_BUILD_SCRIPT_FILE_NAME, ESBUILD_OUTPUT_DIR } from "./cli";
 import { ENV_RC_FILENAME } from "./env-cmd";
@@ -172,17 +171,6 @@ async function generatePackageJson({
         }
         if (oldPackageJson.devDependencies != null) {
             draft.devDependencies = sortDependencies(oldPackageJson.devDependencies);
-        }
-
-        if (
-            canPackageContainCss(packageToLint) &&
-            getDependencies(draft).some((d) => d.name.startsWith("@blueprintjs/"))
-        ) {
-            draft.postcss = {
-                "postcss-modules": {
-                    globalModulePaths: ["@blueprintjs.*"],
-                },
-            };
         }
     });
 

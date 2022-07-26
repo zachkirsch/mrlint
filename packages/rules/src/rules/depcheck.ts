@@ -37,7 +37,7 @@ async function runRule({
     };
 
     if (packageToLint.config.type === PackageType.REACT_APP) {
-        depcheckRc.ignores.push("react-scripts", "sass");
+        depcheckRc.ignores.push("sass");
     }
 
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
