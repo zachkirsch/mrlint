@@ -8,6 +8,7 @@ import { PackageJsonRule } from "./rules/package-json";
 import { PrettierRule } from "./rules/prettier";
 import { StyleLintRule } from "./rules/stylelint";
 import { TsConfigRule } from "./rules/ts-config";
+import { ViteRule } from "./rules/vite";
 
 export type Rules = Rule[];
 
@@ -21,4 +22,5 @@ export const rules: Rules = [
     StyleLintRule,
     CliRule,
     DuplicateDependenciesRule,
+    ViteRule,
 ];

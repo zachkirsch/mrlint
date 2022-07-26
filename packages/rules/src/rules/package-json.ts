@@ -165,13 +165,6 @@ async function generatePackageJson({
             customScripts: ruleConfig?.scripts ?? {},
         });
 
-        if (packageToLint.config.type === PackageType.REACT_APP) {
-            draft.browserslist = {
-                production: [">0.2%", "not dead", "not op_mini all"],
-                development: ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"],
-            };
-        }
-
         if (oldPackageJson.dependencies != null) {
             draft.dependencies = sortDependencies(oldPackageJson.dependencies);
         }
@@ -243,13 +236,10 @@ function addScripts({
     if (packageToLint.config.type === PackageType.REACT_APP) {
         draft.scripts = {
             ...draft.scripts,
-            start: `${executables.get(Executable.ENV_CMD)} -e development ${executables.get(
-                Executable.ENV_CMD
-            )} -f .env.local --silent craco start`,
-            build: "yarn run compile && craco build",
+            dev: executables.get(Executable.VITE),
+            build: `yarn compile && ${executables.get(Executable.VITE)} build`,
+            preview: `${executables.get(Executable.VITE)} preview`,
         };
-
-        draft.scripts.eject = `${executables.get(Executable.REACT_SCRIPTS)} eject`;
     }
 
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
