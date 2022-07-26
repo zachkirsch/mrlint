@@ -62,7 +62,6 @@ async function runRule({
             ruleConfig: getRuleConfig(ruleConfig),
             repository,
             fileSystemForPackage: fileSystems.getFileSystemForPackage(packageToLint),
-            addDevDependency,
         });
     } catch (error) {
         logger.error({
@@ -107,7 +106,6 @@ async function generatePackageJson({
     ruleConfig,
     repository,
     fileSystemForPackage,
-    addDevDependency,
 }: {
     packageToLint: LintablePackage;
     relativePathToRoot: string;
@@ -117,7 +115,6 @@ async function generatePackageJson({
     ruleConfig: RuleConfig | undefined;
     repository: string;
     fileSystemForPackage: FileSystem;
-    addDevDependency: (devDependency: string) => void;
 }): Promise<IPackageJson> {
     const oldPackageJson = await getPackageJson(fileSystemForPackage, logger);
     if (oldPackageJson == null) {
@@ -169,7 +166,6 @@ async function generatePackageJson({
             pathToPrettierIgnore,
             packageToLint,
             customScripts: ruleConfig?.scripts ?? {},
-            addDevDependency,
         });
 
         if (packageToLint.config.type === PackageType.REACT_APP) {
@@ -208,7 +204,6 @@ function addScripts({
     pathToPrettierIgnore,
     packageToLint,
     customScripts,
-    addDevDependency,
 }: {
     draft: Draft<IPackageJson>;
     executables: Executables;
@@ -216,7 +211,6 @@ function addScripts({
     pathToPrettierIgnore: string;
     packageToLint: LintablePackage;
     customScripts: Record<string, string>;
-    addDevDependency: (devDependency: string) => void;
 }) {
     draft.scripts = {
         clean: `rm -rf ./${OUTPUT_DIR} && ${executables.get(Executable.TSC)} --build --clean`,
