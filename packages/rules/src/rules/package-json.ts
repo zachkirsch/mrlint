@@ -262,14 +262,11 @@ function addScripts({
     }
 
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-        addDevDependency("ts-node");
         draft.scripts = {
             ...draft.scripts,
             dist: [
                 "yarn run compile",
-                `${executables.get(
-                    Executable.ENV_CMD
-                )} -f ${ENV_FILE_NAME} node --no-warnings --loader ts-node/esm ${ESBUILD_BUILD_SCRIPT_FILE_NAME}`,
+                `${executables.get(Executable.ENV_CMD)} -f ${ENV_FILE_NAME} node ${ESBUILD_BUILD_SCRIPT_FILE_NAME}`,
             ].join(" && "),
         };
     }
