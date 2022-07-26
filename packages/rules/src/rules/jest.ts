@@ -27,6 +27,7 @@ async function runRule({
     fileSystems,
     packageToLint,
     relativePathToSharedConfigs,
+    relativePathToRoot,
     logger,
     addDevDependency,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
@@ -38,9 +39,7 @@ async function runRule({
         await writePackageFile({
             fileSystem: fileSystemForPackage,
             filename: "jest.config.ts",
-            contents: `import packageConfig from "${path.join(relativePathToSharedConfigs, "jest.config.shared")}";
-            
-export default packageConfig;`,
+            contents: `export { default } from "${path.join(relativePathToSharedConfigs, "jest.config.shared")}";`,
             logger,
         })
     );
@@ -48,11 +47,8 @@ export default packageConfig;`,
     result.accumulate(
         await writePackageFile({
             fileSystem: fileSystemForPackage,
-            filename: "babel.config.js",
-            contents: `module.exports = require("${path.join(
-                relativePathToSharedConfigs,
-                "babel.config.shared.json"
-            )}");`,
+            filename: "babel.config.cjs",
+            contents: `module.exports = require("${path.join(relativePathToRoot, "babel.config.json")}");`,
             logger,
         })
     );

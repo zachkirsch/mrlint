@@ -147,7 +147,8 @@ async function generatePackageJson({
         draft.type = "module";
         draft.source = "src/index.ts";
         draft.module = "src/index.ts";
-        draft.main = "src/index.ts";
+        draft.main = "lib/index.js";
+        draft.types = "lib/index.d.ts";
 
         draft.sideEffects = false;
 
