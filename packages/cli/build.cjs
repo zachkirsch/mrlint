@@ -1,5 +1,7 @@
 const { pnpPlugin } = require("@yarnpkg/esbuild-plugin-pnp");
 const { build } = require("esbuild");
+const path = require("path");
+const { chmod, writeFile } = require("fs/promises");
 
 main();
 
@@ -15,12 +17,19 @@ async function main() {
 
     await build(options).catch(() => process.exit(1));
 
-    const path = require("path");
     process.chdir(path.join(__dirname, "dist"));
+
+    // write cli executable
+    await writeFile(
+        "cli",
+        `#!/usr/bin/env node
+
+require("./bundle.cjs");`
+    );
+    await chmod("cli", "755");
 
     // write cli's package.json
     const packageJson = require("./package.json");
-    const { writeFile } = require("fs/promises");
     await writeFile(
         "package.json",
         JSON.stringify(
@@ -28,8 +37,8 @@ async function main() {
                 name: "mrlint",
                 version: packageJson.version,
                 repository: packageJson.repository,
-                files: ["bundle.cjs"],
-                bin: { mrlint: "bundle.cjs" },
+                files: ["bundle.cjs", "cli"],
+                bin: { mrlint: "cli" },
             },
             undefined,
             2

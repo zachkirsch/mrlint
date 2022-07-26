@@ -17,7 +17,7 @@ import { OUTPUT_DIR } from "../utils/constants";
 import { Executable, Executables } from "../utils/Executables";
 import { getDependencies } from "../utils/getDependencies";
 import { writePackageFile } from "../utils/writePackageFile";
-import { ENV_FILE_NAME, ESBUILD_BUILD_SCRIPT_FILE_NAME, ESBUILD_BUNDLE_FILENAME, ESBUILD_OUTPUT_DIR } from "./cli";
+import { CLI_FILENAME, ENV_FILE_NAME, ESBUILD_BUILD_SCRIPT_FILE_NAME, ESBUILD_OUTPUT_DIR } from "./cli";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 
@@ -150,7 +150,7 @@ async function generatePackageJson({
         draft.sideEffects = false;
 
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-            const pathToCli = path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME);
+            const pathToCli = path.join(ESBUILD_OUTPUT_DIR, CLI_FILENAME);
             draft.bin = {
                 [packageToLint.config.cliName]: pathToCli,
             };
