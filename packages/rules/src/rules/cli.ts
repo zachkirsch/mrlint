@@ -1,12 +1,11 @@
 import { Logger, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
-import { LintablePackage, TypescriptCliPackageConfig } from "@fern-api/mrlint-commons/src/types";
-import { ModuleKind, ModuleResolutionKind, ScriptTarget } from "typescript";
+import { LintablePackage } from "@fern-api/mrlint-commons/src/types";
+import path from "path";
 import { writePackageFile } from "../utils/writePackageFile";
-import { TsConfig } from "./ts-config";
 
-export const CLI_WEBPACK_CONFIG_TS_FILENAME = "tsconfig.webpack.json";
-export const WEBPACK_OUTPUT_DIR = "dist";
-export const WEBPACK_BUNDLE_FILENAME = "bundle.cjs";
+export const ESBUILD_OUTPUT_DIR = "dist";
+export const ESBUILD_BUNDLE_FILENAME = "bundle.cjs";
+export const ESBUILD_BUILD_SCRIPT_FILE_NAME = "build.ts";
 
 export const ENV_FILE_NAME = ".env.cjs";
 
@@ -26,13 +25,12 @@ async function runRule({
     packageToLint.config;
 
     const result = Result.success();
-    result.accumulate(await writeWebpackConfig({ fileSystems, packageToLint, logger, addDevDependency }));
-    result.accumulate(await writeTsConfig({ fileSystems, packageToLint, logger }));
+    result.accumulate(await writeEsbuildScript({ fileSystems, packageToLint, logger, addDevDependency }));
     result.accumulate(await maybeWriteEnvFile({ fileSystems, packageToLint, logger }));
     return result;
 }
 
-async function writeWebpackConfig({
+async function writeEsbuildScript({
     fileSystems,
     packageToLint,
     logger,
@@ -48,110 +46,29 @@ async function writeWebpackConfig({
         return Result.failure();
     }
 
-    addDevDependency("webpack");
-    addDevDependency("webpack-cli");
-    addDevDependency("ts-loader");
-    addDevDependency("node-loader");
+    addDevDependency("esbuild");
+
+    const script = `import { build, BuildOptions } from "esbuild";
+
+const options: BuildOptions = {
+    platform: "node",
+    entryPoints: ["./src/cli.ts"],
+    outfile: "./${path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME)}",
+    bundle: true,
+    define: {
+        ${packageToLint.config.environmentVariables.map(
+            (envVar) =>
+                `        "process.env.${envVar}": process.env.${envVar} ?? throw new Error("Environment variable ${envVar} is not defined"),`
+        )}
+    },
+};
+    
+build(options).catch(() => process.exit(1));`;
 
     return writePackageFile({
         fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
-        filename: "webpack.config.ts",
-        contents: `import path, { dirname } from "path";
-import { fileURLToPath } from "url";
-import webpack from "webpack";
-            
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-export default (): webpack.Configuration => {
-    return {
-        mode: "production",
-        target: "node",
-        entry: path.join(__dirname, "./src/cli.ts"),
-        module: {
-            rules: [
-                {
-                    test: /\\.js$/,
-                    resolve: {
-                        fullySpecified: false,
-                    },
-                },
-                {
-                    test: /\\.ts$/,
-                    loader: "ts-loader",
-                    options: {
-                        projectReferences: true,
-                        transpileOnly: true,
-                    },
-                    exclude: /node_modules/,
-                },
-                {
-                    test: /\\.node$/,
-                    loader: "node-loader",
-                },
-            ],
-            parser: {
-                javascript: {
-                  commonjsMagicComments: true,
-                },
-            },
-        },
-        resolve: {
-            extensions: [
-                // js is first so that if we encounter equivalent TS and JS source files side-by-side
-                // (e.g. in node_modules), prefer the js
-                ".js",
-                ".ts",
-            ],
-        },
-        plugins: ${constructPlugins(packageToLint.config)},
-        output: {
-            path: path.join(__dirname, "${WEBPACK_OUTPUT_DIR}"),
-            filename: "${WEBPACK_BUNDLE_FILENAME}",
-        },
-        optimization: {
-            minimize: false,
-        },
-    };
-};`,
-        logger,
-    });
-}
-
-function constructPlugins(config: TypescriptCliPackageConfig): string {
-    const plugins = ['new webpack.BannerPlugin({ banner: "#!/usr/bin/env node", raw: true })'];
-    if (config.environmentVariables.length > 0) {
-        plugins.push(
-            `new webpack.EnvironmentPlugin(${config.environmentVariables.map((envVar) => `"${envVar}"`).join(", ")})`
-        );
-    }
-    return `[${plugins.join(", ")}]`;
-}
-
-async function writeTsConfig({
-    fileSystems,
-    packageToLint,
-    logger,
-}: {
-    fileSystems: Rule.FileSystems;
-    packageToLint: LintablePackage;
-    logger: Logger;
-}): Promise<Result> {
-    const webpackTsConfig: TsConfig = {
-        compilerOptions: {
-            module: "CommonJS" as unknown as ModuleKind,
-            moduleResolution: "node" as unknown as ModuleResolutionKind,
-            target: "esnext" as unknown as ScriptTarget,
-            esModuleInterop: true,
-            downlevelIteration: true,
-            noUncheckedIndexedAccess: true,
-        },
-        include: ["webpack.config.ts"],
-    };
-
-    return writePackageFile({
-        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
-        filename: CLI_WEBPACK_CONFIG_TS_FILENAME,
-        contents: JSON.stringify(webpackTsConfig, undefined, 2),
+        filename: ESBUILD_BUILD_SCRIPT_FILE_NAME,
+        contents: script,
         logger,
     });
 }

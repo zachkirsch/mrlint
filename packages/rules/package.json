@@ -28,7 +28,7 @@
   "dependencies": {
     "@fern-api/mrlint-commons": "workspace:*",
     "@fern-api/mrlint-virtual-file-system": "workspace:*",
-    "immer": "^9.0.12",
+    "immer": "^9.0.15",
     "semver": "^7.3.7"
   },
   "devDependencies": {
