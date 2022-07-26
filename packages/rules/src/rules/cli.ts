@@ -5,7 +5,7 @@ import { writePackageFile } from "../utils/writePackageFile";
 
 export const ESBUILD_OUTPUT_DIR = "dist";
 export const ESBUILD_BUNDLE_FILENAME = "bundle.cjs";
-export const ESBUILD_BUILD_SCRIPT_FILE_NAME = "build.ts";
+export const ESBUILD_BUILD_SCRIPT_FILE_NAME = "build.cjs";
 
 export const ENV_FILE_NAME = ".env.cjs";
 
@@ -47,14 +47,17 @@ async function writeEsbuildScript({
     }
 
     addDevDependency("esbuild");
+    addDevDependency("@yarnpkg/esbuild-plugin-pnp");
 
-    let script = `import { build, BuildOptions } from "esbuild";
+    let script = `const { pnpPlugin } = require("@yarnpkg/esbuild-plugin-pnp");
+const { build } = require("esbuild");
 
-const options: BuildOptions = {
+const options = {
     platform: "node",
     entryPoints: ["./src/cli.ts"],
     outfile: "./${path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME)}",
-    bundle: true,`;
+    bundle: true,
+    plugins: [pnpPlugin()],`;
 
     if (packageToLint.config.environmentVariables.length > 0) {
         script += `    define: {
