@@ -57,6 +57,7 @@ const options = {
     entryPoints: ["./src/cli.ts"],
     outfile: "./${path.join(ESBUILD_OUTPUT_DIR, ESBUILD_BUNDLE_FILENAME)}",
     bundle: true,
+    external: ["cpu-features"],
     plugins: [pnpPlugin()],`;
 
     if (packageToLint.config.environmentVariables.length > 0) {
