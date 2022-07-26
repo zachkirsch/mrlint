@@ -1,1 +1,1 @@
-module.exports = require("../../shared/babel.config.shared.json");
+module.exports = require("../../babel.config.json");
