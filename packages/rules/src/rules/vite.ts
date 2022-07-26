@@ -21,7 +21,7 @@ async function runRule({ fileSystems, packageToLint, logger }: Rule.PackageRuleR
         })
     );
 
-    if ((await fileSystem.readFile("index.html")) == null) {
+    if (!(await fileSystem.doesFileExist("index.html"))) {
         result.accumulate(
             await writePackageFile({
                 fileSystem,

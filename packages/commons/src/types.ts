@@ -20,9 +20,15 @@ export interface Package {
     config: PackageConfig | undefined;
 }
 
-export interface LintablePackage extends Package {
-    config: NonNullable<Package["config"]>;
+export interface LintablePackage<T extends PackageType = PackageType> extends Package {
+    config: NonNullable<PackageOfType<T>["config"]>;
 }
+
+export type PackageOfType<T extends PackageType> = PackageConfig extends { type: infer InferredT }
+    ? InferredT extends T
+        ? Package & { config: (PackageConfig & { type: T }) | undefined }
+        : never
+    : never;
 
 export type PackageConfig =
     | ReactAppPackageConfig
@@ -33,6 +39,12 @@ export type PackageConfig =
 
 export interface ReactAppPackageConfig extends BasePackageConfig {
     type: typeof PackageType.REACT_APP;
+    environment: EnvironmentConfig;
+}
+
+export interface EnvironmentConfig {
+    environments: string[];
+    variables: string[];
 }
 
 export interface ReactLibraryPackageConfig extends BasePackageConfig {
@@ -47,7 +59,7 @@ export interface TypescriptCliPackageConfig extends BasePackageConfig {
     type: typeof PackageType.TYPESCRIPT_CLI;
     cliName: string;
     cliPackageName: string | undefined;
-    environmentVariables: string[];
+    environment: EnvironmentConfig;
 }
 
 export interface CustomPackageConfig extends BasePackageConfig {

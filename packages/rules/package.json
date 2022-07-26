@@ -18,7 +18,7 @@
   "scripts": {
     "clean": "rm -rf ./lib && tsc --build --clean",
     "compile": "tsc --build",
-    "test": "yarn run compile && jest --passWithNoTests",
+    "test": "yarn compile && jest --passWithNoTests",
     "lint:eslint": "eslint --max-warnings 0 . --ignore-path=../../.eslintignore",
     "lint:eslint:fix": "eslint --max-warnings 0 . --ignore-path=../../.eslintignore --fix",
     "format": "prettier --write --ignore-unknown --ignore-path ../../shared/.prettierignore \"**\"",
@@ -28,6 +28,7 @@
   "dependencies": {
     "@fern-api/mrlint-commons": "workspace:*",
     "@fern-api/mrlint-virtual-file-system": "workspace:*",
+    "env-cmd": "toddbluhm/env-cmd",
     "immer": "^9.0.15",
     "semver": "^7.3.7"
   },

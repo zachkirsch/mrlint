@@ -62,7 +62,10 @@ export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig
                 type: PackageType.TYPESCRIPT_CLI,
                 cliName: rawConfig.cliName,
                 cliPackageName: rawConfig.cliPackageName,
-                environmentVariables: rawConfig.environmentVariables ?? [],
+                environment: {
+                    environments: rawConfig.environment?.environments ?? [],
+                    variables: rawConfig.environment?.variables ?? [],
+                },
             };
         case "library":
             return {
@@ -78,6 +81,10 @@ export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig
             return {
                 ...baseConfig,
                 type: PackageType.REACT_APP,
+                environment: {
+                    environments: rawConfig.environment?.environments ?? [],
+                    variables: rawConfig.environment?.variables ?? [],
+                },
             };
         case "custom":
             return {

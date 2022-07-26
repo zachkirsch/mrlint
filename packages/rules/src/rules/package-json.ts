@@ -8,6 +8,7 @@ import {
     Rule,
     RuleType,
 } from "@fern-api/mrlint-commons";
+import { EnvironmentConfig } from "@fern-api/mrlint-commons/src/types";
 import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
 import produce, { Draft } from "immer";
 import { IPackageJson } from "package-json-type";
@@ -17,7 +18,8 @@ import { OUTPUT_DIR } from "../utils/constants";
 import { Executable, Executables } from "../utils/Executables";
 import { getDependencies } from "../utils/getDependencies";
 import { writePackageFile } from "../utils/writePackageFile";
-import { CLI_FILENAME, ENV_FILE_NAME, ESBUILD_BUILD_SCRIPT_FILE_NAME, ESBUILD_OUTPUT_DIR } from "./cli";
+import { CLI_FILENAME, ESBUILD_BUILD_SCRIPT_FILE_NAME, ESBUILD_OUTPUT_DIR } from "./cli";
+import { ENV_RC_FILENAME } from "./env-cmd";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 
@@ -205,7 +207,7 @@ function addScripts({
     draft.scripts = {
         clean: `rm -rf ./${OUTPUT_DIR} && ${executables.get(Executable.TSC)} --build --clean`,
         compile: `${executables.get(Executable.TSC)} --build`,
-        test: `yarn run compile && ${executables.get(Executable.JEST)} --passWithNoTests`,
+        test: `yarn compile && ${executables.get(Executable.JEST)} --passWithNoTests`,
         "lint:eslint": `${executables.get(Executable.ESLINT)} --max-warnings 0 . --ignore-path=${pathToEslintIgnore}`,
         "lint:eslint:fix": `${executables.get(
             Executable.ESLINT
@@ -218,7 +220,7 @@ function addScripts({
             "lint:style": `${executables.get(
                 Executable.STYLELINT
             )} 'src/**/*.scss' --allow-empty-input --max-warnings 0`,
-            "lint:style:fix": "yarn run lint:style --fix",
+            "lint:style:fix": "yarn lint:style --fix",
         };
     }
 
@@ -233,22 +235,56 @@ function addScripts({
         depcheck: executables.get(Executable.DEPCHECK),
     };
 
+    if (
+        packageToLint.config.type === PackageType.REACT_APP ||
+        packageToLint.config.type === PackageType.TYPESCRIPT_CLI
+    ) {
+        draft.scripts = {
+            ...draft.scripts,
+            ...packageToLint.config.environment.environments.reduce(
+                (envScripts, environment) => ({
+                    ...envScripts,
+                    [`env:${environment}`]: `${executables.get(
+                        Executable.ENV_CMD
+                    )} -r ${ENV_RC_FILENAME} -e ${environment}`,
+                }),
+                {}
+            ),
+        };
+    }
+
     if (packageToLint.config.type === PackageType.REACT_APP) {
         draft.scripts = {
             ...draft.scripts,
-            dev: executables.get(Executable.VITE),
-            build: `yarn compile && ${executables.get(Executable.VITE)} build`,
-            preview: `${executables.get(Executable.VITE)} preview`,
+            ...generateScriptsForEnvironments({
+                environmentConfig: packageToLint.config.environment,
+                scriptName: "start",
+                script: executables.get(Executable.VITE),
+            }),
+            ...generateScriptsForEnvironments({
+                environmentConfig: packageToLint.config.environment,
+                scriptName: "build",
+                script: `${executables.get(Executable.VITE)} build`,
+                prefix: "yarn compile &&",
+            }),
+            ...generateScriptsForEnvironments({
+                environmentConfig: packageToLint.config.environment,
+                scriptName: "preview",
+                script: `${executables.get(Executable.VITE)} preview`,
+                prefix: "yarn compile &&",
+            }),
         };
     }
 
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
         draft.scripts = {
             ...draft.scripts,
-            dist: [
-                "yarn run compile",
-                `${executables.get(Executable.ENV_CMD)} -f ${ENV_FILE_NAME} node ${ESBUILD_BUILD_SCRIPT_FILE_NAME}`,
-            ].join(" && "),
+            ...generateScriptsForEnvironments({
+                environmentConfig: packageToLint.config.environment,
+                scriptName: "dist",
+                script: `node ${ESBUILD_BUILD_SCRIPT_FILE_NAME}`,
+                prefix: "yarn compile &&",
+            }),
         };
     }
 
@@ -282,4 +318,51 @@ function updateWorkspaceVersions(dependencies: Record<string, string> | undefine
             }
         }
     });
+}
+
+function generateScriptsForEnvironments({
+    environmentConfig,
+    scriptName,
+    script,
+    prefix,
+}: {
+    environmentConfig: EnvironmentConfig;
+    scriptName: string;
+    script: string;
+    prefix?: string;
+}): Record<string, string> {
+    function generateScript(environment: string | undefined) {
+        const parts: string[] = [];
+        if (prefix != null) {
+            parts.push(prefix);
+        }
+        if (environment != null) {
+            parts.push(`yarn env:${environment}`);
+        }
+        parts.push(script);
+
+        return parts.join(" ");
+    }
+
+    const firstEnvironment = environmentConfig.environments[0];
+
+    if (firstEnvironment == null) {
+        return {
+            [scriptName]: generateScript(undefined),
+        };
+    }
+
+    if (environmentConfig.environments.length === 1) {
+        return {
+            [scriptName]: generateScript(firstEnvironment),
+        };
+    }
+
+    return environmentConfig.environments.reduce(
+        (acc, environment) => ({
+            ...acc,
+            [`${scriptName}:${environment}`]: generateScript(environment),
+        }),
+        {}
+    );
 }
