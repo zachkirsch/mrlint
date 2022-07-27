@@ -23,11 +23,6 @@ export const CliRule: Rule.PackageRule<typeof PackageType.TYPESCRIPT_CLI> = {
 
         const result = Result.success();
 
-        if (getEnvironments(packageToLint.config).length === 0) {
-            logger.error("CLI does not have any environments.");
-            result.fail();
-        }
-
         for (const [environmentName, packageInfo] of Object.entries(packageToLint.config.environment.environments)) {
             result.accumulate(
                 await writePackageFile({
@@ -171,6 +166,7 @@ export function getCliOutputDirForEnvironment({
     return path.join(CLI_OUTPUT_DIRS_PARENT, environment);
 }
 
+export const ESBUILD_SCRIPT_FILENAME_WITHOUT_ENVIRONMENT = "build.cjs";
 export function getEsbuildScriptFilenameForEnvironment({
     environment,
     allEnvironments,
@@ -179,7 +175,7 @@ export function getEsbuildScriptFilenameForEnvironment({
     allEnvironments: string[];
 }): string {
     if (allEnvironments.length <= 1) {
-        return "build.cjs";
+        return ESBUILD_SCRIPT_FILENAME_WITHOUT_ENVIRONMENT;
     }
     return `build.${environment}.cjs`;
 }

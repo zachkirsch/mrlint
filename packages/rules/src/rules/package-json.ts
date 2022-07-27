@@ -17,7 +17,13 @@ import { OUTPUT_DIR } from "../utils/constants";
 import { Executable, Executables } from "../utils/Executables";
 import { getEnvironments } from "../utils/getEnvironments";
 import { writePackageFile } from "../utils/writePackageFile";
-import { ESBUILD_BUNDLE_FILENAME, getCliOutputDirForEnvironment, getEsbuildScriptFilenameForEnvironment } from "./cli";
+import {
+    CLI_OUTPUT_DIRS_PARENT,
+    ESBUILD_BUNDLE_FILENAME,
+    ESBUILD_SCRIPT_FILENAME_WITHOUT_ENVIRONMENT,
+    getCliOutputDirForEnvironment,
+    getEsbuildScriptFilenameForEnvironment,
+} from "./cli";
 import { ENV_RC_FILENAME } from "./env-cmd";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
@@ -166,6 +172,9 @@ async function generatePackageJson({
                         getCliOutputDirForEnvironment({ environment: environmentName, allEnvironments: environments }),
                         ESBUILD_BUNDLE_FILENAME
                     )}`,
+                fallback: {
+                    [packageToLint.config.cliName]: `./${path.join(CLI_OUTPUT_DIRS_PARENT, ESBUILD_BUNDLE_FILENAME)}`,
+                },
             });
         }
 
@@ -294,6 +303,7 @@ function addScripts({
                         allEnvironments: environments,
                     })}`,
                 prefix: "yarn compile &&",
+                fallback: `yarn compile && node ${ESBUILD_SCRIPT_FILENAME_WITHOUT_ENVIRONMENT}`,
             }),
             ...generateDynamicScriptsForEnvironments({
                 environments,
@@ -310,6 +320,7 @@ function addScripts({
                         environment,
                         allEnvironments: environments,
                     })} &&`,
+                fallback: `yarn ${DIST_CLI_SCRIPT_NAME} && cd ${CLI_OUTPUT_DIRS_PARENT} && yarn npm publish`,
             }),
         };
     }

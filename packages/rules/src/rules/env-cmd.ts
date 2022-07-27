@@ -28,12 +28,23 @@ async function validateEnvFile(
     const result = Result.success();
 
     for (const environment of getEnvironments(packageToLint.config)) {
-        const env = await getEnvVars({
-            rc: {
-                environments: [environment],
-                filePath: absolutePathToEnvCmdRc,
-            },
-        });
+        let env: Record<string, unknown>;
+        try {
+            env = await getEnvVars({
+                rc: {
+                    environments: [environment],
+                    filePath: absolutePathToEnvCmdRc,
+                },
+            });
+        } catch (error) {
+            logger.error({
+                message: `Failed to load environment "${environment}" from ${ENV_RC_FILENAME}`,
+                error,
+            });
+            result.fail();
+            continue;
+        }
+
         for (const variable of packageToLint.config.environment.variables) {
             const value = env[variable];
             if (value == null) {
