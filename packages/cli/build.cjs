@@ -15,7 +15,7 @@ async function main() {
         external: ["cpu-features"],
         plugins: [pnpPlugin()],
         define: {
-            "process.env.CLI_NAME": "mrlint",
+            "process.env.CLI_NAME": JSON.stringify("mrlint"),
         },
     };
 

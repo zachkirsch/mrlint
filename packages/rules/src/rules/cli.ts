@@ -90,7 +90,7 @@ async function main() {
         external: ["cpu-features"],
         plugins: [pnpPlugin()],
         define: {
-            "process.env.CLI_NAME": "${cliName}",
+            "process.env.CLI_NAME": JSON.stringify("${cliName}"),
 `;
 
     if (config.environment.variables.length > 0) {
@@ -103,7 +103,7 @@ async function main() {
     function getEnvironmentVariable(environmentVariable) {
         const value = process.env[environmentVariable];
         if (value != null) {
-            return \`"\${value}"\`;
+            return JSON.stringify(value);
         }
         throw new Error(\`Environment variable \${environmentVariable} is not defined.\`);
     }`;
