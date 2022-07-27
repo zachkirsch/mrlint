@@ -1,5 +1,5 @@
-import { Logger, Result } from "@fern-api/mrlint-commons";
-import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
+import { Logger, Result } from "@mrlint/commons";
+import { FileSystem } from "@mrlint/virtual-file-system";
 
 export declare namespace writePackageFile {
     export interface Args {

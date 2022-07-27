@@ -1,4 +1,4 @@
-import { MonorepoRoot } from "@fern-api/mrlint-commons";
+import { MonorepoRoot } from "@mrlint/commons";
 import execa from "execa";
 import findUp from "find-up";
 import path from "path";

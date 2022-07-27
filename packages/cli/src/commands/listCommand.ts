@@ -1,4 +1,4 @@
-import { parseMonorepo } from "@fern-api/mrlint-parser";
+import { parseMonorepo } from "@mrlint/parser";
 
 export async function listCommand(): Promise<void> {
     const monorepo = await parseMonorepo();

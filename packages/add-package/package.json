@@ -1,5 +1,5 @@
 {
-  "name": "@fern-api/mrlint-add-package",
+  "name": "@mrlint/add-package",
   "version": "0.0.0",
   "repository": {
     "type": "git",
@@ -26,9 +26,9 @@
     "depcheck": "depcheck"
   },
   "dependencies": {
-    "@fern-api/mrlint-commons": "workspace:*",
-    "@fern-api/mrlint-lint": "workspace:*",
-    "@fern-api/mrlint-parser": "workspace:*",
+    "@mrlint/commons": "workspace:*",
+    "@mrlint/lint": "workspace:*",
+    "@mrlint/parser": "workspace:*",
     "execa": "^5.1.1",
     "inquirer": "^8.0.0",
     "inquirer-file-tree-selection-prompt": "^1.0.19"

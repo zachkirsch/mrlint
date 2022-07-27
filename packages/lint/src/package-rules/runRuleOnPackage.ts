@@ -1,4 +1,4 @@
-import { Monorepo, Result, Rule } from "@fern-api/mrlint-commons";
+import { Monorepo, Result, Rule } from "@mrlint/commons";
 import path from "path";
 
 export declare namespace runRuleOnPackage {

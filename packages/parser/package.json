@@ -1,5 +1,5 @@
 {
-  "name": "@fern-api/mrlint-parser",
+  "name": "@mrlint/parser",
   "version": "0.0.0",
   "repository": {
     "type": "git",
@@ -26,7 +26,7 @@
     "depcheck": "depcheck"
   },
   "dependencies": {
-    "@fern-api/mrlint-commons": "workspace:*",
+    "@mrlint/commons": "workspace:*",
     "execa": "^5.1.1",
     "find-up": "^5.0.0",
     "js-yaml": "^4.1.0",

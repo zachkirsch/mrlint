@@ -1,5 +1,5 @@
-import { formatFileContents, Monorepo, Package } from "@fern-api/mrlint-commons";
-import { parseMonorepo } from "@fern-api/mrlint-parser";
+import { formatFileContents, Monorepo, Package } from "@mrlint/commons";
+import { parseMonorepo } from "@mrlint/parser";
 import { readFile, writeFile } from "fs/promises";
 import { IPackageJson } from "package-json-type";
 import path from "path";

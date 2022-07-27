@@ -49,7 +49,7 @@ jobs:
           command: yarn run publish
       - run:
           name: Publish CLI
-          command: yarn workspace @fern-api/mrlint-cli publish:cli
+          command: yarn workspace @mrlint/cli publish:cli
 
 workflows:
   version: 2

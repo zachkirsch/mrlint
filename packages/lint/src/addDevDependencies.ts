@@ -1,5 +1,5 @@
-import { getPackageJson, Logger, MonorepoLoggers, Package, Result } from "@fern-api/mrlint-commons";
-import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
+import { getPackageJson, Logger, MonorepoLoggers, Package, Result } from "@mrlint/commons";
+import { FileSystem } from "@mrlint/virtual-file-system";
 import chalk from "chalk";
 import { exec } from "child_process";
 

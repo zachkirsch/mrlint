@@ -1,5 +1,5 @@
 {
-  "name": "@fern-api/mrlint-cli",
+  "name": "@mrlint/cli",
   "version": "0.0.0",
   "repository": {
     "type": "git",
@@ -7,8 +7,7 @@
     "directory": "packages/cli"
   },
   "files": [
-    "lib",
-    "dist"
+    "lib"
   ],
   "type": "module",
   "source": "src/index.ts",
@@ -33,10 +32,10 @@
     "publish:cli": "yarn dist:cli && cd dist && yarn npm publish"
   },
   "dependencies": {
-    "@fern-api/mrlint-add-package": "workspace:*",
-    "@fern-api/mrlint-commons": "workspace:*",
-    "@fern-api/mrlint-lint": "workspace:*",
-    "@fern-api/mrlint-parser": "workspace:*",
+    "@mrlint/add-package": "workspace:*",
+    "@mrlint/commons": "workspace:*",
+    "@mrlint/lint": "workspace:*",
+    "@mrlint/parser": "workspace:*",
     "chalk": "^4.1.2",
     "yargs": "^17.5.1"
   },

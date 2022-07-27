@@ -1,4 +1,4 @@
-import { LintablePackage, Logger, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { LintablePackage, Logger, PackageType, Result, Rule, RuleType } from "@mrlint/commons";
 import { GetEnvVars as getEnvVars } from "env-cmd";
 import { getEnvironments } from "../utils/getEnvironments";
 import { writePackageFile } from "../utils/writePackageFile";

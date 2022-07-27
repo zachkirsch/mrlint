@@ -1,5 +1,5 @@
-import { getPackageJson, Package } from "@fern-api/mrlint-commons";
-import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
+import { getPackageJson, Package } from "@mrlint/commons";
+import { FileSystem } from "@mrlint/virtual-file-system";
 
 export async function keyPackagesByNpmName({
     allPackages,

@@ -1,4 +1,4 @@
-import { Logger, Monorepo, Package, Result, Rule } from "@fern-api/mrlint-commons";
+import { Logger, Monorepo, Package, Result, Rule } from "@mrlint/commons";
 import { runRuleOnPackage } from "./runRuleOnPackage";
 
 export declare namespace lintPackage {

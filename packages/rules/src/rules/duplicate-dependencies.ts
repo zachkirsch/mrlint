@@ -1,4 +1,4 @@
-import { getPackageJson, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { getPackageJson, Result, Rule, RuleType } from "@mrlint/commons";
 import produce from "immer";
 import semver from "semver";
 

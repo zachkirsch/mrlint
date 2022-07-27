@@ -1,4 +1,4 @@
-import { PackageType, Result, Rule, RuleType, TypescriptCliPackageConfig } from "@fern-api/mrlint-commons";
+import { PackageType, Result, Rule, RuleType, TypescriptCliPackageConfig } from "@mrlint/commons";
 import path from "path";
 import { getEnvironments } from "../utils/getEnvironments";
 import { writePackageFile } from "../utils/writePackageFile";
