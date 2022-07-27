@@ -91,13 +91,28 @@ async function main() {
         plugins: [pnpPlugin()],
         define: {
             "process.env.CLI_NAME": "${cliName}",
-            ${config.environment.variables
-                .map((envVar) => `        "process.env.${envVar}": getEnvironmentVariable("${envVar}"),`)
-                .join("\n")}
-        }
+`;
+
+    if (config.environment.variables.length > 0) {
+        script += `${config.environment.variables
+            .map((envVar) => `        "process.env.${envVar}": getEnvironmentVariable("${envVar}"),`)
+            .join("\n")}
+        },
     };
     
-    await build(options).catch(() => process.exit(1));
+    function getEnvironmentVariable(environmentVariable) {
+        const value = process.env[environmentVariable];
+        if (value != null) {
+            return \`"\${value}"\`;
+        }
+        throw new Error(\`Environment variable \${environmentVariable} is not defined.\`);
+    }`;
+    } else {
+        script += `}
+    };`;
+    }
+
+    script += `    \n\nawait build(options).catch(() => process.exit(1));
  
     process.chdir(path.join(__dirname, "${outputDir}"));
 
