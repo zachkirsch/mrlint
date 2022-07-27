@@ -70,7 +70,7 @@ export default defineConfig({
             },
         }),
     ],
-    servier: {
+    server: {
         open: true,
     },
     resolve: {
