@@ -20,7 +20,7 @@ import { writePackageFile } from "../utils/writePackageFile";
 import {
     CLI_OUTPUT_DIRS_PARENT,
     ESBUILD_BUNDLE_FILENAME,
-    ESBUILD_SCRIPT_FILENAME_WITHOUT_ENVIRONMENT,
+    ESBUILD_SCRIPT_FILENAME_FOR_NO_ENVIRONMENTS,
     getCliOutputDirForEnvironment,
     getEsbuildScriptFilenameForEnvironment,
 } from "./cli";
@@ -303,7 +303,7 @@ function addScripts({
                         allEnvironments: environments,
                     })}`,
                 prefix: "yarn compile &&",
-                fallback: `yarn compile && node ${ESBUILD_SCRIPT_FILENAME_WITHOUT_ENVIRONMENT}`,
+                fallback: `yarn compile && node ${ESBUILD_SCRIPT_FILENAME_FOR_NO_ENVIRONMENTS}`,
             }),
             ...generateDynamicScriptsForEnvironments({
                 environments,

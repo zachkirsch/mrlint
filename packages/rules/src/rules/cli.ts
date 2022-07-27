@@ -1,17 +1,12 @@
-import {
-    CliPackageInfo,
-    PackageType,
-    Result,
-    Rule,
-    RuleType,
-    TypescriptCliPackageConfig,
-} from "@fern-api/mrlint-commons";
+import { PackageType, Result, Rule, RuleType, TypescriptCliPackageConfig } from "@fern-api/mrlint-commons";
 import path from "path";
 import { getEnvironments } from "../utils/getEnvironments";
 import { writePackageFile } from "../utils/writePackageFile";
 
 export const ESBUILD_BUNDLE_FILENAME = "bundle.cjs";
 const CLI_FILENAME = "cli.cjs";
+
+export const ESBUILD_SCRIPT_FILENAME_FOR_NO_ENVIRONMENTS = "build.cjs";
 
 export const CliRule: Rule.PackageRule<typeof PackageType.TYPESCRIPT_CLI> = {
     ruleId: "cli",
@@ -23,18 +18,40 @@ export const CliRule: Rule.PackageRule<typeof PackageType.TYPESCRIPT_CLI> = {
 
         const result = Result.success();
 
+        const allEnvironments = getEnvironments(packageToLint.config);
+
+        if (allEnvironments.length === 0) {
+            result.accumulate(
+                await writePackageFile({
+                    fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+                    filename: ESBUILD_SCRIPT_FILENAME_FOR_NO_ENVIRONMENTS,
+                    contents: generateScriptContents({
+                        outputDir: CLI_OUTPUT_DIRS_PARENT,
+                        config: packageToLint.config,
+                        cliName: packageToLint.config.cliName,
+                        cliPackageName: undefined,
+                    }),
+                    logger,
+                })
+            );
+        }
+
         for (const [environmentName, packageInfo] of Object.entries(packageToLint.config.environment.environments)) {
             result.accumulate(
                 await writePackageFile({
                     fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
                     filename: getEsbuildScriptFilenameForEnvironment({
                         environment: environmentName,
-                        allEnvironments: getEnvironments(packageToLint.config),
+                        allEnvironments,
                     }),
                     contents: generateScriptContents({
-                        environmentName,
-                        packageInfo,
+                        outputDir: getCliOutputDirForEnvironment({
+                            environment: environmentName,
+                            allEnvironments,
+                        }),
                         config: packageToLint.config,
+                        cliName: packageInfo.cliName,
+                        cliPackageName: packageInfo.cliPackageName,
                     }),
                     logger,
                 })
@@ -46,16 +63,16 @@ export const CliRule: Rule.PackageRule<typeof PackageType.TYPESCRIPT_CLI> = {
 };
 
 function generateScriptContents({
-    environmentName,
-    packageInfo,
+    outputDir,
     config,
+    cliName,
+    cliPackageName,
 }: {
-    environmentName: string;
-    packageInfo: CliPackageInfo;
+    outputDir: string;
     config: TypescriptCliPackageConfig;
+    cliName: string;
+    cliPackageName: string | undefined;
 }) {
-    const environments = getEnvironments(config);
-
     let script = `const { pnpPlugin } = require("@yarnpkg/esbuild-plugin-pnp");
 const { build } = require("esbuild");
 const path = require("path");
@@ -68,10 +85,7 @@ async function main() {
         platform: "node",
         target: "node14",
         entryPoints: ["./src/cli.ts"],
-        outfile: "./${path.join(
-            getCliOutputDirForEnvironment({ environment: environmentName, allEnvironments: environments }),
-            ESBUILD_BUNDLE_FILENAME
-        )}",
+        outfile: "./${path.join(outputDir, ESBUILD_BUNDLE_FILENAME)}",
         bundle: true,
         external: ["cpu-features"],
         plugins: [pnpPlugin()],`;
@@ -98,10 +112,7 @@ async function main() {
 
     script += `    \n\nawait build(options).catch(() => process.exit(1));
  
-    process.chdir(path.join(__dirname, "${getCliOutputDirForEnvironment({
-        environment: environmentName,
-        allEnvironments: environments,
-    })}"));
+    process.chdir(path.join(__dirname, "${outputDir}"));
 
     // write cli executable
     await writeFile(
@@ -113,7 +124,7 @@ require("./${ESBUILD_BUNDLE_FILENAME}");\`
     await chmod("${CLI_FILENAME}", "755");
 `;
 
-    if (packageInfo.cliPackageName != null) {
+    if (cliPackageName != null) {
         script += `
         
     // write cli's package.json
@@ -122,11 +133,11 @@ require("./${ESBUILD_BUNDLE_FILENAME}");\`
         "package.json",
         JSON.stringify(
             {
-                name: "${packageInfo.cliPackageName}",
+                name: "${cliPackageName}",
                 version: packageJson.version,
                 repository: packageJson.repository,
                 files: ["${ESBUILD_BUNDLE_FILENAME}", "${CLI_FILENAME}"],
-                bin: { "${packageInfo.cliName}": "${CLI_FILENAME}" },
+                bin: { "${cliName}": "${CLI_FILENAME}" },
             },
             undefined,
             2
@@ -166,7 +177,6 @@ export function getCliOutputDirForEnvironment({
     return path.join(CLI_OUTPUT_DIRS_PARENT, environment);
 }
 
-export const ESBUILD_SCRIPT_FILENAME_WITHOUT_ENVIRONMENT = "build.cjs";
 export function getEsbuildScriptFilenameForEnvironment({
     environment,
     allEnvironments,
@@ -175,7 +185,7 @@ export function getEsbuildScriptFilenameForEnvironment({
     allEnvironments: string[];
 }): string {
     if (allEnvironments.length <= 1) {
-        return ESBUILD_SCRIPT_FILENAME_WITHOUT_ENVIRONMENT;
+        return ESBUILD_SCRIPT_FILENAME_FOR_NO_ENVIRONMENTS;
     }
     return `build.${environment}.cjs`;
 }
