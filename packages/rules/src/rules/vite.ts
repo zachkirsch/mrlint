@@ -70,6 +70,9 @@ export default defineConfig({
             },
         }),
     ],
+    servier: {
+        open: true,
+    },
     resolve: {
         alias: [
             {
