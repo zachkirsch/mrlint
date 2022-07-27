@@ -61,10 +61,21 @@ export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig
                 ...baseConfig,
                 type: PackageType.TYPESCRIPT_CLI,
                 cliName: rawConfig.cliName,
-                cliPackageName: rawConfig.cliPackageName,
                 environment: {
-                    environments: rawConfig.environment?.environments ?? [],
                     variables: rawConfig.environment?.variables ?? [],
+                    environments:
+                        rawConfig.environment?.environments != null
+                            ? Object.entries(rawConfig.environment.environments).reduce(
+                                  (acc, [environmentName, packageInfo]) => ({
+                                      ...acc,
+                                      [environmentName]: {
+                                          cliPackageName: packageInfo.cliPackageName,
+                                          cliName: packageInfo.cliName,
+                                      },
+                                  }),
+                                  {}
+                              )
+                            : {},
                 },
             };
         case "library":

@@ -8,7 +8,6 @@ import {
     Rule,
     RuleType,
 } from "@fern-api/mrlint-commons";
-import { EnvironmentConfig } from "@fern-api/mrlint-commons/src/types";
 import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
 import produce, { Draft } from "immer";
 import { IPackageJson } from "package-json-type";
@@ -16,11 +15,13 @@ import path from "path";
 import { canPackageContainCss } from "../utils/canPackageContainCss";
 import { OUTPUT_DIR } from "../utils/constants";
 import { Executable, Executables } from "../utils/Executables";
+import { getEnvironments } from "../utils/getEnvironments";
 import { writePackageFile } from "../utils/writePackageFile";
-import { CLI_FILENAME, ESBUILD_BUILD_SCRIPT_FILE_NAME, ESBUILD_OUTPUT_DIR } from "./cli";
+import { ESBUILD_BUNDLE_FILENAME, getCliOutputDirForEnvironment, getEsbuildScriptFilenameForEnvironment } from "./cli";
 import { ENV_RC_FILENAME } from "./env-cmd";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
+const DIST_CLI_SCRIPT_NAME = "dist:cli";
 
 interface RuleConfig {
     scripts?: Record<string, string>;
@@ -139,7 +140,12 @@ async function generatePackageJson({
 
         draft.files = [OUTPUT_DIR];
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-            draft.files.push(ESBUILD_OUTPUT_DIR);
+            const environments = getEnvironments(packageToLint.config);
+            draft.files.push(
+                ...environments.map((environment) =>
+                    getCliOutputDirForEnvironment({ environment, allEnvironments: environments })
+                )
+            );
         }
 
         draft.type = "module";
@@ -151,10 +157,16 @@ async function generatePackageJson({
         draft.sideEffects = false;
 
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-            const pathToCli = path.join(ESBUILD_OUTPUT_DIR, CLI_FILENAME);
-            draft.bin = {
-                [packageToLint.config.cliName]: pathToCli,
-            };
+            const environments = getEnvironments(packageToLint.config);
+            draft.bin = generateRecordForEnvironments({
+                environments,
+                keyPrefix: packageToLint.config.cliName,
+                getValueForEnvironment: (environmentName) =>
+                    `./${path.join(
+                        getCliOutputDirForEnvironment({ environment: environmentName, allEnvironments: environments }),
+                        ESBUILD_BUNDLE_FILENAME
+                    )}`,
+            });
         }
 
         addScripts({
@@ -227,9 +239,10 @@ function addScripts({
         packageToLint.config.type === PackageType.REACT_APP ||
         packageToLint.config.type === PackageType.TYPESCRIPT_CLI
     ) {
+        const environments = getEnvironments(packageToLint.config);
         draft.scripts = {
             ...draft.scripts,
-            ...packageToLint.config.environment.environments.reduce(
+            ...environments.reduce(
                 (envScripts, environment) => ({
                     ...envScripts,
                     [`env:${environment}`]: `${executables.get(
@@ -245,18 +258,21 @@ function addScripts({
         draft.scripts = {
             ...draft.scripts,
             ...generateScriptsForEnvironments({
-                environmentConfig: packageToLint.config.environment,
+                environments: packageToLint.config.environment.environments,
+                variables: packageToLint.config.environment.variables,
                 scriptName: "start",
                 script: executables.get(Executable.VITE),
             }),
             ...generateScriptsForEnvironments({
-                environmentConfig: packageToLint.config.environment,
+                environments: packageToLint.config.environment.environments,
+                variables: packageToLint.config.environment.variables,
                 scriptName: "build",
                 script: `${executables.get(Executable.VITE)} build`,
                 prefix: "yarn compile &&",
             }),
             ...generateScriptsForEnvironments({
-                environmentConfig: packageToLint.config.environment,
+                environments: packageToLint.config.environment.environments,
+                variables: packageToLint.config.environment.variables,
                 scriptName: "preview",
                 script: `${executables.get(Executable.VITE)} preview`,
                 prefix: "yarn compile &&",
@@ -265,15 +281,36 @@ function addScripts({
     }
 
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
+        const environments = getEnvironments(packageToLint.config);
         draft.scripts = {
             ...draft.scripts,
-            ...generateScriptsForEnvironments({
-                environmentConfig: packageToLint.config.environment,
-                scriptName: "dist",
-                script: `node ${ESBUILD_BUILD_SCRIPT_FILE_NAME}`,
+            ...generateDynamicScriptsForEnvironments({
+                environments,
+                variables: packageToLint.config.environment.variables,
+                scriptName: DIST_CLI_SCRIPT_NAME,
+                script: (environmentName) =>
+                    `node ${getEsbuildScriptFilenameForEnvironment({
+                        environment: environmentName,
+                        allEnvironments: environments,
+                    })}`,
                 prefix: "yarn compile &&",
             }),
-            "publish:cli": "yarn dist && cd dist && yarn npm publish",
+            ...generateDynamicScriptsForEnvironments({
+                environments,
+                variables: packageToLint.config.environment.variables,
+                scriptName: "publish:cli",
+                script: (environment) =>
+                    `cd ${getCliOutputDirForEnvironment({
+                        environment,
+                        allEnvironments: environments,
+                    })} && yarn npm publish`,
+                prefix: (environment) =>
+                    `yarn ${getScriptNameForEnvironment({
+                        scriptName: DIST_CLI_SCRIPT_NAME,
+                        environment,
+                        allEnvironments: environments,
+                    })} &&`,
+            }),
         };
     }
 
@@ -310,48 +347,116 @@ function updateWorkspaceVersions(dependencies: Record<string, string> | undefine
 }
 
 function generateScriptsForEnvironments({
-    environmentConfig,
+    environments,
+    variables,
     scriptName,
     script,
     prefix,
 }: {
-    environmentConfig: EnvironmentConfig;
+    environments: string[];
+    variables: string[];
     scriptName: string;
     script: string;
     prefix?: string;
 }): Record<string, string> {
-    function generateScript(environment: string | undefined) {
-        const parts: string[] = [];
-        if (prefix != null) {
-            parts.push(prefix);
-        }
-        if (environment != null) {
-            parts.push(`yarn env:${environment}`);
-        }
-        parts.push(script);
+    return generateDynamicScriptsForEnvironments({
+        environments,
+        variables,
+        scriptName,
+        script,
+        prefix,
+        fallback: prefix != null ? `${prefix} ${script}` : script,
+    });
+}
 
-        return parts.join(" ");
-    }
+function generateDynamicScriptsForEnvironments({
+    environments,
+    variables,
+    scriptName,
+    script,
+    prefix,
+    fallback,
+}: {
+    environments: string[];
+    variables: string[];
+    scriptName: string;
+    script: string | ((environment: string) => string);
+    prefix?: string | ((environment: string) => string);
+    fallback?: string;
+}): Record<string, string> {
+    return generateRecordForEnvironments({
+        environments,
+        keyPrefix: scriptName,
+        getValueForEnvironment: (environment: string) => {
+            const parts: string[] = [];
+            if (prefix != null) {
+                parts.push(typeof prefix === "string" ? prefix : prefix(environment));
+            }
+            if (environment != null && variables.length > 0) {
+                parts.push(`yarn env:${environment}`);
+            }
+            parts.push(typeof script === "string" ? script : script(environment));
 
-    const firstEnvironment = environmentConfig.environments[0];
+            return parts.join(" ");
+        },
+        fallback: fallback != null ? { [scriptName]: fallback } : undefined,
+    });
+}
 
+function getScriptNameForEnvironment({
+    scriptName,
+    environment,
+    allEnvironments,
+}: {
+    scriptName: string;
+    environment: string;
+    allEnvironments: string[];
+}): string {
+    return getRecordKeyNameForEnvironment({
+        keyPrefix: scriptName,
+        environment,
+        allEnvironments,
+    });
+}
+
+function generateRecordForEnvironments({
+    environments,
+    keyPrefix,
+    getValueForEnvironment,
+    fallback = {},
+}: {
+    environments: string[];
+    keyPrefix: string;
+    getValueForEnvironment: (environment: string) => string;
+    fallback?: Record<string, string>;
+}): Record<string, string> {
+    const firstEnvironment = environments[0];
     if (firstEnvironment == null) {
-        return {
-            [scriptName]: generateScript(undefined),
-        };
+        return fallback;
     }
 
-    if (environmentConfig.environments.length === 1) {
-        return {
-            [scriptName]: generateScript(firstEnvironment),
-        };
-    }
-
-    return environmentConfig.environments.reduce(
+    return environments.reduce(
         (acc, environment) => ({
             ...acc,
-            [`${scriptName}:${environment}`]: generateScript(environment),
+            [getRecordKeyNameForEnvironment({ keyPrefix, environment, allEnvironments: environments })]:
+                getValueForEnvironment(environment),
         }),
         {}
     );
+}
+
+function getRecordKeyNameForEnvironment({
+    keyPrefix,
+    environment,
+    allEnvironments,
+}: {
+    keyPrefix: string;
+    environment: string;
+    allEnvironments: string[];
+}): string {
+    if (allEnvironments.length <= 1) {
+        return keyPrefix;
+    } else {
+        return `${keyPrefix}:${environment}`;
+    }
 }

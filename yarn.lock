@@ -2118,6 +2118,7 @@ __metadata:
     "@yarnpkg/esbuild-plugin-pnp": ^3.0.0-rc.14
     chalk: ^4.1.2
     depcheck: ^1.4.3
+    env-cmd: toddbluhm/env-cmd
     esbuild: ^0.14.50
     eslint: ^8.12.0
     jest: ^27.5.1
@@ -2126,7 +2127,7 @@ __metadata:
     typescript: ^4.6.3
     yargs: ^17.5.1
   bin:
-    mrlint: dist/cli.cjs
+    mrlint: ./dist/bundle.cjs
   languageName: unknown
   linkType: soft
 

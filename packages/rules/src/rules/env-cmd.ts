@@ -1,5 +1,6 @@
 import { LintablePackage, Logger, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import { GetEnvVars as getEnvVars } from "env-cmd";
+import { getEnvironments } from "../utils/getEnvironments";
 import { writePackageFile } from "../utils/writePackageFile";
 
 export const ENV_RC_FILENAME = ".env-cmdrc.cjs";
@@ -13,32 +14,12 @@ export const EnvCmdRule: Rule.PackageRule<typeof PackageType.REACT_APP | typeof 
 
         if (await fileSystemForPackage.doesFileExist(ENV_RC_FILENAME)) {
             return validateEnvFile(fileSystemForPackage.getAbsolutePathToFile(ENV_RC_FILENAME), packageToLint, logger);
+        } else {
+            return createEnvFile({ packageToLint, fileSystems, logger });
         }
-
-        const config = packageToLint.config.environment.environments.reduce(
-            (environmentsAcc, environment) => ({
-                ...environmentsAcc,
-                [environment]: packageToLint.config.environment.variables.reduce(
-                    (variablesAcc, variable) => ({
-                        ...variablesAcc,
-                        [variable]: null,
-                    }),
-                    {}
-                ),
-            }),
-            {}
-        );
-
-        const contents = `module.exports = ${JSON.stringify(config, undefined, 2)}`;
-
-        return writePackageFile({
-            fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
-            filename: ENV_RC_FILENAME,
-            contents,
-            logger,
-        });
     },
 };
+
 async function validateEnvFile(
     absolutePathToEnvCmdRc: string,
     packageToLint: LintablePackage<"React app" | "TypeScript CLI">,
@@ -46,7 +27,7 @@ async function validateEnvFile(
 ): Promise<Result> {
     const result = Result.success();
 
-    for (const environment of packageToLint.config.environment.environments) {
+    for (const environment of getEnvironments(packageToLint.config)) {
         const env = await getEnvVars({
             rc: {
                 environments: [environment],
@@ -66,4 +47,37 @@ async function validateEnvFile(
     }
 
     return result;
+}
+
+function createEnvFile({
+    packageToLint,
+    fileSystems,
+    logger,
+}: {
+    packageToLint: LintablePackage<"React app" | "TypeScript CLI">;
+    fileSystems: Rule.FileSystems;
+    logger: Logger;
+}): Promise<Result> {
+    const config = getEnvironments(packageToLint.config).reduce(
+        (environmentsAcc, environment) => ({
+            ...environmentsAcc,
+            [environment]: packageToLint.config.environment.variables.reduce(
+                (variablesAcc, variable) => ({
+                    ...variablesAcc,
+                    [variable]: null,
+                }),
+                {}
+            ),
+        }),
+        {}
+    );
+
+    const contents = `module.exports = ${JSON.stringify(config, undefined, 2)}`;
+
+    return writePackageFile({
+        fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
+        filename: ENV_RC_FILENAME,
+        contents,
+        logger,
+    });
 }

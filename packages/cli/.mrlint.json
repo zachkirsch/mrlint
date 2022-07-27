@@ -2,5 +2,12 @@
   "type": "cli",
   "private": false,
   "cliName": "mrlint",
-  "cliPackageName": "mrlint"
+  "environment": {
+    "environments": {
+      "production": {
+        "cliName": "mrlint",
+        "cliPackageName": "mrlint"
+      }
+    }
+  }
 }

@@ -11,10 +11,12 @@ export type { Rule } from "./Rule";
 export { PackageType } from "./types";
 export type {
     BasePackageConfig,
+    CliPackageInfo,
     LintablePackage,
     Monorepo,
     MonorepoRoot,
     Package,
     PackageConfig,
     RootConfig,
+    TypescriptCliPackageConfig,
 } from "./types";
