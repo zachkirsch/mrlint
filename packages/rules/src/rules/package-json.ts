@@ -28,6 +28,7 @@ import { ENV_RC_FILENAME } from "./env-cmd";
 
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 const DIST_CLI_SCRIPT_NAME = "dist:cli";
+const PUBLISH_CLI_SCRIPT_NAME = "publish:cli";
 
 interface RuleConfig {
     scripts?: Record<string, string>;
@@ -305,22 +306,25 @@ function addScripts({
                 prefix: "yarn compile &&",
                 fallback: `yarn compile && node ${ESBUILD_SCRIPT_FILENAME_FOR_NO_ENVIRONMENTS}`,
             }),
-            ...generateDynamicScriptsForEnvironments({
+            ...generateRecordForEnvironments({
                 environments,
-                variables: packageToLint.config.environment.variables,
-                scriptName: "publish:cli",
-                script: (environment) =>
-                    `cd ${getCliOutputDirForEnvironment({
-                        environment,
-                        allEnvironments: environments,
-                    })} && yarn npm publish`,
-                prefix: (environment) =>
-                    `yarn ${getScriptNameForEnvironment({
-                        scriptName: DIST_CLI_SCRIPT_NAME,
-                        environment,
-                        allEnvironments: environments,
-                    })} &&`,
-                fallback: `yarn ${DIST_CLI_SCRIPT_NAME} && cd ${CLI_OUTPUT_DIRS_PARENT} && yarn npm publish`,
+                keyPrefix: PUBLISH_CLI_SCRIPT_NAME,
+                getValueForEnvironment: (environment) =>
+                    [
+                        `yarn ${getScriptNameForEnvironment({
+                            scriptName: DIST_CLI_SCRIPT_NAME,
+                            environment,
+                            allEnvironments: environments,
+                        })}`,
+                        `cd ${getCliOutputDirForEnvironment({
+                            environment,
+                            allEnvironments: environments,
+                        })}`,
+                        "yarn npm publish",
+                    ].join(" && "),
+                fallback: {
+                    [PUBLISH_CLI_SCRIPT_NAME]: `yarn ${DIST_CLI_SCRIPT_NAME} && cd ${CLI_OUTPUT_DIRS_PARENT} && yarn npm publish`,
+                },
             }),
         };
     }
