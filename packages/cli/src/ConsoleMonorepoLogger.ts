@@ -1,4 +1,4 @@
-import { Logger, LogLevel, MonorepoLoggers, Package, Rule } from "@fern-api/mrlint-commons";
+import { Logger, LogLevel, MonorepoLoggers, Package, Rule } from "@mrlint/commons";
 import { ConsoleMessage, ConsoleMessageMetadata } from "./ConsoleMessage";
 
 export class ConsoleMonorepoLogger implements MonorepoLoggers {

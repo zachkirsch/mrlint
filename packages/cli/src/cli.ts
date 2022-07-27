@@ -1,4 +1,4 @@
-import { LogLevel } from "@fern-api/mrlint-commons";
+import { LogLevel } from "@mrlint/commons";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
 import { addPackageCommand } from "./commands/addPackageCommand";

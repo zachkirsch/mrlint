@@ -1,4 +1,4 @@
-import { getRuleConfig, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { getRuleConfig, PackageType, Result, Rule, RuleType } from "@mrlint/commons";
 import { OUTPUT_DIR } from "../utils/constants";
 import { writePackageFile } from "../utils/writePackageFile";
 import { CLI_OUTPUT_DIRS_PARENT } from "./cli";

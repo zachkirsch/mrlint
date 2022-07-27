@@ -1,5 +1,5 @@
 {
-  "name": "@fern-api/mrlint-commons",
+  "name": "@mrlint/commons",
   "version": "0.0.0",
   "repository": {
     "type": "git",
@@ -26,7 +26,7 @@
     "depcheck": "depcheck"
   },
   "dependencies": {
-    "@fern-api/mrlint-virtual-file-system": "workspace:*",
+    "@mrlint/virtual-file-system": "workspace:*",
     "find-up": "^5.0.0",
     "micromatch": "^4.0.5"
   },

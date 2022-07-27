@@ -1,6 +1,6 @@
-import { Monorepo, MonorepoLoggers, PackageType, Result } from "@fern-api/mrlint-commons";
-import { lintMonorepo } from "@fern-api/mrlint-lint";
-import { convertPackageConfig, MRLINT_PACKAGE_CONFIG_FILENAME, PackageConfigSchema } from "@fern-api/mrlint-parser";
+import { Monorepo, MonorepoLoggers, PackageType, Result } from "@mrlint/commons";
+import { lintMonorepo } from "@mrlint/lint";
+import { convertPackageConfig, MRLINT_PACKAGE_CONFIG_FILENAME, PackageConfigSchema } from "@mrlint/parser";
 import execa from "execa";
 import { mkdir, rm, writeFile } from "fs/promises";
 import path from "path";

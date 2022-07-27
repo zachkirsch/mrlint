@@ -1,4 +1,4 @@
-import { PackageType, PRETTIER_RC_FILENAME, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { PackageType, PRETTIER_RC_FILENAME, Result, Rule, RuleType } from "@mrlint/commons";
 import path from "path";
 import { writePackageFile } from "../utils/writePackageFile";
 

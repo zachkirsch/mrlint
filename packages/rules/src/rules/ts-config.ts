@@ -8,8 +8,8 @@ import {
     Result,
     Rule,
     RuleType,
-} from "@fern-api/mrlint-commons";
-import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
+} from "@mrlint/commons";
+import { FileSystem } from "@mrlint/virtual-file-system";
 import path from "path";
 import { CompilerOptions, ProjectReference } from "typescript";
 import { OUTPUT_DIR } from "../utils/constants";

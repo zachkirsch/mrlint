@@ -1,4 +1,4 @@
-import { LintablePackage, PackageType } from "@fern-api/mrlint-commons";
+import { LintablePackage, PackageType } from "@mrlint/commons";
 
 export function canPackageContainCss(p: LintablePackage): boolean {
     if (p.config.type == null) {

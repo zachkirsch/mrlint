@@ -1,11 +1,4 @@
-import {
-    BasePackageConfig,
-    CliPackageInfo,
-    MonorepoRoot,
-    Package,
-    PackageConfig,
-    PackageType,
-} from "@fern-api/mrlint-commons";
+import { BasePackageConfig, CliPackageInfo, MonorepoRoot, Package, PackageConfig, PackageType } from "@mrlint/commons";
 import execa from "execa";
 import { readFile } from "fs/promises";
 import { IPackageJson } from "package-json-type";

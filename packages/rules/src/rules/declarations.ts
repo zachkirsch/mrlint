@@ -1,4 +1,4 @@
-import { PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
+import { PackageType, Result, Rule, RuleType } from "@mrlint/commons";
 import { writePackageFile } from "../utils/writePackageFile";
 
 export const DeclarationsRule: Rule.PackageRule = {

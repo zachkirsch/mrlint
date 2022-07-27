@@ -1,4 +1,4 @@
-import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
+import { FileSystem } from "@mrlint/virtual-file-system";
 import { IPackageJson } from "package-json-type";
 import { Logger } from "./logger/Logger";
 

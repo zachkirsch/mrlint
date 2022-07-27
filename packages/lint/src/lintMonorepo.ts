@@ -7,9 +7,9 @@ import {
     Result,
     Rule,
     RuleType,
-} from "@fern-api/mrlint-commons";
-import { rules } from "@fern-api/mrlint-rules";
-import { LazyVirtualFileSystem } from "@fern-api/mrlint-virtual-file-system";
+} from "@mrlint/commons";
+import { rules } from "@mrlint/rules";
+import { LazyVirtualFileSystem } from "@mrlint/virtual-file-system";
 import {
     addDevDependencies,
     DependencyName,

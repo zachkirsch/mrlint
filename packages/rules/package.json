@@ -1,5 +1,5 @@
 {
-  "name": "@fern-api/mrlint-rules",
+  "name": "@mrlint/rules",
   "version": "0.0.0",
   "repository": {
     "type": "git",
@@ -26,8 +26,8 @@
     "depcheck": "depcheck"
   },
   "dependencies": {
-    "@fern-api/mrlint-commons": "workspace:*",
-    "@fern-api/mrlint-virtual-file-system": "workspace:*",
+    "@mrlint/commons": "workspace:*",
+    "@mrlint/virtual-file-system": "workspace:*",
     "env-cmd": "toddbluhm/env-cmd",
     "immer": "^9.0.15",
     "semver": "^7.3.7"

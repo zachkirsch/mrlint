@@ -7,8 +7,8 @@ import {
     Result,
     Rule,
     RuleType,
-} from "@fern-api/mrlint-commons";
-import { FileSystem } from "@fern-api/mrlint-virtual-file-system";
+} from "@mrlint/commons";
+import { FileSystem } from "@mrlint/virtual-file-system";
 import produce, { Draft } from "immer";
 import { IPackageJson } from "package-json-type";
 import path from "path";
@@ -146,15 +146,6 @@ async function generatePackageJson({
         }
 
         draft.files = [OUTPUT_DIR];
-        if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
-            const environments = getEnvironments(packageToLint.config);
-            draft.files.push(
-                ...environments.map((environment) =>
-                    getCliOutputDirForEnvironment({ environment, allEnvironments: environments })
-                )
-            );
-        }
-
         draft.type = "module";
         draft.source = "src/index.ts";
         draft.module = "src/index.ts";

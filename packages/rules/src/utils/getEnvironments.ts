@@ -1,4 +1,4 @@
-import { PackageType, ReactAppPackageConfig, TypescriptCliPackageConfig } from "@fern-api/mrlint-commons/src/types";
+import { PackageType, ReactAppPackageConfig, TypescriptCliPackageConfig } from "@mrlint/commons/src/types";
 
 export function getEnvironments(config: ReactAppPackageConfig | TypescriptCliPackageConfig): string[] {
     switch (config.type) {

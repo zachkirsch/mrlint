@@ -1,6 +1,6 @@
-import { formatFileContents, Logger, Result } from "@fern-api/mrlint-commons";
-import { LazyVirtualFileSystem } from "@fern-api/mrlint-virtual-file-system";
-import { FileSystemWithUtilities } from "@fern-api/mrlint-virtual-file-system/src/FileSystemWithUtilities";
+import { formatFileContents, Logger, Result } from "@mrlint/commons";
+import { LazyVirtualFileSystem } from "@mrlint/virtual-file-system";
+import { FileSystemWithUtilities } from "@mrlint/virtual-file-system/src/FileSystemWithUtilities";
 import chalk from "chalk";
 import { diffLines } from "diff";
 import { mkdir, writeFile } from "fs/promises";
