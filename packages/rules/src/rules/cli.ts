@@ -131,7 +131,7 @@ require("./${ESBUILD_BUNDLE_FILENAME}");\`
                 version: packageJson.version,
                 repository: packageJson.repository,
                 files: ["${ESBUILD_BUNDLE_FILENAME}", "${CLI_FILENAME}"],
-                bin: ${`{ ${packageInfo.cliName}: "${CLI_FILENAME}" }`},
+                bin: { "${packageInfo.cliName}": "${CLI_FILENAME}" },
             },
             undefined,
             2
