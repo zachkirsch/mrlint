@@ -67,7 +67,7 @@ export interface CliEnvironmentConfig {
 }
 
 export interface CliPackageInfo {
-    cliPackageName: string;
+    cliPackageName: string | undefined;
     cliName: string;
 }
 
