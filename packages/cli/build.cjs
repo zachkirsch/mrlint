@@ -35,7 +35,7 @@ require("./bundle.cjs");`
         "package.json",
         JSON.stringify(
             {
-                name: process.env.MRLINT_CLI_PACKAGE_NAME ?? "mrlint",
+                name: "mrlint",
                 version: packageJson.version,
                 repository: packageJson.repository,
                 files: ["bundle.cjs", "cli.cjs"],

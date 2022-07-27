@@ -39,10 +39,10 @@ export type PackageConfig =
 
 export interface ReactAppPackageConfig extends BasePackageConfig {
     type: typeof PackageType.REACT_APP;
-    environment: EnvironmentConfig;
+    environment: ReactAppEnvironmentConfig;
 }
 
-export interface EnvironmentConfig {
+export interface ReactAppEnvironmentConfig {
     environments: string[];
     variables: string[];
 }
@@ -58,8 +58,17 @@ export interface TypescriptLibraryPackageConfig extends BasePackageConfig {
 export interface TypescriptCliPackageConfig extends BasePackageConfig {
     type: typeof PackageType.TYPESCRIPT_CLI;
     cliName: string;
+    environment: CliEnvironmentConfig;
+}
+
+export interface CliEnvironmentConfig {
+    environments: Record<string, CliPackageInfo>;
+    variables: string[];
+}
+
+export interface CliPackageInfo {
     cliPackageName: string | undefined;
-    environment: EnvironmentConfig;
+    cliName: string;
 }
 
 export interface CustomPackageConfig extends BasePackageConfig {

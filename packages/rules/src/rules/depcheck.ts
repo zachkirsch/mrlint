@@ -1,7 +1,7 @@
 import { getRuleConfig, PackageType, Result, Rule, RuleType } from "@fern-api/mrlint-commons";
 import { OUTPUT_DIR } from "../utils/constants";
 import { writePackageFile } from "../utils/writePackageFile";
-import { ESBUILD_OUTPUT_DIR } from "./cli";
+import { CLI_OUTPUT_DIRS_PARENT } from "./cli";
 
 interface DepcheckConfig {
     ignores: string[];
@@ -49,7 +49,7 @@ async function runRule({
 
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
         depcheckRc.ignores.push("esbuild", "@yarnpkg/esbuild-plugin-pnp");
-        depcheckRc["ignore-patterns"].push(ESBUILD_OUTPUT_DIR);
+        depcheckRc["ignore-patterns"].push(CLI_OUTPUT_DIRS_PARENT);
     }
 
     const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);
