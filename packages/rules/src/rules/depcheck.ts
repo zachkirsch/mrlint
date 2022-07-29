@@ -36,10 +36,6 @@ async function runRule({
         "ignore-patterns": [OUTPUT_DIR],
     };
 
-    if (packageToLint.config.type === PackageType.REACT_APP) {
-        depcheckRc.ignores.push("sass");
-    }
-
     if (
         packageToLint.config.type === PackageType.REACT_APP ||
         packageToLint.config.type === PackageType.REACT_LIBRARY
