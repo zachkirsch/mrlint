@@ -60,28 +60,23 @@ async function runRule({
 
     const executables = new Executables();
 
-    let packageJson: IPackageJson;
-    try {
-        packageJson = await generatePackageJson({
-            packageToLint,
-            relativePathToRoot,
-            relativePathToSharedConfigs,
-            logger,
-            executables,
-            ruleConfig: getRuleConfig(ruleConfig),
-            repository,
-            fileSystemForPackage: fileSystems.getFileSystemForPackage(packageToLint),
-        });
-    } catch (error) {
-        logger.error({
-            message: "Failed to generate package.json",
-            error,
-        });
+    const packageJson = await generatePackageJson({
+        packageToLint,
+        relativePathToRoot,
+        relativePathToSharedConfigs,
+        logger,
+        executables,
+        ruleConfig: getRuleConfig(ruleConfig),
+        repository,
+        fileSystemForPackage: fileSystems.getFileSystemForPackage(packageToLint),
+    });
+
+    if (packageJson == null) {
         return Result.failure();
     }
 
-    // warn about invalid workspace versions
-    packageJson = produce(packageJson, (draft) => {
+    // update workspace versions
+    const packageJsonWithUpdatedVersions = produce(packageJson, (draft) => {
         draft.dependencies = updateWorkspaceVersions(packageJson.dependencies);
         draft.devDependencies = updateWorkspaceVersions(packageJson.devDependencies);
     });
@@ -90,7 +85,7 @@ async function runRule({
         await writePackageFile({
             fileSystem: fileSystems.getFileSystemForPackage(packageToLint),
             filename: "package.json",
-            contents: JSON.stringify(packageJson),
+            contents: JSON.stringify(packageJsonWithUpdatedVersions),
             logger,
         })
     );
@@ -124,10 +119,11 @@ async function generatePackageJson({
     ruleConfig: RuleConfig | undefined;
     repository: string;
     fileSystemForPackage: FileSystem;
-}): Promise<IPackageJson> {
+}): Promise<IPackageJson | undefined> {
     const oldPackageJson = await getPackageJson(fileSystemForPackage, logger);
     if (oldPackageJson == null) {
-        throw new Error("Missing package.json");
+        logger.error("Missing package.json");
+        return undefined;
     }
 
     const pathToEslintIgnore = path.join(relativePathToRoot, ".eslintignore");
@@ -148,6 +144,19 @@ async function generatePackageJson({
         draft.files = [OUTPUT_DIR];
         draft.type = "module";
         draft.source = "src/index.ts";
+
+        // Vite requires that the "module" key points to the source index.ts
+        if (canPackageContainCss(packageToLint)) {
+            draft.module = "src/index.ts";
+
+            // We shouldn't publish the package with a reference to src/
+            // npm/yarn will auto-include src/index.ts since it's listed here,
+            // which can break consumers
+            if (!packageToLint.config.private) {
+                logger.error("UI package cannot be public");
+            }
+        }
+
         draft.main = "lib/index.js";
         draft.types = "lib/index.d.ts";
 
