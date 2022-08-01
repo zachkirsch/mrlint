@@ -148,7 +148,6 @@ async function generatePackageJson({
         draft.files = [OUTPUT_DIR];
         draft.type = "module";
         draft.source = "src/index.ts";
-        draft.module = "src/index.ts";
         draft.main = "lib/index.js";
         draft.types = "lib/index.d.ts";
 
