@@ -154,6 +154,7 @@ async function generatePackageJson({
             // which can break consumers
             if (!packageToLint.config.private) {
                 logger.error("UI package cannot be public");
+                return undefined;
             }
         }
 
