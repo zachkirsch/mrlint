@@ -14,10 +14,14 @@ async function main() {
         bundle: true,
         external: ["cpu-features"],
         plugins: [pnpPlugin()],
+        inject: ["./import-meta-url.js"],
         define: {
+            "import.meta.url": "import_meta_url",
             "process.env.CLI_NAME": JSON.stringify("mrlint"),
         },
     };
+
+    await writeFile("import-meta-url.js", "export var import_meta_url = require('url').pathToFileURL(__filename);");
 
     await build(options).catch(() => process.exit(1));
 
