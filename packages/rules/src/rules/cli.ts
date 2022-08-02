@@ -4,6 +4,9 @@ import { getEnvironments } from "../utils/getEnvironments";
 import { writePackageFile } from "../utils/writePackageFile";
 
 export const ESBUILD_BUNDLE_FILENAME = "bundle.cjs";
+export const IMPORT_META_URL_KEBAB = "import-meta-url";
+export const IMPORT_META_URL_SNAKE = "import_meta_url";
+export const IMPORT_META_URL_JS = `${IMPORT_META_URL_KEBAB}.js`;
 const CLI_FILENAME = "cli.cjs";
 
 export const ESBUILD_SCRIPT_FILENAME_FOR_NO_ENVIRONMENTS = "build.cjs";
@@ -76,7 +79,7 @@ function generateScriptContents({
     let script = `const { pnpPlugin } = require("@yarnpkg/esbuild-plugin-pnp");
 const { build } = require("esbuild");
 const path = require("path");
-const { chmod, writeFile } = require("fs/promises");
+const { chmod, writeFile, mkdir } = require("fs/promises");
 
 main();
 
@@ -89,9 +92,9 @@ async function main() {
         bundle: true,
         external: ["cpu-features"],
         plugins: [pnpPlugin()],
-        inject: ["./import-meta-url.js"],
+        inject: ["./${path.join(outputDir, IMPORT_META_URL_JS)}"],
         define: {
-            "import.meta.url": "import_meta_url",
+            "import.meta.url": JSON.stringify("${IMPORT_META_URL_SNAKE}"),
             "process.env.CLI_NAME": JSON.stringify("${cliName}"),
 `;
 
@@ -115,9 +118,9 @@ async function main() {
     }
 
     script += `    \n\nconst outputPath = path.join(__dirname, "${outputDir}");
-    process.mkdir(outputPath);
+    await mkdir(outputPath, { recursive: true });
     process.chdir(outputPath);
-    await writeFile("import-meta-url.js", "export var import_meta_url = require('url').pathToFileURL(__filename);");`;
+    await writeFile("${IMPORT_META_URL_JS}", "export var ${IMPORT_META_URL_SNAKE} = require('url').pathToFileURL(__filename);");`;
 
     script += `    \n\nawait build(options).catch(() => process.exit(1));
 
