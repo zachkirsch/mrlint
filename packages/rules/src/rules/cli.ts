@@ -114,11 +114,12 @@ async function main() {
     };`;
     }
 
-    script +=
-        '    \n\nawait writeFile("import-meta-url.js", "export var import_meta_url = require(\'url\').pathToFileURL(__filename);");';
+    script += `    \n\nconst outputPath = path.join(__dirname, "${outputDir}");
+    process.mkdir(outputPath);
+    process.chdir(outputPath);
+    await writeFile("import-meta-url.js", "export var import_meta_url = require('url').pathToFileURL(__filename);");`;
+
     script += `    \n\nawait build(options).catch(() => process.exit(1));
- 
-    process.chdir(path.join(__dirname, "${outputDir}"));
 
     // write cli executable
     await writeFile(

@@ -21,11 +21,12 @@ async function main() {
         },
     };
 
+    const outputPath = path.join(__dirname, "dist");
+    process.mkdir(outputPath);
+    process.chdir(outputPath);
     await writeFile("import-meta-url.js", "export var import_meta_url = require('url').pathToFileURL(__filename);");
 
     await build(options).catch(() => process.exit(1));
-
-    process.chdir(path.join(__dirname, "dist"));
 
     // write cli executable
     await writeFile(
