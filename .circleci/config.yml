@@ -29,7 +29,7 @@ jobs:
           command: yarn test --ci
       - run:
           name: Ensure no changes to git-tracked files
-          command: git --no-pager --exit-code diff
+          command: git --no-pager diff --exit-code
 
   publish:
     docker:
