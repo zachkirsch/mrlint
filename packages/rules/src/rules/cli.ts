@@ -4,9 +4,6 @@ import { getEnvironments } from "../utils/getEnvironments";
 import { writePackageFile } from "../utils/writePackageFile";
 
 export const ESBUILD_BUNDLE_FILENAME = "bundle.cjs";
-export const IMPORT_META_URL_KEBAB = "import-meta-url";
-export const IMPORT_META_URL_SNAKE = "import_meta_url";
-export const IMPORT_META_URL_JS = `${IMPORT_META_URL_KEBAB}.js`;
 const CLI_FILENAME = "cli.cjs";
 
 export const ESBUILD_SCRIPT_FILENAME_FOR_NO_ENVIRONMENTS = "build.cjs";
@@ -81,6 +78,8 @@ const { build } = require("esbuild");
 const path = require("path");
 const { chmod, writeFile, mkdir } = require("fs/promises");
 
+const packageJson = require("./package.json");
+
 main();
 
 async function main() {
@@ -92,15 +91,18 @@ async function main() {
         bundle: true,
         external: ["cpu-features"],
         plugins: [pnpPlugin()],
-        inject: ["./${path.join(outputDir, IMPORT_META_URL_JS)}"],
         define: {
-            "import.meta.url": JSON.stringify("${IMPORT_META_URL_SNAKE}"),
             "process.env.CLI_NAME": JSON.stringify("${cliName}"),
+            "process.env.CLI_VERSION": JSON.stringify(packageJson.version),
 `;
+
+    if (cliPackageName != null) {
+        script += `"process.env.CLI_PACKAGE_NAME": JSON.stringify("${cliPackageName}"),`;
+    }
 
     if (config.environment.variables.length > 0) {
         script += `${config.environment.variables
-            .map((envVar) => `        "process.env.${envVar}": getEnvironmentVariable("${envVar}"),`)
+            .map((envVar) => `"process.env.${envVar}": getEnvironmentVariable("${envVar}"),`)
             .join("\n")}
         },
     };
@@ -117,12 +119,9 @@ async function main() {
     };`;
     }
 
-    script += `    \n\nconst outputPath = path.join(__dirname, "${outputDir}");
-    await mkdir(outputPath, { recursive: true });
-    process.chdir(outputPath);
-    await writeFile("${IMPORT_META_URL_JS}", "export var ${IMPORT_META_URL_SNAKE} = require('url').pathToFileURL(__filename);");`;
-
     script += `    \n\nawait build(options).catch(() => process.exit(1));
+
+    process.chdir(path.join(__dirname, "dist"));
 
     // write cli executable
     await writeFile(
@@ -138,7 +137,6 @@ require("./${ESBUILD_BUNDLE_FILENAME}");\`
         script += `
         
     // write cli's package.json
-    const packageJson = require("./package.json");
     await writeFile(
         "package.json",
         JSON.stringify(

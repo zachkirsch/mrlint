@@ -3,6 +3,8 @@ const { build } = require("esbuild");
 const path = require("path");
 const { chmod, writeFile, mkdir } = require("fs/promises");
 
+const packageJson = require("./package.json");
+
 main();
 
 async function main() {
@@ -14,19 +16,16 @@ async function main() {
         bundle: true,
         external: ["cpu-features"],
         plugins: [pnpPlugin()],
-        inject: ["./dist/import-meta-url.js"],
         define: {
-            "import.meta.url": JSON.stringify("import_meta_url"),
             "process.env.CLI_NAME": JSON.stringify("mrlint"),
+            "process.env.CLI_VERSION": JSON.stringify(packageJson.version),
+            "process.env.CLI_PACKAGE_NAME": JSON.stringify("mrlint"),
         },
     };
 
-    const outputPath = path.join(__dirname, "dist");
-    await mkdir(outputPath, { recursive: true });
-    process.chdir(outputPath);
-    await writeFile("import-meta-url.js", "export var import_meta_url = require('url').pathToFileURL(__filename);");
-
     await build(options).catch(() => process.exit(1));
+
+    process.chdir(path.join(__dirname, "dist"));
 
     // write cli executable
     await writeFile(
@@ -38,7 +37,6 @@ require("./bundle.cjs");`
     await chmod("cli.cjs", "755");
 
     // write cli's package.json
-    const packageJson = require("./package.json");
     await writeFile(
         "package.json",
         JSON.stringify(
