@@ -121,7 +121,7 @@ async function main() {
 
     script += `    \n\nawait build(options).catch(() => process.exit(1));
 
-    process.chdir(path.join(__dirname, "dist"));
+    process.chdir(path.join(__dirname, "${outputDir}"));
 
     // write cli executable
     await writeFile(
