@@ -1,8 +1,8 @@
 import { MonorepoRoot } from "@mrlint/commons";
-import execa from "execa";
 import findUp from "find-up";
 import path from "path";
 import { z } from "zod";
+import { getRepository } from "./getRepository";
 import { readConfig } from "./readConfig";
 
 const MONOREPO_ROOT_FILES = [".mrlint.root.json", ".mrlint.root.yml"];
@@ -22,12 +22,6 @@ export async function getMonorepoRoot(): Promise<MonorepoRoot> {
         throw new Error("Failed to read config: " + configPath);
     }
 
-    const getRemoteCommand = await execa("git", ["config", "--get", "remote.origin.url"]);
-    const repository = getRemoteCommand.stdout.trim();
-    if (repository.length === 0) {
-        throw new Error("Could not determine remote repository");
-    }
-
     const fullPath = path.dirname(configPath);
 
     return {
@@ -36,7 +30,7 @@ export async function getMonorepoRoot(): Promise<MonorepoRoot> {
             packages: config.packages,
             absolutePathToSharedConfigs: path.join(fullPath, "shared"),
             absolutePathToScripts: path.join(fullPath, "scripts"),
-            repository,
+            repository: await getRepository(),
         },
     };
 }
