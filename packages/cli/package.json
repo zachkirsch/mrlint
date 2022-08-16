@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "repository": {
     "type": "git",
-    "url": "git@github.com:fern-api/mrlint.git",
+    "url": "github:fern-api/mrlint",
     "directory": "packages/cli"
   },
   "files": [
