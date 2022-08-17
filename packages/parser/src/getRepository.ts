@@ -6,11 +6,6 @@ export async function getRepository(): Promise<string> {
 }
 
 // exported for testing
-const REPOSITORY_REGEX = /git@github.com:(.*)\.git/;
 export function convertRemoteToRepository(remote: string): string {
-    const match = remote.match(REPOSITORY_REGEX);
-    if (match == null) {
-        throw new Error("Could not parse remote: " + remote);
-    }
-    return `github:${match[1]}`;
+    return remote.replace("git@github.com:", "https://github.com/");
 }
