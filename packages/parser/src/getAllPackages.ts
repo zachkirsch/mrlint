@@ -14,7 +14,7 @@ export const MRLINT_PACKAGE_CONFIG_FILENAME = ".mrlint.json";
 export async function getAllPackages(monorepoRoot: MonorepoRoot): Promise<Package[]> {
     const packages: Package[] = [];
 
-    const rootPackageJson = await getRootPackageJson(monorepoRoot);
+    const rootPackageJson = await getPackageJson(monorepoRoot.fullPath);
 
     if (rootPackageJson == null) {
         throw new Error("No package.json found in monorepo root");
@@ -33,21 +33,13 @@ export async function getAllPackages(monorepoRoot: MonorepoRoot): Promise<Packag
             PackageConfigSchema.parse(contents)
         );
         packages.push({
+            name: (await getPackageJson(packageDirectory))?.name,
             relativePath: path.relative(monorepoRoot.fullPath, packageDirectory),
             config: rawConfig != null ? convertPackageConfig(rawConfig) : undefined,
         });
     }
 
     return packages;
-}
-
-async function getRootPackageJson(monorepo: MonorepoRoot): Promise<IPackageJson | undefined> {
-    try {
-        const packageJson = (await readFile(path.join(monorepo.fullPath, "package.json"))).toString();
-        return JSON.parse(packageJson);
-    } catch (e) {
-        return undefined;
-    }
 }
 
 export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig {
@@ -102,5 +94,16 @@ export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig
                 ...baseConfig,
                 type: PackageType.CUSTOM,
             };
+    }
+}
+
+async function getPackageJson(packageDirectory: string): Promise<IPackageJson | undefined> {
+    const packageJsonPath = path.join(packageDirectory, "package.json");
+    try {
+        const packageJsonBuffer = await readFile(packageJsonPath);
+        const packageJsonStr = packageJsonBuffer.toString();
+        return JSON.parse(packageJsonStr) as IPackageJson;
+    } catch {
+        return undefined;
     }
 }

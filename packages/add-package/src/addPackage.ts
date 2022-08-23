@@ -13,15 +13,15 @@ export async function addPackage({
     monorepo: Monorepo;
     loggers: MonorepoLoggers;
 }): Promise<Result> {
-    const { location, name, type, isPrivate } = await promptForPackageMetadata(monorepo);
-    const absolutePackagePath = path.join(location, name);
+    const { location, packageName, directoryName, type, isPrivate } = await promptForPackageMetadata(monorepo);
+    const absolutePackagePath = path.join(location, directoryName);
 
     try {
         const result = await tryaddPackage({
             monorepo,
             loggers,
             absolutePackagePath,
-            packageName: name,
+            packageName,
             packageType: type,
             isPackagePrivate: isPrivate,
         });
@@ -60,7 +60,13 @@ async function tryaddPackage({
         absolutePackagePath,
     });
     await writeSrc(absolutePackagePath);
-    const result = await lintPackage({ monorepo, absolutePackagePath, rawMrlintConfig, loggers });
+    const result = await lintPackage({
+        monorepo,
+        packageName,
+        absolutePackagePath,
+        rawMrlintConfig,
+        loggers,
+    });
     return result;
 }
 
@@ -130,11 +136,13 @@ async function writeSrc(absolutePackagePath: string) {
 async function lintPackage({
     monorepo,
     absolutePackagePath,
+    packageName,
     rawMrlintConfig,
     loggers,
 }: {
     monorepo: Monorepo;
     absolutePackagePath: string;
+    packageName: string;
     rawMrlintConfig: PackageConfigSchema;
     loggers: MonorepoLoggers;
 }) {
@@ -143,6 +151,7 @@ async function lintPackage({
             ...monorepo,
             packages: [
                 {
+                    name: packageName,
                     relativePath: path.relative(monorepo.root.fullPath, absolutePackagePath),
                     config: convertPackageConfig(rawMrlintConfig),
                 },

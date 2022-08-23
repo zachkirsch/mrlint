@@ -8,6 +8,7 @@ import { readConfig } from "./readConfig";
 const MONOREPO_ROOT_FILES = [".mrlint.root.json", ".mrlint.root.yml"];
 
 const RootConfigSchema = z.strictObject({
+    defaultScope: z.string(),
     packages: z.string(),
 });
 
@@ -27,6 +28,9 @@ export async function getMonorepoRoot(): Promise<MonorepoRoot> {
     return {
         fullPath,
         config: {
+            defaultScopeWithAtSign: config.defaultScope.startsWith("@")
+                ? config.defaultScope
+                : `@${config.defaultScope}`,
             packages: config.packages,
             absolutePathToSharedConfigs: path.join(fullPath, "shared"),
             absolutePathToScripts: path.join(fullPath, "scripts"),

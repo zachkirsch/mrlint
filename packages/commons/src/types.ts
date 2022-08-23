@@ -9,6 +9,7 @@ export interface MonorepoRoot {
 }
 
 export interface RootConfig {
+    defaultScopeWithAtSign: string;
     packages: string;
     absolutePathToSharedConfigs: string;
     absolutePathToScripts: string;
@@ -16,6 +17,7 @@ export interface RootConfig {
 }
 
 export interface Package {
+    name: string | undefined;
     relativePath: string;
     config: PackageConfig | undefined;
 }
