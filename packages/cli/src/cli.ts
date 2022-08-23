@@ -1,7 +1,7 @@
 import { LogLevel } from "@mrlint/commons";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
-import { addPackageCommand } from "./commands/addPackageCommand";
+import { addWorkspaceCommand } from "./commands/addWorkspaceCommand";
 import { lintCommand } from "./commands/lintCommand";
 import { listCommand } from "./commands/listCommand";
 import { versionCommand } from "./commands/versionCommand";
@@ -55,13 +55,13 @@ yargs(hideBin(process.argv))
     )
     .command("list", "List the packages in the monorepo", listCommand)
     .command(
-        "add-package",
-        "Create a new package",
+        "add-workspace",
+        "Create a new workspace",
         () => {
             /* no-op */
         },
         async (argv) => {
-            await addPackageCommand({ loggers: new ConsoleMonorepoLogger(convertLogLevel(argv.logLevel)) });
+            await addWorkspaceCommand({ loggers: new ConsoleMonorepoLogger(convertLogLevel(argv.logLevel)) });
         }
     )
     .demandCommand()

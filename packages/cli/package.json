@@ -31,7 +31,7 @@
     "publish:cli": "yarn dist:cli && cd dist && yarn npm publish"
   },
   "dependencies": {
-    "@mrlint/add-package": "workspace:*",
+    "@mrlint/add-workspace": "workspace:*",
     "@mrlint/commons": "workspace:*",
     "@mrlint/lint": "workspace:*",
     "@mrlint/parser": "workspace:*",

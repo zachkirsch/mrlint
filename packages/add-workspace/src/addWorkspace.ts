@@ -6,7 +6,7 @@ import { mkdir, rm, writeFile } from "fs/promises";
 import path from "path";
 import { promptForPackageMetadata } from "./promptForPackageMetadata";
 
-export async function addPackage({
+export async function addWorkspace({
     monorepo,
     loggers,
 }: {
@@ -17,7 +17,7 @@ export async function addPackage({
     const absolutePackagePath = path.join(location, directoryName);
 
     try {
-        const result = await tryaddPackage({
+        const result = await tryAddWorkspace({
             monorepo,
             loggers,
             absolutePackagePath,
@@ -38,7 +38,7 @@ export async function addPackage({
     return Result.failure();
 }
 
-async function tryaddPackage({
+async function tryAddWorkspace({
     monorepo,
     loggers,
     absolutePackagePath,

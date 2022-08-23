@@ -1,10 +1,10 @@
-import { addPackage } from "@mrlint/add-package";
+import { addWorkspace } from "@mrlint/add-workspace";
 import { MonorepoLoggers } from "@mrlint/commons";
 import { parseMonorepo } from "@mrlint/parser";
 
-export async function addPackageCommand({ loggers }: { loggers: MonorepoLoggers }): Promise<void> {
+export async function addWorkspaceCommand({ loggers }: { loggers: MonorepoLoggers }): Promise<void> {
     const monorepo = await parseMonorepo();
-    await addPackage({
+    await addWorkspace({
         monorepo,
         loggers,
     });
