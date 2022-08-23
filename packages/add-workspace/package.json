@@ -1,10 +1,10 @@
 {
-  "name": "@mrlint/add-package",
+  "name": "@mrlint/add-workspace",
   "version": "0.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/fern-api/mrlint.git",
-    "directory": "packages/add-package"
+    "directory": "packages/add-workspace"
   },
   "files": [
     "lib"

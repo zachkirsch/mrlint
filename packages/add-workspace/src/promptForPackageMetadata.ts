@@ -9,8 +9,11 @@ const VALID_PACKAGE_NAME = /[a-z-]+/;
 const LOCATION_KEY = "location";
 type LocationKey = typeof LOCATION_KEY;
 
-const NAME_KEY = "name";
-type NameKey = typeof NAME_KEY;
+const DIRECTORY_NAME_KEY = "directoryName";
+type DirectoryNameKey = typeof DIRECTORY_NAME_KEY;
+
+const PACKAGE_NAME_KEY = "packageName";
+type PackageNameKey = typeof PACKAGE_NAME_KEY;
 
 const TYPE_KEY = "type";
 type TypeKey = typeof TYPE_KEY;
@@ -19,7 +22,8 @@ const PRIVATE_KEY = "isPrivate";
 type PrivateKey = typeof PRIVATE_KEY;
 
 export type PackageMetadata = Record<LocationKey, string> &
-    Record<NameKey, string> &
+    Record<DirectoryNameKey, string> &
+    Record<PackageNameKey, string> &
     Record<TypeKey, PackageType> &
     Record<PrivateKey, boolean>;
 
@@ -28,7 +32,7 @@ export async function promptForPackageMetadata(monorepo: Monorepo): Promise<Pack
 
     const packagesDirectory = path.join(monorepo.root.fullPath, "packages");
 
-    const answers = await inquirer.prompt([
+    const answers = await inquirer.prompt<PackageMetadata>([
         {
             type: "file-tree-selection",
             name: LOCATION_KEY,
@@ -50,15 +54,36 @@ export async function promptForPackageMetadata(monorepo: Monorepo): Promise<Pack
         },
         {
             type: "input",
-            name: NAME_KEY,
-            message: "Package name",
+            name: DIRECTORY_NAME_KEY,
+            message: "Directory name",
             validate: async (item: string, answers) => {
+                if (answers != null) {
+                    const packagePath = path.join(answers[LOCATION_KEY], item);
+                    if (await doesFilepathExist(packagePath)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            },
+        },
+        {
+            type: "input",
+            name: PACKAGE_NAME_KEY,
+            message: "Package name",
+            default: (answers: PackageMetadata | undefined) => {
+                if (answers == null) {
+                    return undefined;
+                }
+                const directoryName = answers[DIRECTORY_NAME_KEY];
+                return `${monorepo.root.config.defaultScopeWithAtSign}/${directoryName}`;
+            },
+            validate: async (item: string) => {
                 if (!VALID_PACKAGE_NAME.test(item)) {
                     return false;
                 }
 
-                const packagePath = path.join(answers[LOCATION_KEY], item);
-                if (await doesFilepathExist(packagePath)) {
+                if (monorepo.packages.some((p) => p.name === item)) {
                     return false;
                 }
 

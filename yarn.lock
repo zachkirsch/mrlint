@@ -2616,9 +2616,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mrlint/add-package@workspace:*, @mrlint/add-package@workspace:packages/add-package":
+"@mrlint/add-workspace@workspace:*, @mrlint/add-workspace@workspace:packages/add-workspace":
   version: 0.0.0-use.local
-  resolution: "@mrlint/add-package@workspace:packages/add-package"
+  resolution: "@mrlint/add-workspace@workspace:packages/add-workspace"
   dependencies:
     "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
@@ -2647,7 +2647,7 @@ __metadata:
     "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
     "@babel/preset-typescript": ^7.16.7
-    "@mrlint/add-package": "workspace:*"
+    "@mrlint/add-workspace": "workspace:*"
     "@mrlint/commons": "workspace:*"
     "@mrlint/lint": "workspace:*"
     "@mrlint/parser": "workspace:*"
