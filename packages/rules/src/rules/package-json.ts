@@ -142,7 +142,9 @@ async function generatePackageJson({
         }
 
         draft.files = [OUTPUT_DIR];
-        draft.type = "module";
+        if (!packageToLint.config.isCommonJs) {
+            draft.type = "module";
+        }
         draft.source = "src/index.ts";
 
         // Vite requires that the "module" key points to the source index.ts

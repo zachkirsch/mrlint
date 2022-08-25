@@ -45,6 +45,7 @@ export async function getAllPackages(monorepoRoot: MonorepoRoot): Promise<Packag
 export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig {
     const baseConfig: BasePackageConfig = {
         private: rawConfig.private,
+        isCommonJs: rawConfig.commonJs ?? false,
         rules: rawConfig.rules ?? {},
     };
     switch (rawConfig.type) {

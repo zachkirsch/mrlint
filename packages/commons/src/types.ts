@@ -79,6 +79,7 @@ export interface CustomPackageConfig extends BasePackageConfig {
 
 export interface BasePackageConfig {
     private: boolean;
+    isCommonJs: boolean;
     rules: Record<string, unknown>;
 }
 

@@ -11,7 +11,7 @@ import {
 } from "@mrlint/commons";
 import { FileSystem } from "@mrlint/virtual-file-system";
 import path from "path";
-import { CompilerOptions, ProjectReference } from "typescript";
+import ts, { CompilerOptions, ProjectReference } from "typescript";
 import { OUTPUT_DIR } from "../utils/constants";
 import { getDependencies } from "../utils/getDependencies";
 import { keyPackagesByNpmName } from "../utils/keyPackagesByNpmName";
@@ -162,6 +162,13 @@ async function generateTsConfig({
         .map((pathToReference) => ({ path: pathToReference }));
     if (references.length > 0) {
         tsConfig.references = references;
+    }
+
+    if (packageToLint.config.isCommonJs) {
+        tsConfig.compilerOptions = {
+            ...tsConfig.compilerOptions,
+            module: "CommonJS" as unknown as ts.ModuleKind,
+        };
     }
 
     return tsConfig;
