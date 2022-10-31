@@ -41,6 +41,7 @@ async function runRule({
         packageToLint.config.type === PackageType.REACT_LIBRARY
     ) {
         depcheckRc.ignores.push("vite");
+        depcheckRc.ignores.push("@types/react");
     }
 
     if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
