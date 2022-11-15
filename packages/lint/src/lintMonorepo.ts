@@ -25,10 +25,16 @@ export declare namespace lintMonorepo {
         monorepo: Monorepo;
         loggers: MonorepoLoggers;
         shouldFix: boolean;
+        packageNamesToLint?: string[];
     }
 }
 
-export async function lintMonorepo({ monorepo, loggers, shouldFix }: lintMonorepo.Args): Promise<Result> {
+export async function lintMonorepo({
+    monorepo,
+    loggers,
+    shouldFix,
+    packageNamesToLint,
+}: lintMonorepo.Args): Promise<Result> {
     const result = Result.success();
 
     const fileSystem = new LazyVirtualFileSystem(monorepo.root.fullPath);
@@ -39,7 +45,12 @@ export async function lintMonorepo({ monorepo, loggers, shouldFix }: lintMonorep
 
     const devDependenciesToAdd: Record<PackageName, PackageWithRequiredDevDependencies> = {};
 
-    const packagesToLint: LintablePackage[] = monorepo.packages.filter(isLintablePackage);
+    let packagesToLint: LintablePackage[] = monorepo.packages.filter(isLintablePackage);
+    if (packageNamesToLint != null) {
+        const packageNamesToLintSet = new Set(packageNamesToLint);
+        packagesToLint = packagesToLint.filter((p) => p.name != null && packageNamesToLintSet.has(p.name));
+    }
+
     for (const packageToLint of packagesToLint) {
         const loggerForPackage = loggers.getLoggerForPackage(packageToLint);
         loggerForPackage.debug("Linting...");
@@ -102,6 +113,7 @@ export async function lintMonorepo({ monorepo, loggers, shouldFix }: lintMonorep
 
     result.accumulate(
         await addDevDependencies({
+            monorepo,
             getFileSystemForPackage: fileSystems.getFileSystemForPackage,
             devDependencies: devDependenciesToAdd,
             shouldFix,
