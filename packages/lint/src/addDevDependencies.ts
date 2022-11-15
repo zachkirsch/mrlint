@@ -1,7 +1,8 @@
-import { getPackageJson, Logger, MonorepoLoggers, Package, Result } from "@mrlint/commons";
+import { getPackageJson, Logger, Monorepo, MonorepoLoggers, Package, Result } from "@mrlint/commons";
 import { FileSystem } from "@mrlint/virtual-file-system";
 import chalk from "chalk";
 import { exec } from "child_process";
+import semverCompare from "semver-compare";
 
 export type PackageName = string;
 export type DependencyName = string;
@@ -17,17 +18,35 @@ export interface PackageWithRequiredDevDependencies {
 }
 
 export async function addDevDependencies({
+    monorepo,
     devDependencies,
     shouldFix,
     loggers,
     getFileSystemForPackage,
 }: {
+    monorepo: Monorepo;
     devDependencies: Record<PackageName, PackageWithRequiredDevDependencies>;
     shouldFix: boolean;
     loggers: MonorepoLoggers;
     getFileSystemForPackage: (p: Package) => FileSystem;
 }): Promise<Result> {
     const result = Result.success();
+
+    const existingVersionsAcrossMonorepo: Record<DependencyName, DependencyVersion> = {};
+    for (const p of monorepo.packages) {
+        const loggerForPackage = loggers.getLoggerForPackage(p);
+        const packageJson = await getPackageJson(getFileSystemForPackage(p), loggerForPackage);
+        const allDependencies = {
+            ...packageJson?.dependencies,
+            ...packageJson?.devDependencies,
+        };
+        for (const [dependency, version] of Object.entries(allDependencies)) {
+            const existingVersion = existingVersionsAcrossMonorepo[dependency];
+            if (existingVersion == null || semverCompare(version, existingVersion) === 1) {
+                existingVersionsAcrossMonorepo[dependency] = version;
+            }
+        }
+    }
 
     for (const [packageName, { package: p, devDependenciesToAdd }] of Object.entries(devDependencies)) {
         const loggerForPackage = loggers.getLoggerForPackage(p);
@@ -40,6 +59,7 @@ export async function addDevDependencies({
                     ...packageJson?.dependencies,
                     ...packageJson?.devDependencies,
                 },
+                existingVersionsAcrossMonorepo,
                 shouldFix,
                 logger: loggerForPackage,
             })
@@ -52,12 +72,14 @@ export async function addDevDependencies({
 export async function addDevDependenciesForPackage({
     packageName,
     existingDevDependencies,
+    existingVersionsAcrossMonorepo,
     devDependenciesToAdd,
     shouldFix,
     logger,
 }: {
     packageName: string;
     existingDevDependencies: Record<DependencyName, DependencyVersion>;
+    existingVersionsAcrossMonorepo: Record<DependencyName, DependencyVersion>;
     devDependenciesToAdd: Record<DependencyName, DependencyVersions>;
     shouldFix: boolean;
     logger: Logger;
@@ -93,9 +115,11 @@ export async function addDevDependenciesForPackage({
         return Result.success();
     }
 
-    const dependenciesWithVersions = Object.entries(filteredDependencies).map(([dependencyName, dependencyVersion]) =>
-        dependencyVersion == null ? dependencyName : `${dependencyName}@${dependencyVersion}`
-    );
+    const dependenciesWithVersions = Object.entries(filteredDependencies).map(([dependencyName, dependencyVersion]) => {
+        // if version isn't specified, default to the existing version used in the monorepo
+        const version = dependencyVersion ?? existingVersionsAcrossMonorepo[dependencyName];
+        return version == null ? dependencyName : `${dependencyName}@${version}`;
+    });
 
     if (!shouldFix) {
         logger.error({

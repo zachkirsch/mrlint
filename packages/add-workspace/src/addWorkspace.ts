@@ -150,6 +150,7 @@ async function lintPackage({
         monorepo: {
             ...monorepo,
             packages: [
+                ...monorepo.packages,
                 {
                     name: packageName,
                     relativePath: path.relative(monorepo.root.fullPath, absolutePackagePath),
@@ -159,5 +160,6 @@ async function lintPackage({
         },
         loggers,
         shouldFix: true,
+        packageNamesToLint: [packageName],
     });
 }

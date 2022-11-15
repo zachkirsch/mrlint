@@ -2705,12 +2705,14 @@ __metadata:
     "@types/diff": ^5.0.2
     "@types/jest": ^27.4.1
     "@types/node": ^17.0.25
+    "@types/semver-compare": ^1.0.1
     chalk: ^4.1.2
     depcheck: ^1.4.3
     diff: ^5.0.0
     eslint: ^8.12.0
     jest: ^27.5.1
     prettier: ^2.6.2
+    semver-compare: ^1.0.0
     typescript: ^4.6.3
   languageName: unknown
   linkType: soft
@@ -3084,6 +3086,13 @@ __metadata:
   version: 2.6.0
   resolution: "@types/prettier@npm:2.6.0"
   checksum: 946f1f82ce6f31664e023a5d65931c31b7d677b454f528f67dce851d72e7fcfe713076f4251b16c3646eecf1545f5f5b909b4962966341ed9ddf5b80113b3674
+  languageName: node
+  linkType: hard
+
+"@types/semver-compare@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@types/semver-compare@npm:1.0.1"
+  checksum: a144766e3bad1fc6e94df2f1964f3ce84cab27bff25e7175f31c5408190e49b17f407e82c6a814b6d7f0ad9f02e7355166bca67b5eb68bd3da116ee996f40c64
   languageName: node
   linkType: hard
 
