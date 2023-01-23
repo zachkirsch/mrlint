@@ -167,7 +167,7 @@ async function generatePackageJson({
 
         if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
             const environments = getEnvironments(packageToLint.config);
-            draft.bin = generateRecordForEnvironments({
+            const bin = generateRecordForEnvironments({
                 environments,
                 keyPrefix: packageToLint.config.cliName,
                 getValueForEnvironment: (environmentName) =>
@@ -179,6 +179,21 @@ async function generatePackageJson({
                     [packageToLint.config.cliName]: `./${path.join(CLI_OUTPUT_DIRS_PARENT, ESBUILD_BUNDLE_FILENAME)}`,
                 },
             });
+
+            // if there's only one bin entry and the cli's name is the same as the package name,
+            // we can use the `bin: <path to cli>` shorthand.
+            // (this matches `yarn install` behavior)
+            const [firstBinEntry, ...remainingBinEntries] = Object.entries(bin);
+            if (
+                packageToLint.name != null &&
+                firstBinEntry != null &&
+                remainingBinEntries.length === 0 &&
+                firstBinEntry[0] === getPackageNameWithoutScope(packageToLint.name)
+            ) {
+                draft.bin = firstBinEntry[1];
+            } else {
+                draft.bin = bin;
+            }
         }
 
         addScripts({
@@ -476,4 +491,13 @@ function getRecordKeyNameForEnvironment({
     } else {
         return `${keyPrefix}:${environment}`;
     }
+}
+
+const PACKAGE_NAME_REGEX = /(@.*\/)?(.*)/;
+function getPackageNameWithoutScope(packageName: string): string {
+    const packageNameWithoutScope = packageName.match(PACKAGE_NAME_REGEX)?.[2];
+    if (packageNameWithoutScope == null) {
+        throw new Error("Cannot parse package name: " + packageName);
+    }
+    return packageNameWithoutScope;
 }
