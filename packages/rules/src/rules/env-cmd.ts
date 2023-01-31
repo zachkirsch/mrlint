@@ -46,13 +46,15 @@ async function validateEnvFile(
         }
 
         for (const variable of packageToLint.config.environment.variables) {
-            const value = env[variable];
-            if (value == null) {
+            if (!(variable in env)) {
                 logger.error(`Environment variable ${variable} is not defined for environment ${environment}.`);
                 result.fail();
-            } else if (typeof value !== "string") {
-                logger.error(`Environment variable ${variable} for environment ${environment} is not a string.`);
-                result.fail();
+            } else {
+                const value = env[variable];
+                if (value != null && typeof value !== "string") {
+                    logger.error(`Environment variable ${variable} for environment ${environment} is not a string.`);
+                    result.fail();
+                }
             }
         }
     }
