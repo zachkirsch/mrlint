@@ -29,6 +29,7 @@ import { ENV_RC_FILENAME } from "./env-cmd";
 const EXPECTED_DEV_DEPENDENCIES = ["@types/node"];
 const DIST_CLI_SCRIPT_NAME = "dist:cli";
 const PUBLISH_CLI_SCRIPT_NAME = "publish:cli";
+const ESLINT_SCRIPT_NAME = "lint:eslint";
 
 interface RuleConfig {
     scripts?: Record<string, string>;
@@ -235,10 +236,10 @@ function addScripts({
         clean: `rm -rf ./${OUTPUT_DIR} && ${executables.get(Executable.TSC)} --build --clean`,
         compile: `${executables.get(Executable.TSC)} --build`,
         test: `yarn compile && ${executables.get(Executable.JEST)} --passWithNoTests`,
-        "lint:eslint": `${executables.get(Executable.ESLINT)} --max-warnings 0 . --ignore-path=${pathToEslintIgnore}`,
-        "lint:eslint:fix": `${executables.get(
+        [ESLINT_SCRIPT_NAME]: `${executables.get(
             Executable.ESLINT
-        )} --max-warnings 0 . --ignore-path=${pathToEslintIgnore} --fix`,
+        )} --max-warnings 0 . --ignore-path=${pathToEslintIgnore} --report-unused-disable-directives`,
+        [`${ESLINT_SCRIPT_NAME}:fix`]: `yarn ${ESLINT_SCRIPT_NAME} --fix`,
     };
 
     if (canPackageContainCss(packageToLint)) {
