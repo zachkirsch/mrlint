@@ -79,6 +79,9 @@ const path = require("path");
 const { chmod, writeFile, mkdir } = require("fs/promises");
 
 const packageJson = require("./package.json");
+${Object.entries(config.plugins)
+    .map(([pluginName, relativePath]) => `const ${pluginName} = require("${relativePath}");`)
+    .join("\n")}
 
 main();
 
@@ -90,7 +93,7 @@ async function main() {
         outfile: "./${path.join(outputDir, ESBUILD_BUNDLE_FILENAME)}",
         bundle: true,
         external: ["cpu-features"],
-        plugins: [pnpPlugin()],
+        plugins: [${[...Object.keys(config.plugins), "pnpPlugin()"].join(", ")}],
         define: {
             "process.env.CLI_NAME": JSON.stringify("${cliName}"),
             "process.env.CLI_VERSION": JSON.stringify(packageJson.version),

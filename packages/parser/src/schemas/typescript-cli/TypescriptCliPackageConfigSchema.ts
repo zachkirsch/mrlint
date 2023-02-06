@@ -5,4 +5,5 @@ export const TypescriptCliPackageConfigSchema = z.strictObject({
     type: z.literal("cli"),
     cliName: z.string(),
     environment: z.optional(TypescriptCliEnvironmentConfigSchema),
+    plugins: z.optional(z.record(z.string())),
 });
