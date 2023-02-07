@@ -51,6 +51,7 @@ async function runRule({
     }
 
     addDevDependency("vite-plugin-checker");
+    addDevDependency("@vitejs/plugin-react");
     result.accumulate(
         await writePackageFile({
             fileSystem,
