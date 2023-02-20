@@ -290,6 +290,7 @@ function addScripts({
                 variables: packageToLint.config.environment.variables,
                 scriptName: "start",
                 script: executables.get(Executable.VITE),
+                prefix: "yarn compile &&",
             }),
             ...generateScriptsForEnvironments({
                 environments: packageToLint.config.environment.environments,
