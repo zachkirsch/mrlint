@@ -22,10 +22,6 @@ async function addVersionToPackage({
     const packageJsonStr = (await readFile(packageJsonPath)).toString();
     const packageJson = JSON.parse(packageJsonStr) as IPackageJson;
 
-    if (packageJson.private === true) {
-        return;
-    }
-
     const { name, version, ...rest } = packageJson;
     const newPackageJson = {
         name,
