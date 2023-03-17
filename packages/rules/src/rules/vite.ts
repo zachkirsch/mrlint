@@ -1,4 +1,4 @@
-import { PackageType, Result, Rule, RuleType } from "@mrlint/commons";
+import { getRuleConfig, PackageType, Result, Rule, RuleType } from "@mrlint/commons";
 import { writePackageFile } from "../utils/writePackageFile";
 
 export const ViteRule: Rule.PackageRule = {
@@ -8,13 +8,21 @@ export const ViteRule: Rule.PackageRule = {
     run: runRule,
 };
 
+interface RuleConfig {
+    sourceMapsInProduction?: boolean;
+}
+
 async function runRule({
     fileSystems,
     packageToLint,
     logger,
     addDevDependency,
+    ruleConfig,
 }: Rule.PackageRuleRunnerArgs): Promise<Result> {
     const result = Result.success();
+
+    const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);
+
     const fileSystem = fileSystems.getFileSystemForPackage(packageToLint);
 
     addDevDependency("sass");
@@ -57,40 +65,61 @@ async function runRule({
             fileSystem,
             filename: "vite.config.ts",
             logger,
-            contents: `import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
-import checker from "vite-plugin-checker";
-
-// https://vitejs.dev/config/
-export default defineConfig({
-    plugins: [
-        react(),
-        checker({
-            typescript: {
-                buildMode: true,
-            },
-        }),
-    ],
-    server: {
-        open: true,
-    },
-    resolve: {
-        alias: [
-            {
-                // this is required for the SCSS modules
-                find: /^~(.*)$/,
-                replacement: "$1",
-            },
-        ],
-    },
-    css: {
-        modules: {
-            generateScopedName: "[name]__[local]___[hash:base64:5]",
-        },
-    },
-});`,
+            contents: generateViteConfig({
+                sourceMapsInProduction: castedRuleConfig?.sourceMapsInProduction,
+            }),
         })
     );
 
     return result;
+}
+
+function generateViteConfig({
+    sourceMapsInProduction = false,
+}: {
+    sourceMapsInProduction: boolean | undefined;
+}): string {
+    let contents = `import react from "@vitejs/plugin-react";
+    import { defineConfig } from "vite";
+    import checker from "vite-plugin-checker";
+    
+    // https://vitejs.dev/config/
+    export default defineConfig({
+        plugins: [
+            react(),
+            checker({
+                typescript: {
+                    buildMode: true,
+                },
+            }),
+        ],
+        server: {
+            open: true,
+        },
+        resolve: {
+            alias: [
+                {
+                    // this is required for the SCSS modules
+                    find: /^~(.*)$/,
+                    replacement: "$1",
+                },
+            ],
+        },
+        css: {
+            modules: {
+                generateScopedName: "[name]__[local]___[hash:base64:5]",
+            },
+        },`;
+
+    if (sourceMapsInProduction) {
+        contents += `
+        build: {
+            sourcemap: true,
+        },`;
+    }
+
+    contents += `
+    });`;
+
+    return contents;
 }
