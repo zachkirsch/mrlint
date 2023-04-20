@@ -10,6 +10,7 @@ export enum Executable {
     RUN_P,
     RUN_S,
     VITE,
+    ORGANIZE_IMPORTS_CLI,
 }
 
 export const EXECUTABLES: Record<Executable, string> = {
@@ -24,6 +25,7 @@ export const EXECUTABLES: Record<Executable, string> = {
     [Executable.RUN_P]: "run-p",
     [Executable.RUN_S]: "run-s",
     [Executable.VITE]: "vite",
+    [Executable.ORGANIZE_IMPORTS_CLI]: "organize-imports-cli",
 };
 
 const DEPENDENCIES: Record<Executable, string> = {
@@ -38,6 +40,7 @@ const DEPENDENCIES: Record<Executable, string> = {
     [Executable.RUN_P]: "npm-run-all",
     [Executable.RUN_S]: "npm-run-all",
     [Executable.VITE]: "vite",
+    [Executable.ORGANIZE_IMPORTS_CLI]: "organize-imports-cli",
 };
 
 const PINNED_VERSIONS: Partial<Record<Executable, string>> = {
