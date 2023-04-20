@@ -25,6 +25,7 @@
     "lint:eslint:fix": "yarn lint:eslint --fix",
     "format": "prettier --write --ignore-unknown --ignore-path ../../shared/.prettierignore \"**\"",
     "format:check": "prettier --check --ignore-unknown --ignore-path ../../shared/.prettierignore \"**\"",
+    "organize-imports": "organize-imports-cli tsconfig.json",
     "depcheck": "depcheck",
     "env:production": "env-cmd -r .env-cmdrc.cjs -e production",
     "dist:cli": "yarn compile && node build.cjs",
@@ -51,6 +52,7 @@
     "esbuild": "^0.14.50",
     "eslint": "^8.12.0",
     "jest": "^27.5.1",
+    "organize-imports-cli": "^0.10.0",
     "package-json-type": "^1.0.3",
     "prettier": "^2.6.2",
     "typescript": "^4.6.3"

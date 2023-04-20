@@ -260,6 +260,7 @@ function addScripts({
         "format:check": `${executables.get(
             Executable.PRETTIER
         )} --check --ignore-unknown --ignore-path ${pathToPrettierIgnore} "**"`,
+        "organize-imports": `${executables.get(Executable.ORGANIZE_IMPORTS_CLI)} tsconfig.json`,
         depcheck: executables.get(Executable.DEPCHECK),
     };
 
