@@ -1,5 +1,6 @@
-import { getPackageJson, Result, Rule, RuleType } from "@mrlint/commons";
+import { getPackageJson, getRuleConfig, Result, Rule, RuleType } from "@mrlint/commons";
 import produce from "immer";
+import { omit } from "lodash-es";
 import semver from "semver";
 
 type DependencyName = string;
@@ -10,6 +11,10 @@ export const DuplicateDependenciesRule: Rule.MonorepoRule = {
     type: RuleType.MONOREPO,
     run: runRule,
 };
+
+interface RuleConfig {
+    exclude?: string[];
+}
 
 async function runRule({ monorepo, getLoggerForPackage, fileSystems }: Rule.MonorepoRuleRunnerArgs): Promise<Result> {
     const result = Result.success();
@@ -43,14 +48,18 @@ async function runRule({ monorepo, getLoggerForPackage, fileSystems }: Rule.Mono
             continue;
         }
 
+        const ruleConfig = p.config?.rules[DuplicateDependenciesRule.ruleId];
+        const castedRuleConfig = getRuleConfig<RuleConfig>(ruleConfig);
+        const latestVersionsWithoutIgnores = omit(latestVersions, castedRuleConfig?.exclude ?? []);
+
         const newPackageJson = produce(packageJson, (draft) => {
             upgradeDependencies({
                 dependencies: draft.dependencies,
-                latestVersions,
+                latestVersions: latestVersionsWithoutIgnores,
             });
             upgradeDependencies({
                 dependencies: draft.devDependencies,
-                latestVersions,
+                latestVersions: latestVersionsWithoutIgnores,
             });
         });
 
