@@ -143,7 +143,6 @@ async function generateTsConfig({
         compilerOptions = {
             ...compilerOptions,
             allowJs: true,
-            noEmit: true,
             incremental: true,
             jsx: "preserve" as unknown as JsxEmit,
             plugins: [
@@ -160,8 +159,12 @@ async function generateTsConfig({
         include: ["./src"],
     };
 
-    if (exclude.length > 0) {
-        tsConfig.exclude = exclude;
+    const exclusionsWithDefaults = [...exclude];
+    if (packageToLint.config.type === PackageType.NEXT_APP) {
+        exclusionsWithDefaults.push("node_modules");
+    }
+    if (exclusionsWithDefaults.length > 0) {
+        tsConfig.exclude = exclusionsWithDefaults;
     }
 
     const references = getDependencies(packageJson)
