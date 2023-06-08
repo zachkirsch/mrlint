@@ -114,8 +114,10 @@ function getRawConfig({
     isPackagePrivate: boolean;
 }): PackageConfigSchema {
     switch (packageType) {
-        case PackageType.REACT_APP:
-            return { type: "react-app", private: isPackagePrivate };
+        case PackageType.VITE_APP:
+            return { type: "vite-app", private: isPackagePrivate };
+        case PackageType.NEXT_APP:
+            return { type: "next-app", private: isPackagePrivate };
         case PackageType.REACT_LIBRARY:
             return { type: "react-library", private: isPackagePrivate };
         case PackageType.TYPESCRIPT_LIBRARY:

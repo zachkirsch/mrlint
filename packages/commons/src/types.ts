@@ -33,15 +33,19 @@ export type PackageOfType<T extends PackageType> = PackageConfig extends { type:
     : never;
 
 export type PackageConfig =
-    | ReactAppPackageConfig
+    | ViteAppPackageConfig
+    | NextAppPackageConfig
     | ReactLibraryPackageConfig
     | TypescriptLibraryPackageConfig
     | TypescriptCliPackageConfig
     | CustomPackageConfig;
 
-export interface ReactAppPackageConfig extends BasePackageConfig {
-    type: typeof PackageType.REACT_APP;
-    environment: ReactAppEnvironmentConfig;
+export interface ViteAppPackageConfig extends BasePackageConfig {
+    type: typeof PackageType.VITE_APP;
+}
+
+export interface NextAppPackageConfig extends BasePackageConfig {
+    type: typeof PackageType.NEXT_APP;
 }
 
 export interface ReactAppEnvironmentConfig {
@@ -85,7 +89,8 @@ export interface BasePackageConfig {
 }
 
 export const PackageType = {
-    REACT_APP: "React app",
+    VITE_APP: "Vite app",
+    NEXT_APP: "Next app",
     REACT_LIBRARY: "React library",
     TYPESCRIPT_LIBRARY: "TypeScript library",
     TYPESCRIPT_CLI: "TypeScript CLI",

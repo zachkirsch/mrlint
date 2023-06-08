@@ -11,7 +11,7 @@ import {
 } from "@mrlint/commons";
 import { FileSystem } from "@mrlint/virtual-file-system";
 import path from "path";
-import ts, { CompilerOptions, ProjectReference } from "typescript";
+import ts, { CompilerOptions, JsxEmit, ProjectReference } from "typescript";
 import { OUTPUT_DIR } from "../utils/constants";
 import { getDependencies } from "../utils/getDependencies";
 import { keyPackagesByNpmName } from "../utils/keyPackagesByNpmName";
@@ -21,7 +21,8 @@ export const TsConfigRule: Rule.PackageRule = {
     ruleId: "ts-config",
     type: RuleType.PACKAGE,
     targetedPackages: [
-        PackageType.REACT_APP,
+        PackageType.VITE_APP,
+        PackageType.NEXT_APP,
         PackageType.REACT_LIBRARY,
         PackageType.TYPESCRIPT_LIBRARY,
         PackageType.TYPESCRIPT_CLI,
@@ -133,13 +134,29 @@ async function generateTsConfig({
         throw new Error("package.json does not exist");
     }
 
+    let compilerOptions: CompilerOptions = {
+        composite: true,
+        outDir: OUTPUT_DIR,
+        rootDir: "src",
+    };
+    if (packageToLint.config.type === PackageType.NEXT_APP) {
+        compilerOptions = {
+            ...compilerOptions,
+            allowJs: true,
+            noEmit: true,
+            incremental: true,
+            jsx: "preserve" as unknown as JsxEmit,
+            plugins: [
+                {
+                    name: "next",
+                },
+            ],
+        };
+    }
+
     const tsConfig: TsConfig = {
         extends: path.join(relativePathToSharedConfigs, "tsconfig.shared.json"),
-        compilerOptions: {
-            composite: true,
-            outDir: OUTPUT_DIR,
-            rootDir: "src",
-        },
+        compilerOptions,
         include: ["./src"],
     };
 

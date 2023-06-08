@@ -5,10 +5,10 @@ import { writePackageFile } from "../utils/writePackageFile";
 
 export const ENV_RC_FILENAME = ".env-cmdrc.cjs";
 
-export const EnvCmdRule: Rule.PackageRule<typeof PackageType.REACT_APP | typeof PackageType.TYPESCRIPT_CLI> = {
+export const EnvCmdRule: Rule.PackageRule<typeof PackageType.TYPESCRIPT_CLI> = {
     ruleId: "env-cmd",
     type: RuleType.PACKAGE,
-    targetedPackages: [PackageType.REACT_APP, PackageType.TYPESCRIPT_CLI],
+    targetedPackages: [PackageType.TYPESCRIPT_CLI],
     run: async ({ fileSystems, logger, packageToLint }) => {
         const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
 
@@ -22,7 +22,7 @@ export const EnvCmdRule: Rule.PackageRule<typeof PackageType.REACT_APP | typeof 
 
 async function validateEnvFile(
     absolutePathToEnvCmdRc: string,
-    packageToLint: LintablePackage<"React app" | "TypeScript CLI">,
+    packageToLint: LintablePackage<typeof PackageType.TYPESCRIPT_CLI>,
     logger: Logger
 ): Promise<Result> {
     const result = Result.success();
@@ -67,7 +67,7 @@ function createEnvFile({
     fileSystems,
     logger,
 }: {
-    packageToLint: LintablePackage<"React app" | "TypeScript CLI">;
+    packageToLint: LintablePackage<typeof PackageType.TYPESCRIPT_CLI>;
     fileSystems: Rule.FileSystems;
     logger: Logger;
 }): Promise<Result> {

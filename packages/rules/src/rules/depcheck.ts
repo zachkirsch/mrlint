@@ -17,7 +17,8 @@ export const DepcheckRule: Rule.PackageRule = {
     ruleId: "depcheck",
     type: RuleType.PACKAGE,
     targetedPackages: [
-        PackageType.REACT_APP,
+        PackageType.VITE_APP,
+        PackageType.NEXT_APP,
         PackageType.REACT_LIBRARY,
         PackageType.TYPESCRIPT_LIBRARY,
         PackageType.TYPESCRIPT_CLI,
@@ -36,10 +37,7 @@ async function runRule({
         "ignore-patterns": [OUTPUT_DIR],
     };
 
-    if (
-        packageToLint.config.type === PackageType.REACT_APP ||
-        packageToLint.config.type === PackageType.REACT_LIBRARY
-    ) {
+    if (packageToLint.config.type === PackageType.VITE_APP || packageToLint.config.type === PackageType.REACT_LIBRARY) {
         depcheckRc.ignores.push("vite");
         depcheckRc.ignores.push("@types/react");
     }

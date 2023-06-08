@@ -12,7 +12,7 @@ import { FileSystem } from "@mrlint/virtual-file-system";
 import produce, { Draft } from "immer";
 import { IPackageJson } from "package-json-type";
 import path from "path";
-import { canPackageContainCss } from "../utils/canPackageContainCss";
+import { canPackageContainReact } from "../utils/canPackageContainReact";
 import { OUTPUT_DIR } from "../utils/constants";
 import { Executable, Executables } from "../utils/Executables";
 import { getEnvironments } from "../utils/getEnvironments";
@@ -39,7 +39,8 @@ export const PackageJsonRule: Rule.PackageRule = {
     ruleId: "package-json",
     type: RuleType.PACKAGE,
     targetedPackages: [
-        PackageType.REACT_APP,
+        PackageType.VITE_APP,
+        PackageType.NEXT_APP,
         PackageType.REACT_LIBRARY,
         PackageType.TYPESCRIPT_LIBRARY,
         PackageType.TYPESCRIPT_CLI,
@@ -143,15 +144,13 @@ async function generatePackageJson({
         }
 
         draft.files = [OUTPUT_DIR];
-        if (!packageToLint.config.isCommonJs) {
+        if (packageToLint.config.type !== PackageType.NEXT_APP && !packageToLint.config.isCommonJs) {
             draft.type = "module";
         }
         draft.source = "src/index.ts";
 
-        // Vite requires that the "module" key points to the source index.ts
-        if (canPackageContainCss(packageToLint)) {
-            draft.module = "src/index.ts";
-
+        // Vite/Next require that the entrypoints are to the source index.ts
+        if (canPackageContainReact(packageToLint)) {
             // We shouldn't publish the package with a reference to src/
             // npm/yarn will auto-include src/index.ts since it's listed here,
             // which can break consumers
@@ -159,10 +158,13 @@ async function generatePackageJson({
                 logger.error("UI package cannot be public");
                 return undefined;
             }
-        }
 
-        draft.main = "lib/index.js";
-        draft.types = "lib/index.d.ts";
+            draft.module = "src/index.ts";
+            draft.main = "src/index.ts";
+        } else {
+            draft.main = "lib/index.js";
+            draft.types = "lib/index.d.ts";
+        }
 
         draft.sideEffects = false;
 
@@ -242,7 +244,7 @@ function addScripts({
         [`${ESLINT_SCRIPT_NAME}:fix`]: `yarn ${ESLINT_SCRIPT_NAME} --fix`,
     };
 
-    if (canPackageContainCss(packageToLint)) {
+    if (canPackageContainReact(packageToLint)) {
         draft.scripts = {
             ...draft.scripts,
             "lint:style": `${executables.get(
@@ -264,10 +266,7 @@ function addScripts({
         depcheck: executables.get(Executable.DEPCHECK),
     };
 
-    if (
-        packageToLint.config.type === PackageType.REACT_APP ||
-        packageToLint.config.type === PackageType.TYPESCRIPT_CLI
-    ) {
+    if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
         const environments = getEnvironments(packageToLint.config);
         draft.scripts = {
             ...draft.scripts,
@@ -283,30 +282,22 @@ function addScripts({
         };
     }
 
-    if (packageToLint.config.type === PackageType.REACT_APP) {
+    if (packageToLint.config.type === PackageType.VITE_APP) {
         draft.scripts = {
             ...draft.scripts,
-            ...generateScriptsForEnvironments({
-                environments: packageToLint.config.environment.environments,
-                variables: packageToLint.config.environment.variables,
-                scriptName: "start",
-                script: executables.get(Executable.VITE),
-                prefix: "yarn compile &&",
-            }),
-            ...generateScriptsForEnvironments({
-                environments: packageToLint.config.environment.environments,
-                variables: packageToLint.config.environment.variables,
-                scriptName: "build",
-                script: `${executables.get(Executable.VITE)} build`,
-                prefix: "yarn compile &&",
-            }),
-            ...generateScriptsForEnvironments({
-                environments: packageToLint.config.environment.environments,
-                variables: packageToLint.config.environment.variables,
-                scriptName: "preview",
-                script: `${executables.get(Executable.VITE)} preview`,
-                prefix: "yarn compile &&",
-            }),
+            start: `yarn compile && ${executables.get(Executable.VITE)}`,
+            build: `yarn compile && ${executables.get(Executable.VITE)} build`,
+            preview: `yarn compile && ${executables.get(Executable.VITE)} preview`,
+        };
+    }
+
+    if (packageToLint.config.type === PackageType.NEXT_APP) {
+        draft.scripts = {
+            ...draft.scripts,
+            dev: `yarn compile && ${executables.get(Executable.NEXT)} dev`,
+            build: `yarn compile && ${executables.get(Executable.NEXT)} build`,
+            start: `yarn compile && ${executables.get(Executable.NEXT)} start`,
+            lint: `yarn compile && ${executables.get(Executable.NEXT)} lint`,
         };
     }
 
@@ -378,29 +369,6 @@ function updateWorkspaceVersions(dependencies: Record<string, string> | undefine
                 draft[dep] = "workspace:*";
             }
         }
-    });
-}
-
-function generateScriptsForEnvironments({
-    environments,
-    variables,
-    scriptName,
-    script,
-    prefix,
-}: {
-    environments: string[];
-    variables: string[];
-    scriptName: string;
-    script: string;
-    prefix?: string;
-}): Record<string, string> {
-    return generateDynamicScriptsForEnvironments({
-        environments,
-        variables,
-        scriptName,
-        script,
-        prefix,
-        fallback: prefix != null ? `${prefix} ${script}` : script,
     });
 }
 

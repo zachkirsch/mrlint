@@ -82,14 +82,15 @@ export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig
                 ...baseConfig,
                 type: PackageType.REACT_LIBRARY,
             };
-        case "react-app":
+        case "vite-app":
             return {
                 ...baseConfig,
-                type: PackageType.REACT_APP,
-                environment: {
-                    environments: rawConfig.environment?.environments ?? [],
-                    variables: rawConfig.environment?.variables ?? [],
-                },
+                type: PackageType.VITE_APP,
+            };
+        case "next-app":
+            return {
+                ...baseConfig,
+                type: PackageType.NEXT_APP,
             };
         case "custom":
             return {
