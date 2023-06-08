@@ -6,7 +6,8 @@ export const PrettierRule: Rule.PackageRule = {
     ruleId: "prettier",
     type: RuleType.PACKAGE,
     targetedPackages: [
-        PackageType.REACT_APP,
+        PackageType.VITE_APP,
+        PackageType.NEXT_APP,
         PackageType.REACT_LIBRARY,
         PackageType.TYPESCRIPT_LIBRARY,
         PackageType.TYPESCRIPT_CLI,

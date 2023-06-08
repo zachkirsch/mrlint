@@ -4,7 +4,7 @@ import { writePackageFile } from "../utils/writePackageFile";
 export const ViteRule: Rule.PackageRule = {
     ruleId: "vite",
     type: RuleType.PACKAGE,
-    targetedPackages: [PackageType.REACT_APP],
+    targetedPackages: [PackageType.VITE_APP],
     run: runRule,
 };
 

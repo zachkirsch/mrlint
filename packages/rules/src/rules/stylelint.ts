@@ -5,7 +5,7 @@ import { writePackageFile } from "../utils/writePackageFile";
 export const StyleLintRule: Rule.PackageRule = {
     ruleId: "stylelint",
     type: RuleType.PACKAGE,
-    targetedPackages: [PackageType.REACT_APP, PackageType.REACT_LIBRARY],
+    targetedPackages: [PackageType.VITE_APP, PackageType.NEXT_APP, PackageType.REACT_LIBRARY],
     run: runRule,
 };
 
