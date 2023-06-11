@@ -287,18 +287,21 @@ function addScripts({
             ...draft.scripts,
             ...generateScriptsForEnvironments({
                 environments: packageToLint.config.environment.environments,
+                variables: packageToLint.config.environment.variables,
                 scriptName: "start",
                 script: executables.get(Executable.VITE),
                 prefix: "yarn compile &&",
             }),
             ...generateScriptsForEnvironments({
                 environments: packageToLint.config.environment.environments,
+                variables: packageToLint.config.environment.variables,
                 scriptName: "build",
                 script: `${executables.get(Executable.VITE)} build`,
                 prefix: "yarn compile &&",
             }),
             ...generateScriptsForEnvironments({
                 environments: packageToLint.config.environment.environments,
+                variables: packageToLint.config.environment.variables,
                 scriptName: "preview",
                 script: `${executables.get(Executable.VITE)} preview`,
                 prefix: "yarn compile &&",
@@ -311,24 +314,28 @@ function addScripts({
             ...draft.scripts,
             ...generateScriptsForEnvironments({
                 environments: packageToLint.config.environment.environments,
+                variables: packageToLint.config.environment.variables,
                 scriptName: "dev",
                 script: `${executables.get(Executable.NEXT)} dev`,
                 prefix: "yarn compile &&",
             }),
             ...generateScriptsForEnvironments({
                 environments: packageToLint.config.environment.environments,
+                variables: packageToLint.config.environment.variables,
                 scriptName: "build",
                 script: `${executables.get(Executable.NEXT)} build`,
                 prefix: "yarn compile &&",
             }),
             ...generateScriptsForEnvironments({
                 environments: packageToLint.config.environment.environments,
+                variables: packageToLint.config.environment.variables,
                 scriptName: "start",
                 script: `${executables.get(Executable.NEXT)} start`,
                 prefix: "yarn compile &&",
             }),
             ...generateScriptsForEnvironments({
                 environments: packageToLint.config.environment.environments,
+                variables: packageToLint.config.environment.variables,
                 scriptName: "lint",
                 script: `${executables.get(Executable.NEXT)} lint`,
                 prefix: "yarn compile &&",
@@ -342,6 +349,7 @@ function addScripts({
             ...draft.scripts,
             ...generateDynamicScriptsForEnvironments({
                 environments,
+                variables: packageToLint.config.environment.variables,
                 scriptName: DIST_CLI_SCRIPT_NAME,
                 script: (environmentName) =>
                     `node ${getEsbuildScriptFilenameForEnvironment({
@@ -408,17 +416,20 @@ function updateWorkspaceVersions(dependencies: Record<string, string> | undefine
 
 function generateScriptsForEnvironments({
     environments,
+    variables,
     scriptName,
     script,
     prefix,
 }: {
     environments: string[];
+    variables: string[];
     scriptName: string;
     script: string;
     prefix?: string;
 }): Record<string, string> {
     return generateDynamicScriptsForEnvironments({
         environments,
+        variables,
         scriptName,
         script,
         prefix,
@@ -428,12 +439,14 @@ function generateScriptsForEnvironments({
 
 function generateDynamicScriptsForEnvironments({
     environments,
+    variables,
     scriptName,
     script,
     prefix,
     fallback,
 }: {
     environments: string[];
+    variables: string[];
     scriptName: string;
     script: string | ((environment: string) => string);
     prefix?: string | ((environment: string) => string);
@@ -447,7 +460,7 @@ function generateDynamicScriptsForEnvironments({
             if (prefix != null) {
                 parts.push(typeof prefix === "string" ? prefix : prefix(environment));
             }
-            if (environment != null) {
+            if (environment != null && variables.length > 0) {
                 parts.push(`yarn env:${environment}`);
             }
             parts.push(typeof script === "string" ? script : script(environment));
