@@ -15,7 +15,7 @@ import path from "path";
 import { canPackageContainReact } from "../utils/canPackageContainReact";
 import { OUTPUT_DIR } from "../utils/constants";
 import { Executable, Executables } from "../utils/Executables";
-import { getEnvironments } from "../utils/getEnvironments";
+import { getEnvironments, hasEnvironments } from "../utils/getEnvironments";
 import { writePackageFile } from "../utils/writePackageFile";
 import {
     CLI_OUTPUT_DIRS_PARENT,
@@ -266,7 +266,7 @@ function addScripts({
         depcheck: executables.get(Executable.DEPCHECK),
     };
 
-    if (packageToLint.config.type === PackageType.TYPESCRIPT_CLI) {
+    if (hasEnvironments(packageToLint.config)) {
         const environments = getEnvironments(packageToLint.config);
         draft.scripts = {
             ...draft.scripts,
@@ -285,19 +285,54 @@ function addScripts({
     if (packageToLint.config.type === PackageType.VITE_APP) {
         draft.scripts = {
             ...draft.scripts,
-            start: `yarn compile && ${executables.get(Executable.VITE)}`,
-            build: `yarn compile && ${executables.get(Executable.VITE)} build`,
-            preview: `yarn compile && ${executables.get(Executable.VITE)} preview`,
+            ...generateScriptsForEnvironments({
+                environments: packageToLint.config.environment.environments,
+                scriptName: "start",
+                script: executables.get(Executable.VITE),
+                prefix: "yarn compile &&",
+            }),
+            ...generateScriptsForEnvironments({
+                environments: packageToLint.config.environment.environments,
+                scriptName: "build",
+                script: `${executables.get(Executable.VITE)} build`,
+                prefix: "yarn compile &&",
+            }),
+            ...generateScriptsForEnvironments({
+                environments: packageToLint.config.environment.environments,
+                scriptName: "preview",
+                script: `${executables.get(Executable.VITE)} preview`,
+                prefix: "yarn compile &&",
+            }),
         };
     }
 
     if (packageToLint.config.type === PackageType.NEXT_APP) {
         draft.scripts = {
             ...draft.scripts,
-            dev: `yarn compile && ${executables.get(Executable.NEXT)} dev`,
-            build: `yarn compile && ${executables.get(Executable.NEXT)} build`,
-            start: `yarn compile && ${executables.get(Executable.NEXT)} start`,
-            lint: `yarn compile && ${executables.get(Executable.NEXT)} lint`,
+            ...generateScriptsForEnvironments({
+                environments: packageToLint.config.environment.environments,
+                scriptName: "dev",
+                script: `${executables.get(Executable.NEXT)} dev`,
+                prefix: "yarn compile &&",
+            }),
+            ...generateScriptsForEnvironments({
+                environments: packageToLint.config.environment.environments,
+                scriptName: "build",
+                script: `${executables.get(Executable.NEXT)} build`,
+                prefix: "yarn compile &&",
+            }),
+            ...generateScriptsForEnvironments({
+                environments: packageToLint.config.environment.environments,
+                scriptName: "start",
+                script: `${executables.get(Executable.NEXT)} start`,
+                prefix: "yarn compile &&",
+            }),
+            ...generateScriptsForEnvironments({
+                environments: packageToLint.config.environment.environments,
+                scriptName: "lint",
+                script: `${executables.get(Executable.NEXT)} lint`,
+                prefix: "yarn compile &&",
+            }),
         };
     }
 
@@ -307,7 +342,6 @@ function addScripts({
             ...draft.scripts,
             ...generateDynamicScriptsForEnvironments({
                 environments,
-                variables: packageToLint.config.environment.variables,
                 scriptName: DIST_CLI_SCRIPT_NAME,
                 script: (environmentName) =>
                     `node ${getEsbuildScriptFilenameForEnvironment({
@@ -372,16 +406,34 @@ function updateWorkspaceVersions(dependencies: Record<string, string> | undefine
     });
 }
 
+function generateScriptsForEnvironments({
+    environments,
+    scriptName,
+    script,
+    prefix,
+}: {
+    environments: string[];
+    scriptName: string;
+    script: string;
+    prefix?: string;
+}): Record<string, string> {
+    return generateDynamicScriptsForEnvironments({
+        environments,
+        scriptName,
+        script,
+        prefix,
+        fallback: prefix != null ? `${prefix} ${script}` : script,
+    });
+}
+
 function generateDynamicScriptsForEnvironments({
     environments,
-    variables,
     scriptName,
     script,
     prefix,
     fallback,
 }: {
     environments: string[];
-    variables: string[];
     scriptName: string;
     script: string | ((environment: string) => string);
     prefix?: string | ((environment: string) => string);
@@ -395,7 +447,7 @@ function generateDynamicScriptsForEnvironments({
             if (prefix != null) {
                 parts.push(typeof prefix === "string" ? prefix : prefix(environment));
             }
-            if (environment != null && variables.length > 0) {
+            if (environment != null) {
                 parts.push(`yarn env:${environment}`);
             }
             parts.push(typeof script === "string" ? script : script(environment));

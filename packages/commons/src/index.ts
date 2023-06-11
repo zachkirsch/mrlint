@@ -15,8 +15,10 @@ export type {
     LintablePackage,
     Monorepo,
     MonorepoRoot,
+    NextAppPackageConfig,
     Package,
     PackageConfig,
     RootConfig,
     TypescriptCliPackageConfig,
+    ViteAppPackageConfig,
 } from "./types";

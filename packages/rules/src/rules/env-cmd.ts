@@ -5,10 +5,12 @@ import { writePackageFile } from "../utils/writePackageFile";
 
 export const ENV_RC_FILENAME = ".env-cmdrc.cjs";
 
-export const EnvCmdRule: Rule.PackageRule<typeof PackageType.TYPESCRIPT_CLI> = {
+export const EnvCmdRule: Rule.PackageRule<
+    typeof PackageType.TYPESCRIPT_CLI | typeof PackageType.NEXT_APP | typeof PackageType.VITE_APP
+> = {
     ruleId: "env-cmd",
     type: RuleType.PACKAGE,
-    targetedPackages: [PackageType.TYPESCRIPT_CLI],
+    targetedPackages: [PackageType.TYPESCRIPT_CLI, PackageType.NEXT_APP, PackageType.VITE_APP],
     run: async ({ fileSystems, logger, packageToLint }) => {
         const fileSystemForPackage = fileSystems.getFileSystemForPackage(packageToLint);
 
@@ -22,7 +24,9 @@ export const EnvCmdRule: Rule.PackageRule<typeof PackageType.TYPESCRIPT_CLI> = {
 
 async function validateEnvFile(
     absolutePathToEnvCmdRc: string,
-    packageToLint: LintablePackage<typeof PackageType.TYPESCRIPT_CLI>,
+    packageToLint: LintablePackage<
+        typeof PackageType.TYPESCRIPT_CLI | typeof PackageType.NEXT_APP | typeof PackageType.VITE_APP
+    >,
     logger: Logger
 ): Promise<Result> {
     const result = Result.success();
@@ -67,7 +71,9 @@ function createEnvFile({
     fileSystems,
     logger,
 }: {
-    packageToLint: LintablePackage<typeof PackageType.TYPESCRIPT_CLI>;
+    packageToLint: LintablePackage<
+        typeof PackageType.TYPESCRIPT_CLI | typeof PackageType.NEXT_APP | typeof PackageType.VITE_APP
+    >;
     fileSystems: Rule.FileSystems;
     logger: Logger;
 }): Promise<Result> {

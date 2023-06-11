@@ -42,10 +42,12 @@ export type PackageConfig =
 
 export interface ViteAppPackageConfig extends BasePackageConfig {
     type: typeof PackageType.VITE_APP;
+    environment: ReactAppEnvironmentConfig;
 }
 
 export interface NextAppPackageConfig extends BasePackageConfig {
     type: typeof PackageType.NEXT_APP;
+    environment: ReactAppEnvironmentConfig;
 }
 
 export interface ReactAppEnvironmentConfig {

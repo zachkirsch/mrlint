@@ -86,11 +86,19 @@ export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig
             return {
                 ...baseConfig,
                 type: PackageType.VITE_APP,
+                environment: {
+                    environments: rawConfig.environment?.environments ?? [],
+                    variables: rawConfig.environment?.variables ?? [],
+                },
             };
         case "next-app":
             return {
                 ...baseConfig,
                 type: PackageType.NEXT_APP,
+                environment: {
+                    environments: rawConfig.environment?.environments ?? [],
+                    variables: rawConfig.environment?.variables ?? [],
+                },
             };
         case "custom":
             return {
