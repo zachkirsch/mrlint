@@ -4,7 +4,7 @@ import { writePackageFile } from "../utils/writePackageFile";
 export const DeclarationsRule: Rule.PackageRule = {
     ruleId: "declarations",
     type: RuleType.PACKAGE,
-    targetedPackages: [PackageType.REACT_LIBRARY],
+    targetedPackages: [PackageType.REACT_LIBRARY, PackageType.NEXT_APP],
     run: runRule,
 };
 
