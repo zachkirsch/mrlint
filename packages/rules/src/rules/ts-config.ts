@@ -144,6 +144,7 @@ async function generateTsConfig({
             ...compilerOptions,
             allowJs: true,
             incremental: true,
+            noEmit: true,
             jsx: "preserve" as unknown as JsxEmit,
             plugins: [
                 {
