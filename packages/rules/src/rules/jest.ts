@@ -24,7 +24,6 @@ async function runRule({
     fileSystems,
     packageToLint,
     relativePathToSharedConfigs,
-    relativePathToRoot,
     logger,
     addDevDependency,
     ruleConfig,
@@ -48,15 +47,6 @@ export default {
     ...defaultConfig,
     testMatch: ${JSON.stringify(castedRuleConfig.testMatch)}
 };`,
-            logger,
-        })
-    );
-
-    result.accumulate(
-        await writePackageFile({
-            fileSystem: fileSystemForPackage,
-            filename: "babel.config.cjs",
-            contents: `module.exports = require("${path.join(relativePathToRoot, "babel.config.json")}");`,
             logger,
         })
     );
