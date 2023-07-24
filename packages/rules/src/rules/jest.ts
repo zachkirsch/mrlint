@@ -18,19 +18,12 @@ export const JestRule: Rule.PackageRule = {
     run: runRule,
 };
 
-const EXPECTED_DEV_DEPENDENCIES = [
-    "jest",
-    "@types/jest",
-    "@babel/core",
-    "@babel/preset-env",
-    "@babel/preset-typescript",
-];
+const EXPECTED_DEV_DEPENDENCIES = ["jest", "@types/jest"];
 
 async function runRule({
     fileSystems,
     packageToLint,
     relativePathToSharedConfigs,
-    relativePathToRoot,
     logger,
     addDevDependency,
     ruleConfig,
@@ -54,15 +47,6 @@ export default {
     ...defaultConfig,
     testMatch: ${JSON.stringify(castedRuleConfig.testMatch)}
 };`,
-            logger,
-        })
-    );
-
-    result.accumulate(
-        await writePackageFile({
-            fileSystem: fileSystemForPackage,
-            filename: "babel.config.cjs",
-            contents: `module.exports = require("${path.join(relativePathToRoot, "babel.config.json")}");`,
             logger,
         })
     );
