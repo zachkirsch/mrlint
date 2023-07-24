@@ -9,7 +9,12 @@ interface RuleConfig {
 export const JestRule: Rule.PackageRule = {
     ruleId: "jest",
     type: RuleType.PACKAGE,
-    targetedPackages: [PackageType.REACT_LIBRARY, PackageType.TYPESCRIPT_LIBRARY, PackageType.TYPESCRIPT_CLI],
+    targetedPackages: [
+        PackageType.REACT_LIBRARY,
+        PackageType.TYPESCRIPT_LIBRARY,
+        PackageType.TYPESCRIPT_CLI,
+        PackageType.NEXT_APP,
+    ],
     run: runRule,
 };
 
