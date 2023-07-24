@@ -18,13 +18,7 @@ export const JestRule: Rule.PackageRule = {
     run: runRule,
 };
 
-const EXPECTED_DEV_DEPENDENCIES = [
-    "jest",
-    "@types/jest",
-    "@babel/core",
-    "@babel/preset-env",
-    "@babel/preset-typescript",
-];
+const EXPECTED_DEV_DEPENDENCIES = ["jest", "@types/jest"];
 
 async function runRule({
     fileSystems,
