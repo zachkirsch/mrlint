@@ -73,6 +73,8 @@ function generateScriptContents({
     cliName: string;
     cliPackageName: string | undefined;
 }) {
+    const files = ["bundle.cjs", "cli.cjs", ...config.additionalFiles];
+
     let script = `const { pnpPlugin } = require("@yarnpkg/esbuild-plugin-pnp");
 const { build } = require("esbuild");
 const path = require("path");
@@ -147,7 +149,7 @@ require("./${ESBUILD_BUNDLE_FILENAME}");\`
                 name: "${cliPackageName}",
                 version: packageJson.version,
                 repository: packageJson.repository,
-                files: ["${ESBUILD_BUNDLE_FILENAME}", "${CLI_FILENAME}"],
+                files: [${files.map((file) => `"${file}"`).join(", ")}],
                 bin: { "${cliName}": "${CLI_FILENAME}" },
             },
             undefined,

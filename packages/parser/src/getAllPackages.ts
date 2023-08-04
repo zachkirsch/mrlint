@@ -70,6 +70,7 @@ export function convertPackageConfig(rawConfig: RawPackageConfig): PackageConfig
                               )
                             : {},
                 },
+                additionalFiles: rawConfig.additionalFiles ?? [],
                 plugins: rawConfig.plugins ?? {},
             };
         case "library":
