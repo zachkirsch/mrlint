@@ -373,10 +373,10 @@ function addScripts({
                             environment,
                             allEnvironments: environments,
                         })}`,
-                        "yarn npm publish",
+                        "yarn npm publish --access public",
                     ].join(" && "),
                 fallback: {
-                    [PUBLISH_CLI_SCRIPT_NAME]: `yarn ${DIST_CLI_SCRIPT_NAME} && cd ${CLI_OUTPUT_DIRS_PARENT} && yarn npm publish`,
+                    [PUBLISH_CLI_SCRIPT_NAME]: `yarn ${DIST_CLI_SCRIPT_NAME} && cd ${CLI_OUTPUT_DIRS_PARENT} && yarn npm publish --access public`,
                 },
             }),
         };
