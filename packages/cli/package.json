@@ -29,7 +29,7 @@
     "depcheck": "depcheck",
     "env:production": "env-cmd -r .env-cmdrc.cjs -e production",
     "dist:cli": "yarn compile && node build.cjs",
-    "publish:cli": "yarn dist:cli && cd dist && yarn npm publish"
+    "publish:cli": "yarn dist:cli && cd dist && yarn npm publish --access public"
   },
   "dependencies": {
     "@mrlint/add-workspace": "workspace:*",
