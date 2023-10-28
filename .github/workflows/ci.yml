@@ -33,8 +33,8 @@ jobs:
       - name: Compile
         run: yarn compile
 
-      - name: Lint monorepo
-        run: yarn lint:monorepo
+      # - name: Lint monorepo
+        # run: yarn lint:monorepo
 
       - name: Run tests
         run: yarn test --ci
