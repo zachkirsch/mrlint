@@ -1,0 +1,35 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  check:
+    uses: ./.github/workflows/check.yml
+  publish: 
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'yarn'
+      
+      - name: Install
+        run: yarn install
+      
+      - name: Add version to package.json's
+        run: yarn mrlint:local version $(git tag --points-at HEAD)
+
+      - name: Publish all packages
+        run: yarn run publish
+      
+      - name: Publish CLI
+        run: yarn workspace @mrlint/cli publish:cli
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
