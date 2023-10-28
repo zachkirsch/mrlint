@@ -30,7 +30,7 @@
     "execa": "^5.1.1",
     "find-up": "^5.0.0",
     "js-yaml": "^4.1.0",
-    "zod": "^3.14.3"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",
