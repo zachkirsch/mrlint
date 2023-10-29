@@ -11,5 +11,5 @@ export function convertRemoteToRepository(remote: string): string {
     if (remotePointingToGithub.endsWith(".git")) {
         return remotePointingToGithub;
     }
-    return `${removeEventListener}.git`;
+    return `${remotePointingToGithub}.git`;
 }
