@@ -7,5 +7,9 @@ export async function getRepository(): Promise<string> {
 
 // exported for testing
 export function convertRemoteToRepository(remote: string): string {
-    return remote.replace("git@github.com:", "https://github.com/");
+    const remotePointingToGithub = remote.replace("git@github.com:", "https://github.com/");
+    if (remotePointingToGithub.endsWith(".git")) {
+        return remotePointingToGithub;
+    }
+    return `${removeEventListener}.git`;
 }
